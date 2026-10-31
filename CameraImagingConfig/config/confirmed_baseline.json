@@ -1,0 +1,57 @@
+{
+  "schema_version": 1,
+  "configuration_acceptance": {
+    "confirmed": true,
+    "date": "2026-11-07",
+    "scope": "Visual configuration and numerical settings accepted by the user; not a physical-camera calibration claim."
+  },
+  "source_run_id": "run14_border_3p5_global075",
+  "resolution_per_eye": [
+    1920,
+    1080
+  ],
+  "vignette": {
+    "center_pixel": [
+      959.5,
+      539.5
+    ],
+    "semiaxes_pixel": [
+      840,
+      470
+    ],
+    "start_radius": 0.3,
+    "end_radius": 1.1,
+    "transition": "Smoothstep: 3t^2 - 2t^3",
+    "minimum_linear_gain": 0.035
+  },
+  "global_linear_multiplier": 0.75,
+  "effective_center_gain_relative_to_source_response": 0.75,
+  "effective_outer_gain_relative_to_source_response": 0.02625,
+  "effective_response_linear_multiplier": 12,
+  "effective_response_ev": 3.584962500721156,
+  "effective_combined_rgb_scales": {
+    "left": [
+      34.88537028118979,
+      44.2237020689781,
+      46.119615095974055
+    ],
+    "right": [
+      30.36501971905973,
+      43.75008812446428,
+      48.854282384646254
+    ]
+  },
+  "effective_scale_note": "Effective response and RGB scales already include global x0.75; do not apply twice.",
+  "complete_config": "applied_parameters.json",
+  "intrinsics_and_distortion": "camera_intrinsics.json",
+  "reference_stereo_transform": "../reference/stereo_extrinsics.json",
+  "focal_length_m": 0.004,
+  "f_number": 5.6,
+  "focus_distance_m": 0.1,
+  "source_renderer": "PathTracing",
+  "source_sampling": {
+    "samples_per_frame": 64,
+    "total_samples_setting": 256
+  },
+  "real_camera_appearance_calibrated": false
+}

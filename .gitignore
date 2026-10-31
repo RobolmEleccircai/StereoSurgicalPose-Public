@@ -1,0 +1,40 @@
+# Local configuration and credentials
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# Python and editor files
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+.ipynb_checkpoints/
+.DS_Store
+.idea/
+.vscode/
+
+# Datasets, generated runs and model weights
+**/datasets/**
+!**/datasets/.gitkeep
+**/results/**
+!**/results/.gitkeep
+**/models/**
+!**/models/.gitkeep
+*.bag
+*.mcap
+*.npy
+*.npz
+*.pt
+*.pth
+*.ckpt
+*.onnx
+*.zip
+*.tar
+*.tar.gz
+*.usd
+*.usda
+*.usdc
+*.usdz
