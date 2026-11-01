@@ -1,0 +1,11 @@
+{
+  "passed": true,
+  "code_sha256": "4c3112d06455bb6ab4f7d09cfb4af6a2d1a2ac3125566b815be401e8b98d7e6d",
+  "bundle_composition_and_dependencies_passed": true,
+  "maximum_bundle_joint_or_body_transform_error": 0.0,
+  "opencv_version": "4.11.0",
+  "video_codec": "mp4v",
+  "video_probe_fps": 60.0,
+  "video_probe_frame_count": 4.0,
+  "simulation_images_rendered": 0
+}

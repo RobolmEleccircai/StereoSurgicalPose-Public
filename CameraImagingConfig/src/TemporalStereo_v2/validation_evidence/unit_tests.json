@@ -1,0 +1,26 @@
+{
+  "passed": true,
+  "tests": [
+    "laptop_rejects_full_generation",
+    "budget_survives_new_run_id",
+    "resume_requires_all_hashes_and_same_fingerprint",
+    "changed_trajectory_cache_rejected",
+    "changed_label_commit_rejected",
+    "contained_tool_rejected_without_surface_intersection",
+    "surface_penetration_rejected",
+    "near_zero_gap_contact_accepted",
+    "between_frame_crossing_rejected",
+    "contact_slide_interval_certified",
+    "between_frame_clearance_violation_rejected",
+    "quintic_peak_speed_bound",
+    "missing_usd_reference_rejected_with_other_geometry_present",
+    "wrong_anatomy_root_rejected",
+    "official_joint_limit_rejected",
+    "actual_organ_and_ecm_meshes_loaded",
+    "relative_geometry_cache_reuses_common_motion_and_invalidates_articulation",
+    "official_jaw_endpoints_within_limits",
+    "closed_and_fully_open_jaw_curves_never_overshoot_hard_stops",
+    "authored_psm_ecm_and_camera_poses_match_independent_fk"
+  ],
+  "rendered_pairs": 0
+}

@@ -1,0 +1,3 @@
+# Other numerical/rendering dependencies are supplied by the pinned Isaac Sim runtime.
+# Install with Isaac Sim Python, --no-deps, into this module's isolated .deps directory.
+python-fcl==0.7.0.11
