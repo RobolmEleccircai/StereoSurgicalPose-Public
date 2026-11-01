@@ -1,0 +1,131 @@
+{
+  "left": {
+    "K": [
+      [
+        1059.0873668016316,
+        0.0,
+        573.590867145083
+      ],
+      [
+        0.0,
+        1057.8746799052892,
+        425.90464418530735
+      ],
+      [
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "D": [
+      -0.30831271065805127,
+      0.5236209680350258,
+      0.00027663477457703695,
+      -0.002105746241307079,
+      0.20944060134327114
+    ]
+  },
+  "right": {
+    "K": [
+      [
+        1052.379703065018,
+        0.0,
+        653.1424915356369
+      ],
+      [
+        0.0,
+        1051.620598749996,
+        424.7991380801812
+      ],
+      [
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "D": [
+      -0.37209481180278603,
+      0.47208750134842775,
+      -0.0018901494671526573,
+      0.0023328668594648585,
+      0.1899421288766328
+    ]
+  },
+  "image": {
+    "width": 1280,
+    "height": 720,
+    "space": "raw_distorted"
+  },
+  "distortion_model": "opencv_5_parameter",
+  "distortion_order": [
+    "k1",
+    "k2",
+    "p1",
+    "p2",
+    "k3"
+  ],
+  "source": {
+    "dataset": "DRENDS",
+    "variant": "ExVivo",
+    "raw_file": "../raw/DRENDS_ExVivo_calibration.json",
+    "raw_sha256": "bdb175e73c4976a9ca5c317ab6be7ae167e540889f7aa75444d57ef7ebc4652b",
+    "dataset_doi": "10.5281/zenodo.17598453",
+    "device_as_reported": "dVRK with da Vinci Si",
+    "camera_system_as_reported": "Panasonic",
+    "video_signal_as_reported": "1080i; source dataset applies deinterlacing"
+  },
+  "resize_pixel_center_transform": [
+    [
+      0.6666666666666666,
+      0.0,
+      -0.16666666666666669
+    ],
+    [
+      0.0,
+      0.6666666666666666,
+      -0.16666666666666669
+    ],
+    [
+      0.0,
+      0.0,
+      1.0
+    ]
+  ],
+  "effective": {
+    "fps": 60,
+    "frame_interval_s": 0.016666666666666666,
+    "synchronized": true,
+    "exposure_time_s": null,
+    "motion_blur": false,
+    "record_type": "requested_capture_configuration"
+  },
+  "mounting": {
+    "status": "existing_preview_convention_not_measured_hand_eye",
+    "T_ecm_tip_from_left_mm": [
+      [
+        -3.5566894905209547e-25,
+        1.0,
+        -8.437694987151194e-17,
+        4.547473508864641e-13
+      ],
+      [
+        -1.0,
+        2.3822983755390745e-23,
+        9.641902030683853e-24,
+        0.0
+      ],
+      [
+        2.2090806236021545e-24,
+        -1.3988810110276975e-16,
+        1.0000000000000002,
+        -3.410605131648481e-13
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ]
+  }
+}

@@ -1,0 +1,104 @@
+{
+  "schema_version": 2,
+  "seed": 20261107,
+  "width": 1280,
+  "height": 720,
+  "fps": 60,
+  "sequence_count": 14,
+  "frames_per_sequence": 150,
+  "renderer": "PathTracing",
+  "samples_per_pixel_per_frame": 64,
+  "rt_subframes": 4,
+  "global_linear_multiplier": 0.75,
+  "vignette_minimum_linear_gain": 0.035,
+  "motion_blur": false,
+  "anatomy_root": "/models_topo_blender",
+  "psm_root": "/SurgicalTools/PSM_Right/Robot",
+  "ecm_root": "/Endoscope/ECM/Robot",
+  "rig_path": "/Endoscope/ECM/Robot/ecm_tip_link/StereoPreviewRig",
+  "free_clearance_mm": 2.0,
+  "contact_target_mm": 0.05,
+  "contact_max_mm": 0.1,
+  "contact_excluded_names": [
+    "Veins_topo_blender",
+    "Back_muscles_topo_blender"
+  ],
+  "approach_mm": 2.0,
+  "slide_length_mm": [
+    2.0,
+    4.0
+  ],
+  "joint_speed_rad_s": 1.0,
+  "insertion_speed_m_s": 0.01,
+  "jaw_speed_rad_s": 0.2,
+  "jaw_half_angle_deg": [
+    0.0,
+    30.0
+  ],
+  "ik_position_tolerance_mm": 0.05,
+  "ik_orientation_tolerance_deg": 0.1,
+  "max_candidates": 300,
+  "max_subdivision_depth": 20,
+  "minimum_visible_mask_pixels": 100,
+  "validation_render_limit": 32,
+  "validation_budget_scope": "temporal_v2_validation",
+  "source_scene": "scene.usdc",
+  "calibration": "calibration.json",
+  "appearance": "appearance.json",
+  "occlusion_search": {
+    "provenance": "Scene-specific collision-free search seeds; sampling design, not manufacturer calibration",
+    "joint_names": [
+      "psm_yaw_joint",
+      "psm_pitch_end_joint",
+      "psm_main_insertion_joint",
+      "psm_tool_roll_joint",
+      "psm_tool_pitch_joint",
+      "psm_tool_yaw_joint"
+    ],
+    "seed_positions": [
+      [
+        0.449802,
+        0.005024,
+        0.154434,
+        0.271723,
+        -0.731844,
+        0.127921
+      ],
+      [
+        0.242613,
+        0.467796,
+        0.153997,
+        -1.83783,
+        0.969603,
+        -0.011673
+      ]
+    ],
+    "seed_half_ranges": [
+      0.025,
+      0.025,
+      0.002,
+      0.04,
+      0.05,
+      0.04
+    ],
+    "excursion_half_ranges": [
+      0.06,
+      0.06,
+      0.005,
+      0.06,
+      0.1,
+      0.1
+    ],
+    "visible_candidates": 40
+  },
+  "native_camera": {
+    "focalLength": 4.0,
+    "focusDistance": 10.0,
+    "fStop": 5.6,
+    "clippingRange": [
+      0.05,
+      1000.0
+    ]
+  },
+  "endoscope_light_intensity": 1000000.0
+}

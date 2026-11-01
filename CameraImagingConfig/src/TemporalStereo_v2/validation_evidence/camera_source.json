@@ -1,0 +1,162 @@
+{
+  "schema_version": "1.0",
+  "profile_id": "drends_exvivo_1080",
+  "source": {
+    "dataset": "DRENDS",
+    "variant": "ExVivo",
+    "raw_file": "../raw/DRENDS_ExVivo_calibration.json",
+    "raw_sha256": "bdb175e73c4976a9ca5c317ab6be7ae167e540889f7aa75444d57ef7ebc4652b",
+    "dataset_doi": "10.5281/zenodo.17598453",
+    "device_as_reported": "dVRK with da Vinci Si",
+    "camera_system_as_reported": "Panasonic",
+    "video_signal_as_reported": "1080i; source dataset applies deinterlacing"
+  },
+  "status": {
+    "calibration_type": "published_real_device_calibration",
+    "applied_to_isaac_scene": false,
+    "rendering_validated": false
+  },
+  "image": {
+    "width": 1920,
+    "height": 1080,
+    "space": "raw_distorted",
+    "projection_model": "opencv_pinhole",
+    "distortion_model": "opencv_5_parameter",
+    "distortion_order": [
+      "k1",
+      "k2",
+      "p1",
+      "p2",
+      "k3"
+    ],
+    "intrinsic_unit": "pixel"
+  },
+  "optical_frame_axes": {
+    "x": "right",
+    "y": "down",
+    "z": "forward"
+  },
+  "left": {
+    "K": [
+      [
+        1588.6310502024473,
+        0.0,
+        860.6363007176245
+      ],
+      [
+        0.0,
+        1586.812019857934,
+        639.1069662779611
+      ],
+      [
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "D": [
+      -0.30831271065805127,
+      0.5236209680350258,
+      0.00027663477457703695,
+      -0.002105746241307079,
+      0.20944060134327114
+    ]
+  },
+  "right": {
+    "K": [
+      [
+        1578.569554597527,
+        0.0,
+        979.9637373034552
+      ],
+      [
+        0.0,
+        1577.430898124994,
+        637.4487071202718
+      ],
+      [
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "D": [
+      -0.37209481180278603,
+      0.47208750134842775,
+      -0.0018901494671526573,
+      0.0023328668594648585,
+      0.1899421288766328
+    ]
+  },
+  "stereo": {
+    "definition": "X_right = R_right_from_left @ X_left + t_right_from_left_m",
+    "R_right_from_left": [
+      [
+        0.9992319550098597,
+        -0.0012723259709014206,
+        0.03916479635843068
+      ],
+      [
+        0.0013073164073902413,
+        0.9999987689068904,
+        -0.0008678182496413336
+      ],
+      [
+        -0.039163643995222715,
+        0.0009183525070538178,
+        0.9992323881949025
+      ]
+    ],
+    "t_right_from_left_m": [
+      -0.005479673825671317,
+      -0.0002989196823596881,
+      0.0006823886735352307
+    ],
+    "baseline_m": 0.0055300843134638115
+  },
+  "derived_right_camera_pose_in_left": {
+    "definition": "X_left = R_left_from_right @ X_right + p_right_in_left_m",
+    "R_left_from_right": [
+      [
+        0.9992319550098597,
+        0.0013073164073902413,
+        -0.039163643995222715
+      ],
+      [
+        -0.0012723259709014206,
+        0.9999987689068904,
+        0.0009183525070538178
+      ],
+      [
+        0.03916479635843068,
+        -0.0008678182496413336,
+        0.9992323881949025
+      ]
+    ],
+    "p_right_in_left_m": [
+      0.005502580799323854,
+      0.0002913207096921303,
+      -0.000467513962396249
+    ]
+  },
+  "ecm_mount": {
+    "ecm_link_name": null,
+    "T_ecm_link_from_left_camera": null,
+    "endoscope_view_angle_deg": null
+  },
+  "acquisition": {
+    "source_dataset_continuous_video_fps": 16,
+    "simulation_capture_fps": null,
+    "exposure_seconds": null,
+    "shutter_model": null,
+    "gain": null
+  },
+  "physical_optics": {
+    "physical_focal_length_m": null,
+    "pixel_pitch_m": null,
+    "sensor_active_size_m": null,
+    "f_stop": null,
+    "focus_distance_m": null
+  },
+  "note": "Derived configuration data for this project, not an executable Isaac Sim scene. Unverified quantities remain null. Do not mix calibration profiles."
+}

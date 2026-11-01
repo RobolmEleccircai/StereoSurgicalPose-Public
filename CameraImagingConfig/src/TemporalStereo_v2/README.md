@@ -25,7 +25,7 @@ python3 generate.py --mode plan --machine machine.local.json --run-id geometry_c
 python3 generate.py --machine machine.local.json --run-id validation_v2
 ```
 
-`generate` is rejected when the machine role is `laptop`. Validation's budget is stored outside individual run directories and persists across crashes and new run IDs. Do not change the budget scope to bypass the user-approved cap. Four consecutive frames from each of seven categories plus four jaw/contact keyframes form the 32-pair validation selection. Both jaw-limit keyframes are rendered first, using one safe wrist view that exposes at least one physical endpoint. Those keyframes are explicitly marked; they must not be concatenated into a continuous training video.
+`generate` is rejected when the machine role is `laptop`. Validation's budget is stored outside individual run directories and persists across crashes and new run IDs. Do not change the budget scope to bypass the user-approved cap. Four consecutive frames from each of seven categories plus four jaw/contact keyframes form the 32-pair validation selection. Both jaw-limit keyframes are rendered first, using one safe wrist view. The open keyframe supplies one directly visible physical endpoint per eye; the closed keyframe retains its actual self-occlusion labels. Those keyframes are explicitly marked; they must not be concatenated into a continuous training video.
 
 ## Server transfer
 
@@ -92,7 +92,7 @@ Occlusion search seeds and bounded excursions are explicit scene-specific sampli
 
 Native USD camera attributes and endoscope light intensity are included in effective settings. Apertures are derived and recorded in `config/render_map.json`. The uncalibrated light-intensity setting is not a measured lumen/candela claim.
 
-Actual execution evidence is recorded separately from this specification. Do not infer that a run passed merely because code or this README exists.
+The [completed laptop validation report](validation_evidence/README.md) records 20 passing tests, all 14 checked trajectories, exactly 32 rendered pairs, and an actual resume with zero new render attempts. It includes source/effective camera settings, fingerprints, joint coverage and rendered examples. No full dataset was generated. Near-field tissue saturation in the occlusion sample remains an explicitly documented appearance finding.
 
 ## Sources
 

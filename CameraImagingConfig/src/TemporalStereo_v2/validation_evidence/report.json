@@ -1,0 +1,42 @@
+{
+  "mode": "validate",
+  "passed": true,
+  "rendered_pairs": 32,
+  "planned_sequences": 14,
+  "planned_frames": 2100,
+  "fps": 60,
+  "per_eye_resolution": [
+    1280,
+    720
+  ],
+  "main_target_scalars": 18,
+  "maximum_projection_error_px": 1.1368683772161603e-13,
+  "maximum_stereo_consistency_error_mm": 3.9085729160208465e-13,
+  "visible_tip_checks": 2,
+  "maximum_visible_tip_mask_distance_px": 0.5125986302470663,
+  "mask_changed_pixels_by_sequence": {
+    "seq_000": 143,
+    "seq_002": 212,
+    "seq_004": 185,
+    "seq_006": 128,
+    "seq_008": 634,
+    "seq_010": 161,
+    "seq_012": 2051
+  },
+  "jaw_limit_changed_mask_pixels": {
+    "left": 1669,
+    "right": 1671
+  },
+  "insertion_sample_range_m": [
+    0.0582111387210468,
+    0.1561735822520934
+  ],
+  "insertion_near_lower_limit_count": 0,
+  "split_by_sequence": true,
+  "limitations": [
+    "Geometric contact approximation; no tissue mechanics or contact forces.",
+    "Existing ECM optical mount is a preview convention, not a measured official calibration.",
+    "No shutter integration or motion blur.",
+    "Numerical projection checks do not establish real-world model accuracy."
+  ]
+}

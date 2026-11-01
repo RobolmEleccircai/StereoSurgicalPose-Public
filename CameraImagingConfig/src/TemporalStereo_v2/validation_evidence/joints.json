@@ -1,0 +1,214 @@
+{
+  "psm": {
+    "psm_remote_center_joint": {
+      "path": "/SurgicalTools/PSM_Right/Robot/psm_base_link/psm_remote_center_joint",
+      "parent": "/SurgicalTools/PSM_Right/Robot/psm_base_link",
+      "child": "/SurgicalTools/PSM_Right/Robot/psm_remote_center_link",
+      "angular": false,
+      "linear": false,
+      "q0": 0.0,
+      "lower": null,
+      "upper": null
+    },
+    "psm_yaw_joint": {
+      "path": "/SurgicalTools/PSM_Right/Robot/psm_base_link/psm_yaw_joint",
+      "parent": "/SurgicalTools/PSM_Right/Robot/psm_base_link",
+      "child": "/SurgicalTools/PSM_Right/Robot/psm_yaw_link",
+      "angular": true,
+      "linear": false,
+      "q0": 3.973643164038744e-08,
+      "lower": -1.5882999530594424,
+      "upper": 1.5882999530594424
+    },
+    "psm_pitch_end_joint": {
+      "path": "/SurgicalTools/PSM_Right/Robot/psm_yaw_link/psm_pitch_end_joint",
+      "parent": "/SurgicalTools/PSM_Right/Robot/psm_yaw_link",
+      "child": "/SurgicalTools/PSM_Right/Robot/psm_pitch_end_link",
+      "angular": true,
+      "linear": false,
+      "q0": -7.947286470203698e-08,
+      "lower": -0.9251000041738984,
+      "upper": 0.9251000041738984
+    },
+    "psm_main_insertion_joint": {
+      "path": "/SurgicalTools/PSM_Right/Robot/psm_pitch_end_link/psm_main_insertion_joint",
+      "parent": "/SurgicalTools/PSM_Right/Robot/psm_pitch_end_link",
+      "child": "/SurgicalTools/PSM_Right/Robot/psm_main_insertion_link",
+      "angular": false,
+      "linear": true,
+      "q0": 0.05650000782013337,
+      "lower": 0.05649999901652336,
+      "upper": 0.23999999463558197
+    },
+    "psm_main_insertion_joint_2": {
+      "path": "/SurgicalTools/PSM_Right/Robot/psm_main_insertion_link/psm_main_insertion_joint_2",
+      "parent": "/SurgicalTools/PSM_Right/Robot/psm_main_insertion_link",
+      "child": "/SurgicalTools/PSM_Right/Robot/psm_main_insertion_link_2",
+      "angular": false,
+      "linear": false,
+      "q0": 0.0,
+      "lower": null,
+      "upper": null
+    },
+    "psm_main_insertion_joint_3": {
+      "path": "/SurgicalTools/PSM_Right/Robot/psm_main_insertion_link/psm_main_insertion_joint_3",
+      "parent": "/SurgicalTools/PSM_Right/Robot/psm_main_insertion_link",
+      "child": "/SurgicalTools/PSM_Right/Robot/psm_main_insertion_link_3",
+      "angular": false,
+      "linear": false,
+      "q0": 0.0,
+      "lower": null,
+      "upper": null
+    },
+    "psm_tool_roll_joint": {
+      "path": "/SurgicalTools/PSM_Right/Robot/psm_main_insertion_link/psm_tool_roll_joint",
+      "parent": "/SurgicalTools/PSM_Right/Robot/psm_main_insertion_link",
+      "child": "/SurgicalTools/PSM_Right/Robot/psm_tool_roll_link",
+      "angular": true,
+      "linear": false,
+      "q0": 4.483528552793876e-31,
+      "lower": -4.537899731027134,
+      "upper": 4.537899731027134
+    },
+    "psm_tool_pitch_joint": {
+      "path": "/SurgicalTools/PSM_Right/Robot/psm_tool_roll_link/psm_tool_pitch_joint",
+      "parent": "/SurgicalTools/PSM_Right/Robot/psm_tool_roll_link",
+      "child": "/SurgicalTools/PSM_Right/Robot/psm_tool_pitch_link",
+      "angular": true,
+      "linear": false,
+      "q0": 2.1073429608572394e-08,
+      "lower": -1.3962998869023977,
+      "upper": 1.3962998869023977
+    },
+    "psm_tool_yaw_joint": {
+      "path": "/SurgicalTools/PSM_Right/Robot/psm_tool_pitch_link/psm_tool_yaw_joint",
+      "parent": "/SurgicalTools/PSM_Right/Robot/psm_tool_pitch_link",
+      "child": "/SurgicalTools/PSM_Right/Robot/psm_tool_yaw_link",
+      "angular": true,
+      "linear": false,
+      "q0": 3.11273492653123e-16,
+      "lower": -0.5235987755982988,
+      "upper": 0.5235987755982988
+    },
+    "psm_tool_gripper1_joint": {
+      "path": "/SurgicalTools/PSM_Right/Robot/psm_tool_yaw_link/psm_tool_gripper1_joint",
+      "parent": "/SurgicalTools/PSM_Right/Robot/psm_tool_yaw_link",
+      "child": "/SurgicalTools/PSM_Right/Robot/psm_tool_gripper1_link",
+      "angular": true,
+      "linear": false,
+      "q0": -6.4595060473648245e-34,
+      "lower": -0.5235987755982988,
+      "upper": 0.0
+    },
+    "psm_tool_gripper2_joint": {
+      "path": "/SurgicalTools/PSM_Right/Robot/psm_tool_yaw_link/psm_tool_gripper2_joint",
+      "parent": "/SurgicalTools/PSM_Right/Robot/psm_tool_yaw_link",
+      "child": "/SurgicalTools/PSM_Right/Robot/psm_tool_gripper2_link",
+      "angular": true,
+      "linear": false,
+      "q0": -6.4595060473648245e-34,
+      "lower": 0.0,
+      "upper": 0.5235987755982988
+    },
+    "psm_tool_tip_joint": {
+      "path": "/SurgicalTools/PSM_Right/Robot/psm_tool_yaw_link/psm_tool_tip_joint",
+      "parent": "/SurgicalTools/PSM_Right/Robot/psm_tool_yaw_link",
+      "child": "/SurgicalTools/PSM_Right/Robot/psm_tool_tip_link",
+      "angular": false,
+      "linear": false,
+      "q0": 0.0,
+      "lower": null,
+      "upper": null
+    }
+  },
+  "ecm": {
+    "ecm_remote_center_joint": {
+      "path": "/Endoscope/ECM/Robot/ecm_base_link/ecm_remote_center_joint",
+      "parent": "/Endoscope/ECM/Robot/ecm_base_link",
+      "child": "/Endoscope/ECM/Robot/ecm_remote_center_link",
+      "angular": false,
+      "linear": false,
+      "q0": 0.0,
+      "lower": null,
+      "upper": null
+    },
+    "ecm_yaw_joint": {
+      "path": "/Endoscope/ECM/Robot/ecm_base_link/ecm_yaw_joint",
+      "parent": "/Endoscope/ECM/Robot/ecm_base_link",
+      "child": "/Endoscope/ECM/Robot/ecm_yaw_link",
+      "angular": true,
+      "linear": false,
+      "q0": -1.4117018245856525e-16,
+      "lower": -1.5707963267948966,
+      "upper": 1.5707963267948966
+    },
+    "ecm_pitch_end_joint": {
+      "path": "/Endoscope/ECM/Robot/ecm_yaw_link/ecm_pitch_end_joint",
+      "parent": "/Endoscope/ECM/Robot/ecm_yaw_link",
+      "child": "/Endoscope/ECM/Robot/ecm_pitch_end_link",
+      "angular": true,
+      "linear": false,
+      "q0": -1.1235457393779907e-16,
+      "lower": -0.7839999372461295,
+      "upper": 1.1579999662459985
+    },
+    "ecm_main_insertion_joint": {
+      "path": "/Endoscope/ECM/Robot/ecm_pitch_end_link/ecm_main_insertion_joint",
+      "parent": "/Endoscope/ECM/Robot/ecm_pitch_end_link",
+      "child": "/Endoscope/ECM/Robot/ecm_main_insertion_link",
+      "angular": false,
+      "linear": true,
+      "q0": 2.670288157258227e-09,
+      "lower": 0.0,
+      "upper": 0.2540000081062317
+    },
+    "ecm_tool_joint": {
+      "path": "/Endoscope/ECM/Robot/ecm_main_insertion_link/ecm_tool_joint",
+      "parent": "/Endoscope/ECM/Robot/ecm_main_insertion_link",
+      "child": "/Endoscope/ECM/Robot/ecm_tool_link",
+      "angular": true,
+      "linear": false,
+      "q0": -8.564701270858802e-35,
+      "lower": -1.5707963267948966,
+      "upper": 1.5707963267948966
+    },
+    "ecm_end_joint": {
+      "path": "/Endoscope/ECM/Robot/ecm_tool_link/ecm_end_joint",
+      "parent": "/Endoscope/ECM/Robot/ecm_tool_link",
+      "child": "/Endoscope/ECM/Robot/ecm_end_link",
+      "angular": false,
+      "linear": false,
+      "q0": 0.0,
+      "lower": null,
+      "upper": null
+    },
+    "ecm_tip_joint": {
+      "path": "/Endoscope/ECM/Robot/ecm_tool_link/ecm_tip_joint",
+      "parent": "/Endoscope/ECM/Robot/ecm_tool_link",
+      "child": "/Endoscope/ECM/Robot/ecm_tip_link",
+      "angular": false,
+      "linear": false,
+      "q0": 0.0,
+      "lower": null,
+      "upper": null
+    }
+  },
+  "order": {
+    "psm": [
+      "psm_yaw_joint",
+      "psm_pitch_end_joint",
+      "psm_main_insertion_joint",
+      "psm_tool_roll_joint",
+      "psm_tool_pitch_joint",
+      "psm_tool_yaw_joint",
+      "psm_tool_gripper1_joint",
+      "psm_tool_gripper2_joint"
+    ],
+    "ecm": [
+      "ecm_yaw_joint",
+      "ecm_pitch_end_joint",
+      "ecm_main_insertion_joint",
+      "ecm_tool_joint"
+    ]
+  }
+}

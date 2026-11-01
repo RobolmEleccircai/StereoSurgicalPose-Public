@@ -1,0 +1,13 @@
+{
+  "passed": true,
+  "scope": "Fault injection on isolated copies of actual captured records; original outputs unchanged; no renderer invocation.",
+  "fingerprint": "20420dce07f822a749570d5d1f272f28b81cfa1e2ef3c637fb535c53288f593d",
+  "checks": {
+    "corrupt_real_png_rejected": true,
+    "only_damaged_pair_pending_complete_pairs_preserved": true,
+    "partial_pair_missing_right_mask_rejected": true,
+    "interrupted_before_commit_receipt_rejected": true
+  },
+  "original_record_preserved": true,
+  "render_attempts": 0
+}

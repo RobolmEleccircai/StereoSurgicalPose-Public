@@ -1,0 +1,14 @@
+{
+  "passed": true,
+  "scope": "Actual completed-run resume plus separate copied-record interruption/corruption checks.",
+  "pair_count": 32,
+  "file_count": 224,
+  "all_original_data_checksums_unchanged": true,
+  "new_render_attempts": 0,
+  "total_render_attempts": 32,
+  "resume_capture_completion_lines": 0,
+  "data_file_manifest_sha256": "ae822a006be23c93ad603a64b468bbf41f65f62f92e3bc4655321a5c4744776e",
+  "trajectory_index_sha256": "dc216e7577f95764ee3dd39d53bacf1ecc49feb62f7d857f4d25241c3fb85608",
+  "trajectory_index_unchanged": true,
+  "local_delivery_copy_verified": true
+}

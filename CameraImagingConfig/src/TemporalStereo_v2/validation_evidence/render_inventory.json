@@ -1,0 +1,222 @@
+{
+  "mode": "validate",
+  "fingerprint": "20420dce07f822a749570d5d1f272f28b81cfa1e2ef3c637fb535c53288f593d",
+  "jobs": [
+    {
+      "sequence_id": "seq_000",
+      "frame_index": 0,
+      "jaw_override_deg": 0.0,
+      "reason": "closed_jaw",
+      "job_id": "validation_000",
+      "q_psm_override": [
+        -0.02466693747211993,
+        0.028428407099198888,
+        0.06082726698995947,
+        -1.991598135296782,
+        0.17637774352447116,
+        0.12382714708883574,
+        -0.0,
+        0.0
+      ]
+    },
+    {
+      "sequence_id": "seq_000",
+      "frame_index": 0,
+      "jaw_override_deg": 30.0,
+      "reason": "maximum_opening",
+      "job_id": "validation_001",
+      "q_psm_override": [
+        -0.02466693747211993,
+        0.028428407099198888,
+        0.06082726698995947,
+        -1.991598135296782,
+        0.17637774352447116,
+        0.12382714708883574,
+        -0.5235987755982988,
+        0.5235987755982988
+      ]
+    },
+    {
+      "sequence_id": "seq_000",
+      "frame_index": 75,
+      "reason": "continuous_category_clip",
+      "job_id": "validation_002"
+    },
+    {
+      "sequence_id": "seq_000",
+      "frame_index": 76,
+      "reason": "continuous_category_clip",
+      "job_id": "validation_003"
+    },
+    {
+      "sequence_id": "seq_000",
+      "frame_index": 77,
+      "reason": "continuous_category_clip",
+      "job_id": "validation_004"
+    },
+    {
+      "sequence_id": "seq_000",
+      "frame_index": 78,
+      "reason": "continuous_category_clip",
+      "job_id": "validation_005"
+    },
+    {
+      "sequence_id": "seq_002",
+      "frame_index": 75,
+      "reason": "continuous_category_clip",
+      "job_id": "validation_006"
+    },
+    {
+      "sequence_id": "seq_002",
+      "frame_index": 76,
+      "reason": "continuous_category_clip",
+      "job_id": "validation_007"
+    },
+    {
+      "sequence_id": "seq_002",
+      "frame_index": 77,
+      "reason": "continuous_category_clip",
+      "job_id": "validation_008"
+    },
+    {
+      "sequence_id": "seq_002",
+      "frame_index": 78,
+      "reason": "continuous_category_clip",
+      "job_id": "validation_009"
+    },
+    {
+      "sequence_id": "seq_004",
+      "frame_index": 75,
+      "reason": "continuous_category_clip",
+      "job_id": "validation_010"
+    },
+    {
+      "sequence_id": "seq_004",
+      "frame_index": 76,
+      "reason": "continuous_category_clip",
+      "job_id": "validation_011"
+    },
+    {
+      "sequence_id": "seq_004",
+      "frame_index": 77,
+      "reason": "continuous_category_clip",
+      "job_id": "validation_012"
+    },
+    {
+      "sequence_id": "seq_004",
+      "frame_index": 78,
+      "reason": "continuous_category_clip",
+      "job_id": "validation_013"
+    },
+    {
+      "sequence_id": "seq_006",
+      "frame_index": 75,
+      "reason": "continuous_category_clip",
+      "job_id": "validation_014"
+    },
+    {
+      "sequence_id": "seq_006",
+      "frame_index": 76,
+      "reason": "continuous_category_clip",
+      "job_id": "validation_015"
+    },
+    {
+      "sequence_id": "seq_006",
+      "frame_index": 77,
+      "reason": "continuous_category_clip",
+      "job_id": "validation_016"
+    },
+    {
+      "sequence_id": "seq_006",
+      "frame_index": 78,
+      "reason": "continuous_category_clip",
+      "job_id": "validation_017"
+    },
+    {
+      "sequence_id": "seq_008",
+      "frame_index": 75,
+      "reason": "continuous_category_clip",
+      "job_id": "validation_018"
+    },
+    {
+      "sequence_id": "seq_008",
+      "frame_index": 76,
+      "reason": "continuous_category_clip",
+      "job_id": "validation_019"
+    },
+    {
+      "sequence_id": "seq_008",
+      "frame_index": 77,
+      "reason": "continuous_category_clip",
+      "job_id": "validation_020"
+    },
+    {
+      "sequence_id": "seq_008",
+      "frame_index": 78,
+      "reason": "continuous_category_clip",
+      "job_id": "validation_021"
+    },
+    {
+      "sequence_id": "seq_010",
+      "frame_index": 75,
+      "reason": "continuous_category_clip",
+      "job_id": "validation_022"
+    },
+    {
+      "sequence_id": "seq_010",
+      "frame_index": 76,
+      "reason": "continuous_category_clip",
+      "job_id": "validation_023"
+    },
+    {
+      "sequence_id": "seq_010",
+      "frame_index": 77,
+      "reason": "continuous_category_clip",
+      "job_id": "validation_024"
+    },
+    {
+      "sequence_id": "seq_010",
+      "frame_index": 78,
+      "reason": "continuous_category_clip",
+      "job_id": "validation_025"
+    },
+    {
+      "sequence_id": "seq_012",
+      "frame_index": 75,
+      "reason": "continuous_category_clip",
+      "job_id": "validation_026"
+    },
+    {
+      "sequence_id": "seq_012",
+      "frame_index": 76,
+      "reason": "continuous_category_clip",
+      "job_id": "validation_027"
+    },
+    {
+      "sequence_id": "seq_012",
+      "frame_index": 77,
+      "reason": "continuous_category_clip",
+      "job_id": "validation_028"
+    },
+    {
+      "sequence_id": "seq_012",
+      "frame_index": 78,
+      "reason": "continuous_category_clip",
+      "job_id": "validation_029"
+    },
+    {
+      "sequence_id": "seq_003",
+      "frame_index": 75,
+      "reason": "contact_keyframe",
+      "job_id": "validation_030"
+    },
+    {
+      "sequence_id": "seq_003",
+      "frame_index": 149,
+      "reason": "withdraw_keyframe",
+      "job_id": "validation_031"
+    }
+  ],
+  "pairs": 32,
+  "complete": true
+}

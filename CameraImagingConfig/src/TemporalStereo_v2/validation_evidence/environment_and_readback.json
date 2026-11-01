@@ -17,5 +17,10 @@
   "absolute_authored_bundle_asset_paths": [],
   "maximum_bundle_joint_or_body_transform_error": 0.0,
   "unit_tests_passed": 20,
-  "unit_suite_readback_tolerance": 1e-06
+  "unit_suite_readback_tolerance": 1e-06,
+  "gpu": {
+    "name": "NVIDIA GeForce RTX 4060 Laptop GPU",
+    "driver_version": "580.95.05",
+    "memory_total_MiB": 8188
+  }
 }

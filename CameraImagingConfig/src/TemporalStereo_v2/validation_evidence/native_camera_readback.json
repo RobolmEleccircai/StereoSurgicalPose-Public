@@ -1,0 +1,20 @@
+{
+  "record_type": "initialized_native_camera_attributes",
+  "stage_meters_per_unit": 0.01,
+  "eyes": {
+    "left": {
+      "focalLength": 4.0,
+      "horizontalAperture": 5.760000228881836,
+      "verticalAperture": 3.5999999046325684,
+      "focusDistance": 10.0,
+      "fStop": 5.599999904632568
+    },
+    "right": {
+      "focalLength": 4.0,
+      "horizontalAperture": 5.760000228881836,
+      "verticalAperture": 3.5999999046325684,
+      "focusDistance": 10.0,
+      "fStop": 5.599999904632568
+    }
+  }
+}
