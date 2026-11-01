@@ -1,0 +1,525 @@
+{
+  "new_rgb_renders": 0,
+  "simulation_app_started": false,
+  "source_files_unchanged": true,
+  "source_file_count": 224,
+  "pairs": 32,
+  "geometry_sha256": "3778ec01493c86a304ba9eb61d70e1f9c85a6b607b83cb728293fb23d2623e6c",
+  "annotation_code_sha256": "873758f0e54b3ce29e240a797b04ea1a1e8ebf2620f7854f453bdcb207b0ad7b",
+  "source": "actual_CAD_and_saved_full_joint_truth",
+  "visibility_display": "Projected contour classified by saved visible-tool mask dilated by 2 pixels; not a new per-facet visibility label. Interior line alpha 0.20; boundary-region alpha 0.95, using a 4-pixel eroded mask only to set opacity, never to move or synthesize projected edges.",
+  "files": [
+    {
+      "file": "seq_000_validation_000.jpg",
+      "sha256": "9a77d09cceb20f70677d2e25ba7de7bb79492dc163459c989e2d7faf7257bbb7",
+      "statistics": {
+        "left": {
+          "projected_edges": 13988,
+          "visible_region_line_pixels": 9168,
+          "hidden_region_line_pixels": 0
+        },
+        "right": {
+          "projected_edges": 13773,
+          "visible_region_line_pixels": 8669,
+          "hidden_region_line_pixels": 0
+        }
+      }
+    },
+    {
+      "file": "seq_000_validation_001.jpg",
+      "sha256": "7cc69171f8bb55f4bc3cd76146b4a72c49b69f1208d21720a3344003bcf843e4",
+      "statistics": {
+        "left": {
+          "projected_edges": 14212,
+          "visible_region_line_pixels": 9242,
+          "hidden_region_line_pixels": 0
+        },
+        "right": {
+          "projected_edges": 14137,
+          "visible_region_line_pixels": 8750,
+          "hidden_region_line_pixels": 0
+        }
+      }
+    },
+    {
+      "file": "seq_000_validation_002.jpg",
+      "sha256": "ad2a249095bb2cb4fc8c8ebc7031d306853cdf3fefc8465ce438d59604cabe93",
+      "statistics": {
+        "left": {
+          "projected_edges": 15282,
+          "visible_region_line_pixels": 8443,
+          "hidden_region_line_pixels": 0
+        },
+        "right": {
+          "projected_edges": 15194,
+          "visible_region_line_pixels": 7959,
+          "hidden_region_line_pixels": 0
+        }
+      }
+    },
+    {
+      "file": "seq_000_validation_003.jpg",
+      "sha256": "7a10952b4ac0c8aebc69f953e04da9843e6fbe1e92595ec6eee6dc48a988d404",
+      "statistics": {
+        "left": {
+          "projected_edges": 15286,
+          "visible_region_line_pixels": 8446,
+          "hidden_region_line_pixels": 0
+        },
+        "right": {
+          "projected_edges": 15196,
+          "visible_region_line_pixels": 7963,
+          "hidden_region_line_pixels": 0
+        }
+      }
+    },
+    {
+      "file": "seq_000_validation_004.jpg",
+      "sha256": "2cb8e8000d08c956250bc9e1d83c9f9175e2d14fbd09ffe136a16f468e8d517a",
+      "statistics": {
+        "left": {
+          "projected_edges": 15283,
+          "visible_region_line_pixels": 8430,
+          "hidden_region_line_pixels": 0
+        },
+        "right": {
+          "projected_edges": 15194,
+          "visible_region_line_pixels": 7987,
+          "hidden_region_line_pixels": 0
+        }
+      }
+    },
+    {
+      "file": "seq_000_validation_005.jpg",
+      "sha256": "45f7470e5141388b7d32bdef21a4c0cc0b56885ea844d60d22ca7f50edfaae0e",
+      "statistics": {
+        "left": {
+          "projected_edges": 15282,
+          "visible_region_line_pixels": 8432,
+          "hidden_region_line_pixels": 0
+        },
+        "right": {
+          "projected_edges": 15200,
+          "visible_region_line_pixels": 7999,
+          "hidden_region_line_pixels": 0
+        }
+      }
+    },
+    {
+      "file": "seq_002_validation_006.jpg",
+      "sha256": "ea1725a0c24bd73452bff6d83b1381c62fe76b7e433fffcb9fbdce4a7fc52d46",
+      "statistics": {
+        "left": {
+          "projected_edges": 15026,
+          "visible_region_line_pixels": 8844,
+          "hidden_region_line_pixels": 0
+        },
+        "right": {
+          "projected_edges": 14999,
+          "visible_region_line_pixels": 8556,
+          "hidden_region_line_pixels": 0
+        }
+      }
+    },
+    {
+      "file": "seq_002_validation_007.jpg",
+      "sha256": "b212659d6f12c95806fa13a83aa787b6d8587045725fc59e053a6a5c8630ed6f",
+      "statistics": {
+        "left": {
+          "projected_edges": 15034,
+          "visible_region_line_pixels": 8829,
+          "hidden_region_line_pixels": 0
+        },
+        "right": {
+          "projected_edges": 15000,
+          "visible_region_line_pixels": 8556,
+          "hidden_region_line_pixels": 0
+        }
+      }
+    },
+    {
+      "file": "seq_002_validation_008.jpg",
+      "sha256": "aebcff13fb66e78315ffa56ea086187bd424e4fb03c04003c7c59328feff4b82",
+      "statistics": {
+        "left": {
+          "projected_edges": 15039,
+          "visible_region_line_pixels": 8829,
+          "hidden_region_line_pixels": 0
+        },
+        "right": {
+          "projected_edges": 14996,
+          "visible_region_line_pixels": 8563,
+          "hidden_region_line_pixels": 0
+        }
+      }
+    },
+    {
+      "file": "seq_002_validation_009.jpg",
+      "sha256": "c68b3e6c2726264c4520832ee7924dfe277d8fa155402640d7872e360de0ceed",
+      "statistics": {
+        "left": {
+          "projected_edges": 15041,
+          "visible_region_line_pixels": 8807,
+          "hidden_region_line_pixels": 0
+        },
+        "right": {
+          "projected_edges": 15002,
+          "visible_region_line_pixels": 8558,
+          "hidden_region_line_pixels": 0
+        }
+      }
+    },
+    {
+      "file": "seq_003_validation_030.jpg",
+      "sha256": "f740c9378c37595f48d7ab0431b6f742476e768ccddeeb76ac639852a1a30318",
+      "statistics": {
+        "left": {
+          "projected_edges": 15222,
+          "visible_region_line_pixels": 9133,
+          "hidden_region_line_pixels": 0
+        },
+        "right": {
+          "projected_edges": 14808,
+          "visible_region_line_pixels": 8923,
+          "hidden_region_line_pixels": 0
+        }
+      }
+    },
+    {
+      "file": "seq_003_validation_031.jpg",
+      "sha256": "eb836f69741787e6e45c821f52595105d087d568bf1a3bb74146ba4d1767f091",
+      "statistics": {
+        "left": {
+          "projected_edges": 15215,
+          "visible_region_line_pixels": 9364,
+          "hidden_region_line_pixels": 0
+        },
+        "right": {
+          "projected_edges": 14853,
+          "visible_region_line_pixels": 9120,
+          "hidden_region_line_pixels": 0
+        }
+      }
+    },
+    {
+      "file": "seq_004_validation_010.jpg",
+      "sha256": "c97a78571c30014e32a25d3a4aefadeab84d1ebb72c39f3f3cbcbac0959a01f4",
+      "statistics": {
+        "left": {
+          "projected_edges": 15476,
+          "visible_region_line_pixels": 8665,
+          "hidden_region_line_pixels": 0
+        },
+        "right": {
+          "projected_edges": 15352,
+          "visible_region_line_pixels": 8177,
+          "hidden_region_line_pixels": 0
+        }
+      }
+    },
+    {
+      "file": "seq_004_validation_011.jpg",
+      "sha256": "004fa13b5ebfa2f191ad9dfbac9e5e54504c2804075fae30bc22b962cb33c240",
+      "statistics": {
+        "left": {
+          "projected_edges": 15475,
+          "visible_region_line_pixels": 8662,
+          "hidden_region_line_pixels": 0
+        },
+        "right": {
+          "projected_edges": 15349,
+          "visible_region_line_pixels": 8173,
+          "hidden_region_line_pixels": 0
+        }
+      }
+    },
+    {
+      "file": "seq_004_validation_012.jpg",
+      "sha256": "7179835c9b188355fe0e076b530b5d8a7aa8a03b1b3eae90b106be6985a6125c",
+      "statistics": {
+        "left": {
+          "projected_edges": 15466,
+          "visible_region_line_pixels": 8643,
+          "hidden_region_line_pixels": 0
+        },
+        "right": {
+          "projected_edges": 15344,
+          "visible_region_line_pixels": 8181,
+          "hidden_region_line_pixels": 0
+        }
+      }
+    },
+    {
+      "file": "seq_004_validation_013.jpg",
+      "sha256": "214357a64db9a3a73ccfb8e24c7a278ef9092163fa16660bc5f99fcdaebeb2ad",
+      "statistics": {
+        "left": {
+          "projected_edges": 15479,
+          "visible_region_line_pixels": 8661,
+          "hidden_region_line_pixels": 0
+        },
+        "right": {
+          "projected_edges": 15344,
+          "visible_region_line_pixels": 8156,
+          "hidden_region_line_pixels": 0
+        }
+      }
+    },
+    {
+      "file": "seq_006_validation_014.jpg",
+      "sha256": "d8aa1e9943cdf8725163ddf8adc3256cc1818d6f5b7533982cf7f36324200b92",
+      "statistics": {
+        "left": {
+          "projected_edges": 15000,
+          "visible_region_line_pixels": 7981,
+          "hidden_region_line_pixels": 1146
+        },
+        "right": {
+          "projected_edges": 15229,
+          "visible_region_line_pixels": 7599,
+          "hidden_region_line_pixels": 1287
+        }
+      }
+    },
+    {
+      "file": "seq_006_validation_015.jpg",
+      "sha256": "f5234f1832cd7eb5ae74d00eca38dc466602299d8d51861b6d853da2b7a029a7",
+      "statistics": {
+        "left": {
+          "projected_edges": 15000,
+          "visible_region_line_pixels": 7980,
+          "hidden_region_line_pixels": 1147
+        },
+        "right": {
+          "projected_edges": 15229,
+          "visible_region_line_pixels": 7593,
+          "hidden_region_line_pixels": 1286
+        }
+      }
+    },
+    {
+      "file": "seq_006_validation_016.jpg",
+      "sha256": "e7cc6ddb5eb6e541cf35cdbd27b088f6b6e9f20fdc6d64ab7270138cf1fbc2f6",
+      "statistics": {
+        "left": {
+          "projected_edges": 15000,
+          "visible_region_line_pixels": 7996,
+          "hidden_region_line_pixels": 1150
+        },
+        "right": {
+          "projected_edges": 15229,
+          "visible_region_line_pixels": 7576,
+          "hidden_region_line_pixels": 1284
+        }
+      }
+    },
+    {
+      "file": "seq_006_validation_017.jpg",
+      "sha256": "9c8598fa02be0b6648892f7c9c1e4df0ed8deb4581a8c32b3fd37c1bf73371d6",
+      "statistics": {
+        "left": {
+          "projected_edges": 15004,
+          "visible_region_line_pixels": 7965,
+          "hidden_region_line_pixels": 1149
+        },
+        "right": {
+          "projected_edges": 15229,
+          "visible_region_line_pixels": 7579,
+          "hidden_region_line_pixels": 1281
+        }
+      }
+    },
+    {
+      "file": "seq_008_validation_018.jpg",
+      "sha256": "5c29ba50b141b87df66f46c6c8064fd56b143d3b1aada94940a4cdfb40c6bd74",
+      "statistics": {
+        "left": {
+          "projected_edges": 15610,
+          "visible_region_line_pixels": 9078,
+          "hidden_region_line_pixels": 0
+        },
+        "right": {
+          "projected_edges": 15577,
+          "visible_region_line_pixels": 8631,
+          "hidden_region_line_pixels": 0
+        }
+      }
+    },
+    {
+      "file": "seq_008_validation_019.jpg",
+      "sha256": "744678858e78add91c182e92670216efa742ec16a6674e445cbd620c1b3df705",
+      "statistics": {
+        "left": {
+          "projected_edges": 15611,
+          "visible_region_line_pixels": 9085,
+          "hidden_region_line_pixels": 0
+        },
+        "right": {
+          "projected_edges": 15576,
+          "visible_region_line_pixels": 8634,
+          "hidden_region_line_pixels": 0
+        }
+      }
+    },
+    {
+      "file": "seq_008_validation_020.jpg",
+      "sha256": "a29084d174e469ac739fb4c9548f6da13229eee0c54eeb9cc5b4796552964bde",
+      "statistics": {
+        "left": {
+          "projected_edges": 15619,
+          "visible_region_line_pixels": 9116,
+          "hidden_region_line_pixels": 0
+        },
+        "right": {
+          "projected_edges": 15557,
+          "visible_region_line_pixels": 8651,
+          "hidden_region_line_pixels": 0
+        }
+      }
+    },
+    {
+      "file": "seq_008_validation_021.jpg",
+      "sha256": "86058ec4ea0da72a928db36672f8dc1f4763d4859610669bcf3d2a09283cfea7",
+      "statistics": {
+        "left": {
+          "projected_edges": 15630,
+          "visible_region_line_pixels": 9131,
+          "hidden_region_line_pixels": 0
+        },
+        "right": {
+          "projected_edges": 15553,
+          "visible_region_line_pixels": 8671,
+          "hidden_region_line_pixels": 0
+        }
+      }
+    },
+    {
+      "file": "seq_010_validation_022.jpg",
+      "sha256": "b9fcb23df74aa56a443c750f9650ffb06d16fb957c62c2b4ec262a40d432e45c",
+      "statistics": {
+        "left": {
+          "projected_edges": 14905,
+          "visible_region_line_pixels": 8743,
+          "hidden_region_line_pixels": 0
+        },
+        "right": {
+          "projected_edges": 14904,
+          "visible_region_line_pixels": 8266,
+          "hidden_region_line_pixels": 0
+        }
+      }
+    },
+    {
+      "file": "seq_010_validation_023.jpg",
+      "sha256": "c45b7993bc7ff8076873138afdf796d9eb433f0f641c35eacf976fea95416d09",
+      "statistics": {
+        "left": {
+          "projected_edges": 14903,
+          "visible_region_line_pixels": 8745,
+          "hidden_region_line_pixels": 0
+        },
+        "right": {
+          "projected_edges": 14902,
+          "visible_region_line_pixels": 8265,
+          "hidden_region_line_pixels": 0
+        }
+      }
+    },
+    {
+      "file": "seq_010_validation_024.jpg",
+      "sha256": "df808d987b6c7e3b4a51bbd842c9b965c2dbf8469caf78329723d53b39590e38",
+      "statistics": {
+        "left": {
+          "projected_edges": 14911,
+          "visible_region_line_pixels": 8724,
+          "hidden_region_line_pixels": 0
+        },
+        "right": {
+          "projected_edges": 14901,
+          "visible_region_line_pixels": 8267,
+          "hidden_region_line_pixels": 0
+        }
+      }
+    },
+    {
+      "file": "seq_010_validation_025.jpg",
+      "sha256": "318686d64fef61ae1692c76e8ed51fb9e4c4b2478fb74d6e08bb89e1d5c82ed4",
+      "statistics": {
+        "left": {
+          "projected_edges": 14903,
+          "visible_region_line_pixels": 8741,
+          "hidden_region_line_pixels": 0
+        },
+        "right": {
+          "projected_edges": 14900,
+          "visible_region_line_pixels": 8273,
+          "hidden_region_line_pixels": 0
+        }
+      }
+    },
+    {
+      "file": "seq_012_validation_026.jpg",
+      "sha256": "16ddb6cc9ddf249066984bd3ff697a4cb1c66dcc5af5772a4178eeb58255d6a2",
+      "statistics": {
+        "left": {
+          "projected_edges": 15456,
+          "visible_region_line_pixels": 8982,
+          "hidden_region_line_pixels": 0
+        },
+        "right": {
+          "projected_edges": 15146,
+          "visible_region_line_pixels": 8747,
+          "hidden_region_line_pixels": 1
+        }
+      }
+    },
+    {
+      "file": "seq_012_validation_027.jpg",
+      "sha256": "8e4a950eec4e98c0f9624cbe741e4b816c072e22fceb8eb66f2f1de8447dd142",
+      "statistics": {
+        "left": {
+          "projected_edges": 15457,
+          "visible_region_line_pixels": 9028,
+          "hidden_region_line_pixels": 0
+        },
+        "right": {
+          "projected_edges": 15128,
+          "visible_region_line_pixels": 8732,
+          "hidden_region_line_pixels": 0
+        }
+      }
+    },
+    {
+      "file": "seq_012_validation_028.jpg",
+      "sha256": "034afd3cba7d25d88f38464d9f4a2746c4c088e9d6da7e3212ed518b9910243b",
+      "statistics": {
+        "left": {
+          "projected_edges": 15479,
+          "visible_region_line_pixels": 9042,
+          "hidden_region_line_pixels": 0
+        },
+        "right": {
+          "projected_edges": 15119,
+          "visible_region_line_pixels": 8750,
+          "hidden_region_line_pixels": 0
+        }
+      }
+    },
+    {
+      "file": "seq_012_validation_029.jpg",
+      "sha256": "0b46ad5562e90af9cd660f86c9429974e576249f9154123f80571c6ed71accdb",
+      "statistics": {
+        "left": {
+          "projected_edges": 15473,
+          "visible_region_line_pixels": 9042,
+          "hidden_region_line_pixels": 0
+        },
+        "right": {
+          "projected_edges": 15124,
+          "visible_region_line_pixels": 8735,
+          "hidden_region_line_pixels": 0
+        }
+      }
+    }
+  ]
+}

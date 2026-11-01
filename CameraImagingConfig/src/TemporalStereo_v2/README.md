@@ -108,6 +108,25 @@ python3 tools/reannotate.py --run /path/to/existing/run \
 
 The utility lives outside the capture modules so it does not change the validated simulation-source fingerprint or require rendering the saved dataset again. `annotation_report.json` records the utility hash, unchanged source-file check and generated preview hashes.
 
+## CAD pose overlays from saved frames
+
+For direct visual comparison with the tool's shape, `tools/export_pose_geometry.py` reads the original USD visual meshes and the saved joint states. It uses USD and forward kinematics only, never `SimulationApp`, physics stepping or a new RGB render. It verifies C and T against both saved camera-coordinate labels before exporting millimeter geometry and body transforms.
+
+```bash
+python3 tools/export_pose_geometry.py --machine machine.local.json \
+  --settings /path/to/assets/settings.json --run /path/to/existing/run \
+  --output /path/to/existing/run/pose_geometry
+
+python3 tools/pose_geometry_overlay.py --run /path/to/existing/run \
+  --geometry /path/to/existing/run/pose_geometry \
+  --output /path/to/existing/run/previews_pose_geometry \
+  --font /path/to/chinese-capable-font.ttf
+```
+
+The second command requires NumPy and Pillow. It projects component silhouette/boundary edges of the actual CAD with each camera's distortion. Cyan lines show the CAD overlay; internal lines are translucent to retain the original appearance. Magenta dashed lines show projected geometry outside the saved visible-instrument mask. The mask sets opacity and display-region classification only; it does not generate, move or fit the CAD edges. This is not a new per-facet visibility annotation. C anchors the yellow positive-d arrow, while T is identified by a named leader without a circle or crosshair.
+
+These diagnostic images use the **full saved joint truth**, in addition to camera calibration. They are not a reconstruction of all articulation from C/d/T alone, and are not model predictions. The learning-target definitions are unchanged. The original RGB, masks and labels remain byte-identical; the overlay report records this check and zero new RGB renders.
+
 ## Sources
 
 - [ORBIT-Surgical](https://github.com/orbit-surgical/orbit-surgical): official PSM/ECM asset joint frames and limits; local `psm.py` gripper control speed 0.2 rad/s.
