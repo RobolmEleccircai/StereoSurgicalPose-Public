@@ -1,0 +1,98 @@
+{
+  "source_images": "../SingleInstrument_2026-11-07/preview_final/images/0000_{left,right}.png",
+  "old_real_images_used": false,
+  "stereo_extrinsic_truth_supplied_to_estimator": false,
+  "extraction": "Manually specified image ROIs + color edge midpoint + local ellipse fit; not fully automatic.",
+  "known_CAD_length_mm": 10.094863153535307,
+  "points": {
+    "left": [
+      [
+        1200.411929977153,
+        643.1
+      ],
+      [
+        1314.8529243460348,
+        650.6279277058585
+      ]
+    ],
+    "right": [
+      [
+        1292.8127409455055,
+        633.5
+      ],
+      [
+        1402.0071815101508,
+        642.5917387114157
+      ]
+    ]
+  },
+  "algorithm_file": "/home/leorobot/capstone-1/Grasp5-Stereo-SurgPose/pixel_extraction/geometry.py",
+  "algorithm_sha256": "7c35957eb7784dd5307819625591645aff7260835339beb8f45aa59943adef8c",
+  "adaptation": "Remove the original real-blue-marker exclusion only. Same SIFT/matching parameters and unchanged geometric solver.",
+  "estimates": {
+    "original": {
+      "R": [
+        [
+          0.9997458520851075,
+          0.003363389851468418,
+          0.022291676637911595
+        ],
+        [
+          -0.0033071840276398534,
+          0.9999912601395635,
+          -0.002557768225404322
+        ],
+        [
+          -0.022300084583460555,
+          0.00248339549701683,
+          0.9997482377950843
+        ]
+      ],
+      "unit_t": [
+        -0.8831049783593395,
+        0.14555638431636597,
+        -0.44602571246700207
+      ],
+      "matches": 19,
+      "inliers": 4,
+      "status": "stereo_mismatch",
+      "epipolar_residual_px": [
+        10.27703886359,
+        10.166300345613777
+      ],
+      "baseline_estimated_mm": null
+    },
+    "blue_filter_removed": {
+      "R": [
+        [
+          0.9974749813993453,
+          0.004237782352452276,
+          0.07089219056503282
+        ],
+        [
+          -0.004190186990087587,
+          0.9999908848620451,
+          -0.0008200767111399415
+        ],
+        [
+          -0.07089501967954998,
+          0.0005209544675859297,
+          0.9974836463777634
+        ]
+      ],
+      "unit_t": [
+        -0.9755796070341385,
+        -0.015895269870658868,
+        0.21907024155474633
+      ],
+      "matches": 88,
+      "inliers": 64,
+      "status": "paired",
+      "epipolar_residual_px": [
+        2.1554058936084703,
+        0.4837012944355234
+      ],
+      "baseline_estimated_mm": 11.618500963688794
+    }
+  }
+}

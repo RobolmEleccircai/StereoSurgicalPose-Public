@@ -1,0 +1,195 @@
+{
+  "profile_id": "initial_imaging_with_complete_border_3p5_global075",
+  "status": "debugging_initial_not_fitted_to_real_camera",
+  "provenance": "User requested usable starting values. Values marked heuristic are simulation choices, not official dVRK hardware parameters or a fit to grasp5.bag.",
+  "target_reference": "/Users/roblom/CUHK(SZ)/Capstone-1/grasp5.bag",
+  "geometry": {
+    "resolution_per_eye": [
+      1920,
+      1080
+    ],
+    "intrinsics_and_distortion_reference": "../run03/config/camera_intrinsics.json",
+    "stereo_geometry_reference": "../run03/ground_truth/stereo_extrinsics.json",
+    "provenance": "Retain historical DRENDS geometry for this initial trial; correspondence to grasp5 is unverified. Do not substitute old test project extrinsics."
+  },
+  "optics": {
+    "focal_length_m": 0.004,
+    "f_number": 5.6,
+    "focus_distance_m": 0.1,
+    "focus_mode": "fixed_for_all_frames",
+    "provenance": {
+      "focal_length_m": "heuristic effective focal length",
+      "f_number": "heuristic moderate initial aperture",
+      "focus_distance_m": "selected to match the first preview tool-tip axial depth of 0.100 m, not recovered real focus"
+    },
+    "derived_intermediate_render": {
+      "resolution": [
+        2240,
+        1472
+      ],
+      "pixel_pitch_m": 2.5e-06,
+      "horizontal_aperture_m": 0.005600000000000001,
+      "vertical_aperture_m": 0.00368,
+      "stage_meters_per_unit": 0.01,
+      "usd_focalLength": 4.0,
+      "usd_horizontalAperture": 5.6,
+      "usd_verticalAperture": 3.68,
+      "usd_focusDistance": 10.0,
+      "usd_fStop": 5.6,
+      "warning": "These are the overscanned intermediate camera values, not the measured physical sensor dimensions. Preserve the existing K/D ray map."
+    }
+  },
+  "field_blur": {
+    "status": "heuristic_image_space_model",
+    "in_focus_base_sigma_px": 0.3,
+    "additional_corner_sigma_px": 0.8,
+    "max_total_sigma_px": 0.8544003745317532,
+    "radial_definition": "r = distance from each output pixel to that eye principal point / maximum such distance over the four image corners; clamp to [0,1]",
+    "sigma_formula": "sqrt(0.3**2 + (0.8*r**2)**2)",
+    "application": "after geometric distortion mapping, before noise, same law in both eyes; do not change object pose labels",
+    "depth_of_field_is_separate": true
+  },
+  "noise": {
+    "model": "heuristic signal-dependent Gaussian approximation in final encoded RGB DN, not physical shot/read sensor calibration",
+    "pixel_sigma_dn_formula": "sqrt(1.0**2 + 6.0*Y)",
+    "Y_definition": "0.2126*R+0.7152*G+0.0722*B for encoded RGB in [0,1]",
+    "pixel_sigma_at_midgray_dn": 2.0,
+    "row_offset_sigma_dn": 0.3,
+    "row_offset_shared_across_rgb_channels": true,
+    "pixel_noise_independent_between_eyes": true,
+    "seed_base": 20261106,
+    "final_quantization": "add noise in floating point DN, round and clip to [0,255]"
+  },
+  "illumination": {
+    "light_type": "existing camera-following shared point light",
+    "intensity_renderer_units": 1000000,
+    "light_exposure": 0.0,
+    "light_color_rgb": [
+      1.0,
+      1.0,
+      1.0
+    ],
+    "light_position": "retain existing stereo optical-center midpoint",
+    "post_hdr_exposure_ev": 3.584962500721156,
+    "post_hdr_linear_multiplier": 12.0,
+    "fixed_rgb_base_scales": {
+      "left": [
+        2.9071141900991497,
+        3.685308505748175,
+        3.843301257997838
+      ],
+      "right": [
+        2.5304183099216444,
+        3.6458406770386897,
+        4.0711901987205215
+      ]
+    },
+    "combined_rgb_scales": {
+      "left": [
+        34.88537028118979,
+        44.2237020689781,
+        46.119615095974055
+      ],
+      "right": [
+        30.36501971905973,
+        43.75008812446428,
+        48.854282384646254
+      ]
+    },
+    "auto_exposure": false,
+    "auto_white_balance": false,
+    "provenance": "Base white-reference RGB scales retained; effective response includes source x16 and global x0.75, total x12. These effective scales already include the global adjustment. Not hardware gain or exposure."
+  },
+  "timing": {
+    "nominal_sequence_fps": 30,
+    "exposure_time_s": 0.016666666666666666,
+    "provenance": "Initial timing assumption; not measured from bag. Frame rate does not imply this exposure time.",
+    "static_preview_motion_blur": false,
+    "continuous_motion_blur_implemented": false,
+    "warning": "Exposure time alone does not set brightness in the existing pipeline. Moving-scene capture must implement shutter integration separately; static screenshots do not validate capture FPS."
+  },
+  "initial_tuning_controls": {
+    "if_too_soft_in_depth_f_number": 8.0,
+    "if_too_sharp_in_depth_f_number": 4.0,
+    "if_peripheral_blur_too_weak_corner_sigma_px": 1.2,
+    "if_peripheral_blur_too_strong_corner_sigma_px": 0.5,
+    "if_too_dark_post_hdr_exposure_ev": 4.5,
+    "if_highlights_clip_post_hdr_exposure_ev": 3.5,
+    "rule": "Change only the relevant control for each comparison; keep optics, lighting and color fixed across a stereo pair."
+  },
+  "implementation_reference": "https://docs.isaacsim.omniverse.nvidia.com/5.1.0/sensors/isaacsim_sensors_camera.html",
+  "latest_render": "../run05_initial",
+  "field_edge_attenuation": {
+    "date": "2026-11-07",
+    "source": "User explicitly requested outer linear gain 3.5 percent and an additional 25 percent overall brightness reduction; use linear RGB multiplier 0.75. Oval and transition retained. These are effect settings, not measured hardware parameters.",
+    "effect": "elliptical image-space field-edge attenuation",
+    "center_pixel": [
+      959.5,
+      539.5
+    ],
+    "semiaxes_pixel": [
+      840.0,
+      470.0
+    ],
+    "coordinate_definition": "r=sqrt(((u-959.5)/840.0)^2+((v-539.5)/470.0)^2); side midpoint r=1.1422619048, top/bottom midpoint r=1.1478723404",
+    "transition": "Smoothstep, s=t*t*(3-2*t)",
+    "application": "linear RGB before sRGB encoding and sensor noise",
+    "intrinsics_modified": false,
+    "selected": "border_3p5_global075",
+    "profiles": {
+      "border_3p5_global075": {
+        "start_radius": 0.3,
+        "end_radius": 1.1,
+        "outer_linear_gain": 0.035
+      }
+    },
+    "previous_run": "run13_border_2p5percent",
+    "previous_start_radius": 0.3,
+    "previous_end_radius": 1.1,
+    "change": "Outer mask gain 0.025 -> 0.035, then global linear multiplier 0.75. Effective central gain 0.75 and outer gain 0.02625 relative to source response. No ellipse or transition changes.",
+    "previous_semiaxes_pixel": [
+      840.0,
+      470.0
+    ],
+    "previous_outer_linear_gain": 0.025,
+    "global_linear_multiplier": 0.75,
+    "previous_global_linear_multiplier": 1.0,
+    "configuration_acceptance": {
+      "confirmed": true,
+      "date": "2026-11-07",
+      "scope": "User-approved visual configuration and numerical settings for subsequent image generation; not a real-camera calibration claim.",
+      "confirmed_run": "run14_border_3p5_global075",
+      "user_confirmation": "不错，非常完美，就按照这个数值，然后更新文档",
+      "future_generation_rule": "Use these values as the default baseline; record any later requested changes in a new output run."
+    }
+  },
+  "processing_order": "existing native DoF HDR -> distortion map (already in cache) -> existing field blur -> source fixed RGB x16 response -> border_3p5_global075 elliptical gain -> global linear x0.75 (effective RGB x12) -> sRGB -> original noise model and seeds -> uint8",
+  "global_brightness_adjustment": {
+    "linear_multiplier": 0.75,
+    "ev_delta": -0.4150374992788438,
+    "application": "Applied once after mask in generator, BEFORE sRGB/noise. Already folded into effective illumination scales below; do not apply a second time when using these scales.",
+    "source_post_hdr_linear_multiplier": 16.0,
+    "source_combined_rgb_scales": {
+      "left": [
+        46.513827041586396,
+        58.9649360919708,
+        61.49282012796541
+      ],
+      "right": [
+        40.48669295874631,
+        58.333450832619036,
+        65.13904317952834
+      ]
+    },
+    "center_effective_linear_gain": 0.75,
+    "outer_effective_linear_gain": 0.026250000000000002
+  },
+  "configuration_acceptance": {
+    "confirmed": true,
+    "date": "2026-11-07",
+    "scope": "User-approved visual configuration and numerical settings for subsequent image generation; not a real-camera calibration claim.",
+    "confirmed_run": "run14_border_3p5_global075",
+    "user_confirmation": "不错，非常完美，就按照这个数值，然后更新文档",
+    "future_generation_rule": "Use these values as the default baseline; record any later requested changes in a new output run."
+  }
+}

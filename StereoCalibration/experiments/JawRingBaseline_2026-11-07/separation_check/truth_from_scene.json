@@ -1,0 +1,181 @@
+{
+  "source_scene": "/home/leorobot/PoseProject/CameraImagingConfig/SingleInstrument_2026-11-07/preview/native/scene/sample_0000.usda",
+  "source_scene_sha256": "5be65f256f2789d959bae4b03d5139d235d24efdffecaf60a0401f16498ca704",
+  "point_source": "Fresh USD transform of the same fixed model A/B points; distorted image projections, not image detections.",
+  "model_definition": {
+    "units": "mm",
+    "coordinate_frame": "psm_tool_pitch_link, canonical metric mesh coordinates",
+    "A_definition": "Midpoint of distal-most visible-mesh end centers of the two closed jaw meshes; not the nominal tool control frame. Image estimate uses end-edge midpoint.",
+    "B_definition": "Center of 24-vertex circular rim in the visible negative-Y side of tool_pitch_link, plane Y=-2.591 mm, radius derived from mesh.",
+    "A_model_mm": [
+      18.75199992087007,
+      -0.01249960466686717,
+      5.427308605310266e-07
+    ],
+    "B_model_mm": [
+      8.992000017346433,
+      -2.5909999385476112,
+      0.0
+    ],
+    "known_length_mm": 10.094863153535307,
+    "rim_radius_mm": 0.7112867337835679,
+    "rim_max_circle_residual_mm": 0.0002867331910942905,
+    "mesh_sample_count": 24,
+    "source_file": "/home/leorobot/orbit-surgical/source/extensions/orbit.surgical.assets/data/Robots/dVRK/PSM/psm_col.usd",
+    "geometry_export_sha256": "fd4354894607629d8eb57189058e0fe53b7802ab69d3284eb5cf233eb241b1c2",
+    "scope": "Metric length computed only from model geometry and current closed-jaw relative transforms. No baseline is used."
+  },
+  "stage_meters_per_unit": 0.01,
+  "model_length_mm": 10.09486315353526,
+  "world_points_m": [
+    [
+      -0.02826239819192607,
+      1.0397865432604687,
+      -0.09990179815003955
+    ],
+    [
+      -0.022868607504717357,
+      1.0470096959662933,
+      -0.1044448531903756
+    ]
+  ],
+  "points": {
+    "left": [
+      [
+        1200.11328023139,
+        638.3549014074085
+      ],
+      [
+        1318.9292898384851,
+        650.1182818701704
+      ]
+    ],
+    "right": [
+      [
+        1294.247540804413,
+        630.9922412964843
+      ],
+      [
+        1405.8558553541532,
+        642.3956930885244
+      ]
+    ]
+  },
+  "cameras": {
+    "left": {
+      "T_world_from_optical_m": [
+        [
+          1.0,
+          2.220446049250313e-16,
+          2.5363265666181665e-17,
+          -0.05
+        ],
+        [
+          -1.1293615042207337e-16,
+          0.5999999999999998,
+          -0.8000000000000002,
+          1.12
+        ],
+        [
+          -1.9285364333973408e-16,
+          0.8,
+          0.5999999999999996,
+          -0.15999999999999998
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "points_optical_m": [
+        [
+          0.021737601808073926,
+          -4.951256375040902e-05,
+          0.10022968650160136
+        ],
+        [
+          0.02713139249528264,
+          0.0006499350274755678,
+          0.09172533131273997
+        ]
+      ]
+    },
+    "right": {
+      "T_world_from_optical_m": [
+        [
+          0.9992319550098597,
+          0.0013073164073904634,
+          -0.03916364399522269,
+          -0.044497419200676146
+        ],
+        [
+          -0.03209523266928552,
+          0.6006935159438471,
+          -0.7988348990516898,
+          1.1205488035957325
+        ],
+        [
+          0.02248101703833707,
+          0.7994783241757276,
+          0.6002741149225842,
+          -0.16004745180968402
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "points_optical_m": [
+        [
+          0.020166770783261567,
+          -0.00040699541275657225,
+          0.09998376851604862
+        ],
+        [
+          0.02522245753208799,
+          0.0003068829430820097,
+          0.09127534321181541
+        ]
+      ]
+    }
+  },
+  "relative_pose": {
+    "R_right_from_left": [
+      [
+        0.9992319550098598,
+        -0.0012723259709014206,
+        0.0391647963584307
+      ],
+      [
+        0.001307316407390235,
+        0.9999987689068903,
+        -0.0008678182496414897
+      ],
+      [
+        -0.03916364399522271,
+        0.0009183525070538035,
+        0.9992323881949026
+      ]
+    ],
+    "unit_translation_right_from_left": [
+      -0.9908843184054557,
+      -0.054053367980659274,
+      0.12339570879128313
+    ],
+    "translation_right_from_left_m": [
+      -0.005479673825671327,
+      -0.0002989196823597329,
+      0.0006823886735354279
+    ],
+    "baseline_mm": 5.530084313463848
+  },
+  "consistency_with_saved_truth": {
+    "rotation_max_abs_difference": 1.5612511283791264e-16,
+    "translation_max_abs_difference_m": 1.9721637517511326e-16,
+    "baseline_difference_mm": 3.6415315207705135e-14
+  }
+}

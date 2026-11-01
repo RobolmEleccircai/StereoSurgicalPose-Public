@@ -1,0 +1,22 @@
+{
+  "relative_pose_estimated": {
+    "status": "stereo_mismatch",
+    "epipolar_residual_px": [
+      10.27703886359,
+      10.166300345613777
+    ],
+    "baseline_estimated_mm": null,
+    "matches": 19,
+    "inliers": 4
+  },
+  "relative_pose_adapted": {
+    "status": "paired",
+    "epipolar_residual_px": [
+      2.1554058936084703,
+      0.4837012944355234
+    ],
+    "baseline_estimated_mm": 11.618500963688794,
+    "matches": 88,
+    "inliers": 64
+  }
+}

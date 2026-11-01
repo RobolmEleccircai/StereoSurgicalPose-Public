@@ -1,0 +1,23 @@
+{
+  "units": "mm",
+  "coordinate_frame": "psm_tool_pitch_link, canonical metric mesh coordinates",
+  "A_definition": "Midpoint of distal-most visible-mesh end centers of the two closed jaw meshes; not the nominal tool control frame. Image estimate uses end-edge midpoint.",
+  "B_definition": "Center of 24-vertex circular rim in the visible negative-Y side of tool_pitch_link, plane Y=-2.591 mm, radius derived from mesh.",
+  "A_model_mm": [
+    18.75199992087007,
+    -0.01249960466686717,
+    5.427308605310266e-07
+  ],
+  "B_model_mm": [
+    8.992000017346433,
+    -2.5909999385476112,
+    0.0
+  ],
+  "known_length_mm": 10.094863153535307,
+  "rim_radius_mm": 0.7112867337835679,
+  "rim_max_circle_residual_mm": 0.0002867331910942905,
+  "mesh_sample_count": 24,
+  "source_file": "/home/leorobot/orbit-surgical/source/extensions/orbit.surgical.assets/data/Robots/dVRK/PSM/psm_col.usd",
+  "geometry_export_sha256": "fd4354894607629d8eb57189058e0fe53b7802ab69d3284eb5cf233eb241b1c2",
+  "scope": "Metric length computed only from model geometry and current closed-jaw relative transforms. No baseline is used."
+}

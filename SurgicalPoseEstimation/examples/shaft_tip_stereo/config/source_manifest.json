@@ -1,0 +1,25 @@
+{
+  "instrument_asset": {
+    "path": "/home/leorobot/orbit-surgical/source/extensions/orbit.surgical.assets/data/Robots/dVRK/PSM/psm_col.usd",
+    "sha256": "5730339c3b806f17a5228c69b97464d0b3469888002f62fb23d9621f746347c8",
+    "repository": "https://github.com/orbit-surgical/orbit-surgical"
+  },
+  "intrinsics_source": {
+    "dataset": "DRENDS",
+    "variant": "ExVivo",
+    "raw_file": "../raw/DRENDS_ExVivo_calibration.json",
+    "raw_sha256": "bdb175e73c4976a9ca5c317ab6be7ae167e540889f7aa75444d57ef7ebc4652b",
+    "dataset_doi": "10.5281/zenodo.17598453",
+    "device_as_reported": "dVRK with da Vinci Si",
+    "camera_system_as_reported": "Panasonic",
+    "video_signal_as_reported": "1080i; source dataset applies deinterlacing"
+  },
+  "source_scene_and_profile_hashes": {
+    "/home/leorobot/sufia-bc/scenes/OR_scene_CTLiver-Prostate-Bladder/organs_psm_ecm.usda": "02f2b8cb2a050364f5235830ee6c98d5bb9209daf24a089625c89e55ef164137",
+    "/home/leorobot/sufia-bc/scenes/OR_scene_CTLiver-Prostate-Bladder/organs_with_psm.usda": "4031a10ddcdde0d8d4af4117ef740e3c20ddc699b1dc04a0932246b52d81a3fa",
+    "/home/leorobot/sufia-bc/scenes/OR_scene_CTLiver-Prostate-Bladder/main_scene_isaac51.usda": "c86aafb7239464f6df338e245230581161e99d9ad3d6cad4f6ab14fc2309f832",
+    "/home/leorobot/PoseProject/CameraImagingConfig/calibration/profiles/drends_exvivo_1080.json": "5649b935cdbbd51eb194b6ef951fc6d2e355aa2adeb537b55b5d45ea29e55fcd"
+  },
+  "accepted_imaging_reference": "/home/leorobot/PoseProject/CameraImagingConfig/SingleInstrument_2026-11-07/preview_final/config",
+  "landmark_definition_authority": "Dataset conventions defined from the actual USD geometry; not a manufacturer-supplied landmark annotation."
+}

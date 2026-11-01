@@ -1,0 +1,291 @@
+{
+  "scope": "Investigation only. No original project files or production calibration were changed. This is not a successful automatic calibration.",
+  "image_sources": {
+    "left": {
+      "path": "/home/leorobot/PoseProject/CameraImagingConfig/JawRingBaseline_2026-11-07/input_images/left/00.png",
+      "sha256": "6a3bf2aa5113fb767acb7949a04449d6da553bce0d98c7de5eba8cec1a370914"
+    },
+    "right": {
+      "path": "/home/leorobot/PoseProject/CameraImagingConfig/JawRingBaseline_2026-11-07/input_images/right/00.png",
+      "sha256": "1526173fb3d0440abdbd86fd71948901e1fb0a1207cf25e5e945f11975d88cd9"
+    }
+  },
+  "findings": {
+    "basic_coordinate_and_solver_control": "Exact simulation correspondences at the same feature locations recover the true pose and baseline. No sign/order/intrinsic-normalization error was found by these controls.",
+    "matching": "17 of 82 depth-checkable input pairs differ by over 2 pixels. Of 64 solver-accepted pairs, 62 are depth-checkable, 3 exceed 2 pixels, including 1 over 10 pixels.",
+    "sensitivity": "Correct correspondences perturbed by only 0.25 pixel per coordinate still cause large failures at the current point locations. Equal-count spread-out controls are substantially more stable. Thus false matches alone do not explain the failure.",
+    "accepted_pairs": 64,
+    "accepted_pairs_inside_instrument_bounding_box": 59,
+    "quality_gate": "Current checks accept an unstable relative-pose estimate. Inlier count and positive depth alone did not certify accuracy.",
+    "dependency_defect": "OpenCV 4.5.5 ignores maxIters for this USAC overload. Using explicit UsacParams bypasses it but leaves this particular estimate identical; not the principal cause demonstrated here."
+  },
+  "controlled_solver_cases": [
+    {
+      "name": "actual_image_matches",
+      "n": 88,
+      "status": "solved",
+      "E_inliers": 64,
+      "pose_inliers": 64,
+      "R": [
+        [
+          0.9974749813993453,
+          0.004237782352452276,
+          0.07089219056503282
+        ],
+        [
+          -0.004190186990087587,
+          0.9999908848620451,
+          -0.0008200767111399415
+        ],
+        [
+          -0.07089501967954998,
+          0.0005209544675859297,
+          0.9974836463777634
+        ]
+      ],
+      "unit_t": [
+        -0.9755796070341385,
+        -0.015895269870658868,
+        0.21907024155474633
+      ],
+      "rotation_error_deg": 1.8479897532127871,
+      "translation_direction_error_deg": 5.969138055700596,
+      "true_AB_scale_status": "paired",
+      "baseline_with_true_AB_mm": 10.386500585720164,
+      "baseline_relative_error_percent": 87.81812350369806
+    },
+    {
+      "name": "perfect_correspondences_same_left_locations",
+      "n": 88,
+      "status": "solved",
+      "E_inliers": 88,
+      "pose_inliers": 84,
+      "R": [
+        [
+          0.9992319529284049,
+          -0.0012723319218273382,
+          0.039164849270314175
+        ],
+        [
+          0.001307321810969854,
+          0.9999987689131239,
+          -0.0008678029263107529
+        ],
+        [
+          -0.03916369692161717,
+          0.0009183374744889308,
+          0.9992323861343338
+        ]
+      ],
+      "unit_t": [
+        -0.9908840516030294,
+        -0.054053425658808635,
+        0.12339782596671861
+      ],
+      "rotation_error_deg": 3.4150945850063763e-06,
+      "translation_direction_error_deg": 0.00012230735851884026,
+      "true_AB_scale_status": "paired",
+      "baseline_with_true_AB_mm": 5.530096298370532,
+      "baseline_relative_error_percent": 0.00021672195222866009
+    },
+    {
+      "name": "perfect_correspondences_visible_stable_subset",
+      "n": 83,
+      "status": "solved",
+      "E_inliers": 83,
+      "pose_inliers": 81,
+      "R": [
+        [
+          0.999231951316732,
+          -0.0012723322430950174,
+          0.03916489037925379
+        ],
+        [
+          0.0013073219691744145,
+          0.9999987689173702,
+          -0.0008677977948939723
+        ],
+        [
+          -0.03916373803692284,
+          0.0009183324055533964,
+          0.9992323845275272
+        ]
+      ],
+      "unit_t": [
+        -0.9908840635489172,
+        -0.05405344164506617,
+        0.12339772303859062
+      ],
+      "rotation_error_deg": 5.663293681020318e-06,
+      "translation_direction_error_deg": 0.00011640476511811228,
+      "true_AB_scale_status": "paired",
+      "baseline_with_true_AB_mm": 5.530101918042288,
+      "baseline_relative_error_percent": 0.0003183419535979226
+    },
+    {
+      "name": "oracle_verified_image_matches_within_1px",
+      "n": 50,
+      "status": "solved",
+      "E_inliers": 48,
+      "pose_inliers": 48,
+      "R": [
+        [
+          0.971176803754068,
+          -0.03170307813930684,
+          0.23624252514423535
+        ],
+        [
+          0.01691696155505007,
+          0.9977836514650591,
+          0.06435527391596683
+        ],
+        [
+          -0.23775918964737558,
+          -0.05850384351089394,
+          0.9695606572219586
+        ]
+      ],
+      "unit_t": [
+        -0.8731991043004693,
+        -0.2620344650512268,
+        0.41092732127977966
+      ],
+      "rotation_error_deg": 12.10272754363789,
+      "translation_direction_error_deg": 21.548060751903584,
+      "true_AB_scale_status": "paired",
+      "baseline_with_true_AB_mm": 36.28679343109831,
+      "baseline_relative_error_percent": 556.1707086952089
+    },
+    {
+      "name": "oracle_verified_image_matches_within_2px",
+      "n": 65,
+      "status": "solved",
+      "E_inliers": 57,
+      "pose_inliers": 2,
+      "R": [
+        [
+          0.999927874522484,
+          0.0014837109177697101,
+          -0.011918236231099832
+        ],
+        [
+          -0.0015243066337972538,
+          0.9999930656182869,
+          -0.0033978235131434976
+        ],
+        [
+          0.011913112197657116,
+          0.0034157454900501233,
+          0.999923202271311
+        ]
+      ],
+      "unit_t": [
+        0.7990127762498549,
+        -0.023931821602930194,
+        0.6008376247408816
+      ],
+      "rotation_error_deg": 2.9351639398343385,
+      "translation_direction_error_deg": 135.7494175646751,
+      "true_AB_scale_status": "invalid_depth",
+      "baseline_with_true_AB_mm": null,
+      "baseline_relative_error_percent": null
+    },
+    {
+      "name": "perfect_correspondences_spread_across_scene",
+      "n": 102,
+      "status": "solved",
+      "E_inliers": 102,
+      "pose_inliers": 95,
+      "R": [
+        [
+          0.9992318723042534,
+          -0.001272591932614163,
+          0.03916689777234868
+        ],
+        [
+          0.0013075825078733144,
+          0.9999987686032163,
+          -0.0008677672707903643
+        ],
+        [
+          -0.039165745228728066,
+          0.0009183146651308566,
+          0.9992323058722902
+        ]
+      ],
+      "unit_t": [
+        -0.9908822306574732,
+        -0.05405402862828848,
+        0.12341218317622575
+      ],
+      "rotation_error_deg": 0.00012147611931488672,
+      "translation_direction_error_deg": 0.0009522148614922074,
+      "true_AB_scale_status": "paired",
+      "baseline_with_true_AB_mm": 5.530416047250262,
+      "baseline_relative_error_percent": 0.005998711187937822
+    }
+  ],
+  "noise_summary": [
+    {
+      "layout": "same_feature_locations",
+      "sigma_px": 0.25,
+      "trials": 10,
+      "scale_failed": 1,
+      "rotation_error_median_deg": 1.619657721628867,
+      "translation_direction_error_median_deg": 8.060495858892924,
+      "baseline_error_median_percent_among_returned": 67.43815545255875,
+      "baseline_error_max_percent_among_returned": 94.2097997356991,
+      "within_5_percent_of_truth": 0
+    },
+    {
+      "layout": "same_feature_locations",
+      "sigma_px": 0.5,
+      "trials": 10,
+      "scale_failed": 0,
+      "rotation_error_median_deg": 2.0378793630557377,
+      "translation_direction_error_median_deg": 15.736207778672224,
+      "baseline_error_median_percent_among_returned": 79.265085967166,
+      "baseline_error_max_percent_among_returned": 722.7676556785923,
+      "within_5_percent_of_truth": 0
+    },
+    {
+      "layout": "spread_scene_points",
+      "sigma_px": 0.25,
+      "trials": 10,
+      "scale_failed": 0,
+      "rotation_error_median_deg": 0.1576789835149454,
+      "translation_direction_error_median_deg": 1.387943635469289,
+      "baseline_error_median_percent_among_returned": 7.035545909649921,
+      "baseline_error_max_percent_among_returned": 14.674537831614254,
+      "within_5_percent_of_truth": 3
+    },
+    {
+      "layout": "spread_scene_points",
+      "sigma_px": 0.5,
+      "trials": 10,
+      "scale_failed": 0,
+      "rotation_error_median_deg": 0.2615307373337005,
+      "translation_direction_error_median_deg": 1.661425082727027,
+      "baseline_error_median_percent_among_returned": 10.166463296725103,
+      "baseline_error_max_percent_among_returned": 15.617520967099207,
+      "within_5_percent_of_truth": 3
+    }
+  ],
+  "readme_sources": {
+    "opencv": "https://docs.opencv.org/4.5.5/d9/d0c/group__calib3d.html",
+    "depth": "https://docs.omniverse.nvidia.com/kit/docs/omni_replicator/1.12.27/source/extensions/omni.replicator.core/docs/API.html#distance-to-image-plane"
+  },
+  "upstream_bug": {
+    "source_4_5_5": "https://github.com/opencv/opencv/blob/4.5.5/modules/calib3d/src/five-point.cpp#L408-L416",
+    "upstream_issue": "https://github.com/opencv/opencv/issues/22696",
+    "legacy_maxIters_ignored": true,
+    "legacy_1_1000_12000_same_E": true,
+    "explicit_12000_same_E": true,
+    "interpretation": "This dependency defect is real, but bypassing it produced the same result on this pair; it does not explain away the observed error."
+  },
+  "caveats": [
+    "Scene-depth transfer is a diagnostic for geometric correspondences, with visibility/depth-edge filtering. It does not establish semantic identity for blurred/highlight features.",
+    "Ground truth is used only for diagnostic controls and error measurement; no oracle-filtered result is presented as an image-only fix.",
+    "Noise tests use 10 trials per condition. They demonstrate instability for this setup, not a universal performance bound."
+  ]
+}

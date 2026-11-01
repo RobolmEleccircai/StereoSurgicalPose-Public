@@ -1,0 +1,42 @@
+{
+  "psm_tool_pitch_link__visuals": {
+    "path": "/SurgicalTools/PSM_Right/Robot/psm_tool_pitch_link/visuals_xform/visuals",
+    "visibility": "invisible",
+    "source": "/home/leorobot/orbit-surgical/source/extensions/orbit.surgical.assets/data/Robots/dVRK/PSM/psm_col.usd"
+  },
+  "psm_tool_pitch_link__tool_pitch_link": {
+    "path": "/SurgicalTools/PSM_Right/Robot/psm_tool_pitch_link/visuals_xform/tool_pitch_link",
+    "visibility": "inherited",
+    "source": "/home/leorobot/orbit-surgical/source/extensions/orbit.surgical.assets/data/Robots/dVRK/PSM/psm_col.usd"
+  },
+  "psm_tool_yaw_link__visuals": {
+    "path": "/SurgicalTools/PSM_Right/Robot/psm_tool_yaw_link/visuals_xform/visuals",
+    "visibility": "invisible",
+    "source": "/home/leorobot/orbit-surgical/source/extensions/orbit.surgical.assets/data/Robots/dVRK/PSM/psm_col.usd"
+  },
+  "psm_tool_yaw_link__tool_yaw_link": {
+    "path": "/SurgicalTools/PSM_Right/Robot/psm_tool_yaw_link/visuals_xform/tool_yaw_link",
+    "visibility": "inherited",
+    "source": "/home/leorobot/orbit-surgical/source/extensions/orbit.surgical.assets/data/Robots/dVRK/PSM/psm_col.usd"
+  },
+  "psm_tool_gripper1_link__visuals": {
+    "path": "/SurgicalTools/PSM_Right/Robot/psm_tool_gripper1_link/visuals_xform/visuals",
+    "visibility": "invisible",
+    "source": "/home/leorobot/orbit-surgical/source/extensions/orbit.surgical.assets/data/Robots/dVRK/PSM/psm_col.usd"
+  },
+  "psm_tool_gripper1_link__gripper_right": {
+    "path": "/SurgicalTools/PSM_Right/Robot/psm_tool_gripper1_link/visuals_xform/gripper_right",
+    "visibility": "inherited",
+    "source": "/home/leorobot/orbit-surgical/source/extensions/orbit.surgical.assets/data/Robots/dVRK/PSM/psm_col.usd"
+  },
+  "psm_tool_gripper2_link__visuals": {
+    "path": "/SurgicalTools/PSM_Right/Robot/psm_tool_gripper2_link/visuals_xform/visuals",
+    "visibility": "invisible",
+    "source": "/home/leorobot/orbit-surgical/source/extensions/orbit.surgical.assets/data/Robots/dVRK/PSM/psm_col.usd"
+  },
+  "psm_tool_gripper2_link__gripper_left": {
+    "path": "/SurgicalTools/PSM_Right/Robot/psm_tool_gripper2_link/visuals_xform/gripper_left",
+    "visibility": "inherited",
+    "source": "/home/leorobot/orbit-surgical/source/extensions/orbit.surgical.assets/data/Robots/dVRK/PSM/psm_col.usd"
+  }
+}

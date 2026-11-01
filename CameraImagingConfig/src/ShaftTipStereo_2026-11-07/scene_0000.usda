@@ -1,0 +1,69 @@
+#usda 1.0
+(
+    metersPerUnit = 0.01
+    subLayers = [
+        @/home/leorobot/PoseProject/CameraImagingConfig/SingleInstrument_2026-11-07/preview/native/scene/sample_0000.usda@
+    ]
+    upAxis = "Y"
+)
+
+over "SurgicalTools"
+{
+    over "PSM_Right"
+    {
+        matrix4d xformOp:transform = ( (25.289885515764364, -64.33370969475847, -72.260608131333, 0), (-64.33370969475847, 44.60152776284686, -62.22441255753676, 0), (72.26060813133303, 62.22441255753678, -30.108586721388775, 0), (1.4850542231745019, 107.68990725513632, -11.78543965256379, 1) )
+        uniform token[] xformOpOrder = ["xformOp:transform"]
+
+        over "Robot"
+        {
+            over "psm_tool_roll_link"
+            {
+                def Xform "ShaftAxisReference" (
+                    doc = "Shaft-axis reference: psm_tool_roll_link origin; +Z points toward the distal wrist. Non-rendering ground-truth frame."
+                )
+                {
+                    custom double3 label:axisDirectionLocal = (0, 0, 1)
+                    double3 xformOp:translate = (0, 0, 0)
+                    uniform token[] xformOpOrder = ["xformOp:translate"]
+                }
+            }
+
+            over "psm_tool_gripper1_link"
+            {
+                over "visuals_xform"
+                {
+                    over "gripper_right"
+                    {
+                        def Xform "DistalTipReference"
+                        {
+                            double3 xformOp:translate = (0.00028500000674587983, 0.009651999920606613, -0.000013999999888862172)
+                            uniform token[] xformOpOrder = ["xformOp:translate"]
+                        }
+                    }
+                }
+            }
+
+            over "psm_tool_gripper2_link"
+            {
+                over "visuals_xform"
+                {
+                    over "gripper_left"
+                    {
+                        def Xform "DistalTipReference"
+                        {
+                            double3 xformOp:translate = (-0.00028500000674587983, 0.009651999920606613, -0.000010999999782749606)
+                            uniform token[] xformOpOrder = ["xformOp:translate"]
+                        }
+                    }
+                }
+            }
+
+            def Xform "ClosedJawTipReference"
+            {
+                double3 xformOp:translate = (-3.1828228386210355e-9, 0.000012499999835741127, -0.05965199992060643)
+                uniform token[] xformOpOrder = ["xformOp:translate"]
+            }
+        }
+    }
+}
+

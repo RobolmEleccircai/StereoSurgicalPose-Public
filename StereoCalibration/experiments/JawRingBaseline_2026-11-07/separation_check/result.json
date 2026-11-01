@@ -1,0 +1,192 @@
+{
+  "purpose": "Separate endpoint extraction and relative-pose errors for the same single-instrument stereo pair.",
+  "no_new_render": true,
+  "no_refitting_to_truth": true,
+  "old_solver_unchanged": true,
+  "algorithm_sha256": "7c35957eb7784dd5307819625591645aff7260835339beb8f45aa59943adef8c",
+  "known_length_mm": 10.094863153535307,
+  "true_baseline_used_only_for_reporting": true,
+  "controls_use_true_R_and_unit_t_not_metric_translation": true,
+  "cases": [
+    {
+      "name": "both_true",
+      "point_source": "simulation_model_projection",
+      "pose_source": "simulation_R_and_unit_t",
+      "status": "paired",
+      "epipolar_residual_px": [
+        2.125872776744112e-09,
+        1.8569592756434243e-08
+      ],
+      "baseline_estimated_mm": 5.530084334277251,
+      "baseline_true_mm": 5.530084313463848,
+      "signed_error_mm": 2.0813402556996152e-08,
+      "absolute_error_mm": 2.0813402556996152e-08,
+      "relative_error_percent": 3.7636682659325515e-07
+    },
+    {
+      "name": "pose_error_only",
+      "point_source": "simulation_model_projection",
+      "pose_source": "frozen_image_estimate",
+      "status": "paired",
+      "epipolar_residual_px": [
+        0.5356202492466021,
+        0.231522064907237
+      ],
+      "baseline_estimated_mm": 10.386500585720164,
+      "baseline_true_mm": 5.530084313463848,
+      "signed_error_mm": 4.856416272256316,
+      "absolute_error_mm": 4.856416272256316,
+      "relative_error_percent": 87.81812350369806
+    },
+    {
+      "name": "endpoint_error_only",
+      "point_source": "image_extracted",
+      "pose_source": "simulation_R_and_unit_t",
+      "status": "paired",
+      "epipolar_residual_px": [
+        1.5797298574629322,
+        0.242249510400654
+      ],
+      "baseline_estimated_mm": 6.671252335974803,
+      "baseline_true_mm": 5.530084313463848,
+      "signed_error_mm": 1.1411680225109544,
+      "absolute_error_mm": 1.1411680225109544,
+      "relative_error_percent": 20.63563515175715
+    },
+    {
+      "name": "both_estimated",
+      "point_source": "image_extracted",
+      "pose_source": "frozen_image_estimate",
+      "status": "paired",
+      "epipolar_residual_px": [
+        2.1554058936084703,
+        0.4837012944355234
+      ],
+      "baseline_estimated_mm": 11.618500963688794,
+      "baseline_true_mm": 5.530084313463848,
+      "signed_error_mm": 6.0884166502249455,
+      "absolute_error_mm": 6.0884166502249455,
+      "relative_error_percent": 110.09627168616127
+    }
+  ],
+  "individual_endpoint_controls": [
+    {
+      "name": "only_A_detected",
+      "point_source": "A from image, other endpoint from model",
+      "pose_source": "simulation_R_and_unit_t",
+      "status": "paired",
+      "epipolar_residual_px": [
+        1.5797298574629322,
+        1.8569592756434243e-08
+      ],
+      "baseline_estimated_mm": 6.445182779719746,
+      "baseline_true_mm": 5.530084313463848,
+      "signed_error_mm": 0.9150984662558974,
+      "absolute_error_mm": 0.9150984662558974,
+      "relative_error_percent": 16.547640404468122
+    },
+    {
+      "name": "only_B_detected",
+      "point_source": "B from image, other endpoint from model",
+      "pose_source": "simulation_R_and_unit_t",
+      "status": "paired",
+      "epipolar_residual_px": [
+        2.125872776744112e-09,
+        0.242249510400654
+      ],
+      "baseline_estimated_mm": 5.694992200200387,
+      "baseline_true_mm": 5.530084313463848,
+      "signed_error_mm": 0.16490788673653878,
+      "absolute_error_mm": 0.16490788673653878,
+      "relative_error_percent": 2.9820139692092074
+    }
+  ],
+  "point_errors": {
+    "left": {
+      "truth": [
+        [
+          1200.11328023139,
+          638.3549014074085
+        ],
+        [
+          1318.9292898384851,
+          650.1182818701704
+        ]
+      ],
+      "detected": [
+        [
+          1200.411929977153,
+          643.1
+        ],
+        [
+          1314.8529243460348,
+          650.6279277058585
+        ]
+      ],
+      "delta_uv_px": [
+        [
+          0.29864974576298664,
+          4.745098592591489
+        ],
+        [
+          -4.07636549245035,
+          0.5096458356880476
+        ]
+      ],
+      "euclidean_error_px": [
+        4.754487598475574,
+        4.108101082723519
+      ],
+      "true_AB_pixel_distance": 119.39690640408153,
+      "detected_AB_pixel_distance": 114.68832062456518
+    },
+    "right": {
+      "truth": [
+        [
+          1294.247540804413,
+          630.9922412964843
+        ],
+        [
+          1405.8558553541532,
+          642.3956930885244
+        ]
+      ],
+      "detected": [
+        [
+          1292.8127409455055,
+          633.5
+        ],
+        [
+          1402.0071815101508,
+          642.5917387114157
+        ]
+      ],
+      "delta_uv_px": [
+        [
+          -1.434799858907354,
+          2.5077587035157194
+        ],
+        [
+          -3.8486738440024055,
+          0.1960456228913472
+        ]
+      ],
+      "euclidean_error_px": [
+        2.889204795472174,
+        3.8536637429546325
+      ],
+      "true_AB_pixel_distance": 112.18936932440234,
+      "detected_AB_pixel_distance": 109.57228464818324
+    }
+  },
+  "relative_pose_errors": {
+    "rotation_deg": 1.8479897532127871,
+    "translation_direction_deg": 5.969138055700596
+  },
+  "scope_notes": [
+    "Ground-truth endpoints are projections of the previously chosen fixed model A/B definitions. This does not prove that a visible silhouette midpoint or ellipse center denotes exactly that physical point.",
+    "The image-defined tip midpoint is not guaranteed to coincide with the projection of the 3D midpoint of closed-jaw ends.",
+    "The four-case errors are nonlinear and must not be added as independent percentage contributions.",
+    "Both-true is an implementation/units/projection consistency check, not evidence of image-only calibration accuracy."
+  ]
+}

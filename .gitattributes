@@ -1,0 +1,6 @@
+# Preserve exporter/source bytes so the provenance hashes remain reproducible.
+CameraImagingConfig/src/ShaftTipStereo_2026-11-07/*.usda whitespace=-blank-at-eof
+CameraImagingConfig/src/ShaftTipStereo_2026-11-07/render/native/scene/*.usda whitespace=-blank-at-eof
+CameraImagingConfig/src/SingleInstrument_2026-11-07/*.usda whitespace=-blank-at-eof
+CameraImagingConfig/src/SingleInstrument_2026-11-07/preview/native/scene/*.usda whitespace=-blank-at-eof
+CameraImagingConfig/src/calibration/raw/DRENDS_ExVivo_calibration.json whitespace=-blank-at-eol

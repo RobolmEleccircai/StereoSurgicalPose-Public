@@ -38,3 +38,11 @@ venv/
 *.usda
 *.usdc
 *.usdz
+
+# Small authored scene overlays are part of the tested source snapshot.
+!CameraImagingConfig/src/ShaftTipStereo_2026-11-07/*.usda
+!CameraImagingConfig/src/ShaftTipStereo_2026-11-07/render/native/scene/*.usda
+!CameraImagingConfig/src/SingleInstrument_2026-11-07/*.usda
+!CameraImagingConfig/src/SingleInstrument_2026-11-07/preview/native/scene/*.usda
+
+*.log

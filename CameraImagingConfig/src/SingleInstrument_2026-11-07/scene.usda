@@ -1,0 +1,25 @@
+#usda 1.0
+(
+    customLayerData = {
+        string activeInstrument = "/SurgicalTools/PSM_Right"
+        string configuration = "single_psm_instrument_stereo_ecm"
+        int instrumentCount = 1
+        string sourceSample = "/home/leorobot/PoseProject/CameraImagingConfig/CameraRefinement_2026-11-06/run05_initial/native/scene/sample_0000.usda"
+        int stereoCameraCount = 2
+    }
+    metersPerUnit = 0.01
+    subLayers = [
+        @/home/leorobot/PoseProject/CameraImagingConfig/CameraRefinement_2026-11-06/run05_initial/native/scene/sample_0000.usda@
+    ]
+    upAxis = "Y"
+)
+
+over "SurgicalTools"
+{
+    over "PSM_Left" (
+        active = false
+    )
+    {
+    }
+}
+

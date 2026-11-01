@@ -1,0 +1,35 @@
+{
+  "retrieved_on": "2026-11-06",
+  "dataset": "DRENDS: A Dataset for Depth in Robotic Endoscopy with Dynamic Scenarios",
+  "release_version": "1.0",
+  "source_type": "Author-published real-device research calibration; not a universal manufacturer specification",
+  "dataset_doi": "10.5281/zenodo.17598453",
+  "dataset_url": "https://zenodo.org/records/17598453",
+  "archive_url": "https://zenodo.org/records/17598453/files/DRENDS.zip?download=1",
+  "archive_local_path": "calibration/source/DRENDS.zip",
+  "archive_md5": "f8b6e9472e71c1c6191787f8a8261d95",
+  "archive_sha256": "fe65010f84c585c28fe61c7d005ee49d4a5c31099cbc4f259565e2146fc2a5fb",
+  "paper_url": "https://www.nature.com/articles/s41597-026-07775-2",
+  "paper_doi": "10.1038/s41597-026-07775-2",
+  "dataset_license_reported_by_paper": "CC BY 4.0; attribute original authors and dataset",
+  "code_repository": "https://github.com/L0za007/DRENDS",
+  "audited_code_commit": "077ec79fd4c414508bea1de1ef1e14b94911c942",
+  "files": [
+    {
+      "archive_entry": "DRENDS/Phantom/calibration.json",
+      "raw_path": "calibration/raw/DRENDS_Phantom_calibration.json",
+      "raw_sha256": "ffd2c95e8bd9807f8a797857b0515c44511b26b20be74bce016bf67167274170",
+      "derived_profile_path": "calibration/profiles/drends_phantom_720p.json",
+      "derived_profile_sha256": "3bb452a00004a363d1103e55ff1f5916e8492c63825212c93b4761aec96529ad",
+      "baseline_m_derived_from_norm_t": 0.005784272145480954
+    },
+    {
+      "archive_entry": "DRENDS/ExVivo/calibration.json",
+      "raw_path": "calibration/raw/DRENDS_ExVivo_calibration.json",
+      "raw_sha256": "bdb175e73c4976a9ca5c317ab6be7ae167e540889f7aa75444d57ef7ebc4652b",
+      "derived_profile_path": "calibration/profiles/drends_exvivo_1080.json",
+      "derived_profile_sha256": "5649b935cdbbd51eb194b6ef951fc6d2e355aa2adeb537b55b5d45ea29e55fcd",
+      "baseline_m_derived_from_norm_t": 0.0055300843134638115
+    }
+  ]
+}

@@ -1,0 +1,42 @@
+{
+  "relative_pose_estimated": {
+    "status": "stereo_mismatch",
+    "epipolar_residual_px": [
+      10.27703886359,
+      10.166300345613777
+    ],
+    "baseline_estimated_mm": null,
+    "matches": 19,
+    "inliers": 4,
+    "baseline_true_mm": 5.530084313463812,
+    "abs_error_mm": null,
+    "relative_error_percent": null,
+    "rotation_error_deg": 1.0069370292582187
+  },
+  "relative_pose_adapted": {
+    "status": "paired",
+    "epipolar_residual_px": [
+      2.1554058936084703,
+      0.4837012944355234
+    ],
+    "baseline_estimated_mm": 11.618500963688794,
+    "matches": 88,
+    "inliers": 64,
+    "baseline_true_mm": 5.530084313463812,
+    "abs_error_mm": 6.088416650224982,
+    "relative_error_percent": 110.09627168616265,
+    "rotation_error_deg": 1.8479897532131815
+  },
+  "diagnostic_known_relative_pose": {
+    "status": "paired",
+    "epipolar_residual_px": [
+      1.5797298574636094,
+      0.24224951040137058
+    ],
+    "baseline_estimated_mm": 6.671252335974649,
+    "baseline_true_mm": 5.530084313463812,
+    "abs_error_mm": 1.1411680225108372,
+    "relative_error_percent": 20.63563515175517,
+    "warning": "Uses true R and translation direction to isolate endpoint/length error; not an independent extrinsic calibration."
+  }
+}

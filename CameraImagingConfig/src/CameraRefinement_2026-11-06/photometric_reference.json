@@ -1,0 +1,57 @@
+{
+  "status": "single_patch_relative_response_reference_NOT_radiometric_calibration",
+  "source": "DRENDS author-linked ExVivo calibration archive; same published K,D,R,t used without refitting",
+  "source_frame": "00000.png",
+  "source_sha256": {
+    "left": "2e299905704a210bf7c7002d09e930f8340b14d1723e04363806853c06539ef4",
+    "right": "c04fb4adcf0d0d4f8229996017f9e348fc5c1c69696e57a40e36f8e14b9f0513"
+  },
+  "source_pixels": {
+    "left": [
+      806.0413205088863,
+      648.1739406976021
+    ],
+    "right": [
+      902.1242328731181,
+      640.2981782026403
+    ]
+  },
+  "archive_sha256": "dd62b5aa374513b90c2c02ad679ff8b81065e879d53fe87dfbc642ebd87b964c",
+  "point_in_left_camera_m": [
+    -0.0034527261895049358,
+    0.0005740849513418316,
+    0.10045389615532782
+  ],
+  "board_normal_in_left_camera": [
+    -0.06568490954470839,
+    0.3200260254791999,
+    0.9451290047787604
+  ],
+  "target_encoded_rgb_0_1": {
+    "left": [
+      0.5490196078431373,
+      0.611764705882353,
+      0.6235294117647059
+    ],
+    "right": [
+      0.5176470588235295,
+      0.611764705882353,
+      0.6431372549019608
+    ]
+  },
+  "display_transfer": "IEC sRGB encoding convention, NOT an estimated physical camera response",
+  "method": "Use a unit-albedo diffuse patch at the recovered board point and normal; choose per-eye RGB multipliers so the patch matches source encoded RGB after sRGB display encoding. Lock multipliers across all captures.",
+  "unknowns": {
+    "physical_exposure_s": null,
+    "hardware_gain_db": null,
+    "hardware_white_balance": null,
+    "physical_gamma": null,
+    "angular_falloff_exponent": null
+  },
+  "limitations": [
+    "Board illumination is not labelled 60% or 80%.",
+    "Reference material reflectance and light intensity are not separated.",
+    "No physical gamma, vignetting or sensor noise is inferred.",
+    "Static board pose is used only for relative display matching, not to change camera extrinsics."
+  ]
+}

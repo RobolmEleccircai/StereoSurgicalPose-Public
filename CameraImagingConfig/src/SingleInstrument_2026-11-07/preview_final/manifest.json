@@ -1,0 +1,34 @@
+{
+  "samples": [
+    "0000"
+  ],
+  "completed": true,
+  "source_run": "../preview",
+  "selected_profile": "border_3p5_global075",
+  "resolution_per_eye": [
+    1920,
+    1080
+  ],
+  "source_renderer": "PathTracing",
+  "new_scene_render_performed": true,
+  "global_linear_multiplier": 0.75,
+  "outer_mask_gain": 0.035,
+  "outer_effective_linear_gain": 0.026250000000000002,
+  "native_scene": "../preview/native/scene/sample_0000.usda",
+  "instrument_configuration": {
+    "count": 1,
+    "active_tools": [
+      "right_tool"
+    ],
+    "active_prim": "/SurgicalTools/PSM_Right",
+    "inactive_prim": "/SurgicalTools/PSM_Left",
+    "ecm_retained": true,
+    "stereo_camera_count": 2
+  },
+  "native_render_sampling": {
+    "spp_per_frame": 64,
+    "total_spp_setting": 256,
+    "optix_denoiser_enabled": true,
+    "unused_viewport_updates_disabled": true
+  }
+}
