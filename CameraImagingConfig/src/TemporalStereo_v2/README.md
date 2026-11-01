@@ -96,7 +96,7 @@ The [completed laptop validation report](validation_evidence/README.md) records 
 
 ## Offline named annotations
 
-`tools/reannotate.py` rebuilds previews using only saved RGB PNGs and label JSON files; it never starts Isaac Sim. It requires Pillow and a Chinese-capable font. Saved images and labels remain unchanged and are checked before/after processing. Output names C, T, J1 and J2 explicitly, uses a positive-d shaft arrow (from C−9d to C+6d, millimeters), and distinguishes visible endpoints, self-occlusion and tissue occlusion. C/T use reference-point diamonds without a surface-visibility claim. The arrow endpoint is not a physical landmark.
+`tools/reannotate.py` rebuilds previews using only saved RGB PNGs and label JSON files; it never starts Isaac Sim. It requires Pillow and a Chinese-capable font. Saved images and labels remain unchanged and are checked before/after processing. Output names C, T, J1 and J2 explicitly, uses a positive-d shaft arrow starting exactly at C and ending at C+15d (millimeters), and distinguishes visible endpoints, self-occlusion and tissue occlusion. The 15 mm length is solely a display choice. T is only named as the midpoint of the two physical tips, with no direction arrow. C/T use reference-point diamonds without a surface-visibility claim. The arrow endpoint is not a physical landmark.
 
 ```bash
 python3 tools/reannotate.py --run /path/to/existing/run \

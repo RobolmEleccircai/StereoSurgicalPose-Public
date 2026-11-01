@@ -51,8 +51,9 @@ def panel(image, record, eye, font_path):
     points = {"C": g['shaft_reference_pixel'], "T": g['tip_pixel'], "J1": g['jaw_tip_pixels'][0], "J2": g['jaw_tip_pixels'][1]}
     points = {k: (v[0], v[1]+header) for k, v in points.items()}
     C, direction = g['shaft_reference_position_mm'], g['shaft_direction_unit']
-    # Positive d points toward the distal instrument. Arrow tips are not landmarks.
-    curve = [project([C[j]+(-9+15*i/60)*direction[j] for j in range(3)], e['K'], e['D']) for i in range(61)]
+    # Start exactly at C; retain a 15 mm display length along positive d.
+    # T is only a named midpoint marker. The arrow tip is not a landmark.
+    curve = [project([C[j]+(15*i/60)*direction[j] for j in range(3)], e['K'], e['D']) for i in range(61)]
     curve = [(x, y+header) for x, y in curve]
     draw.line(curve, fill="#111111", width=8)
     draw.line(curve, fill=COLORS['d'], width=4)
@@ -114,7 +115,7 @@ def panel(image, record, eye, font_path):
     callout('d', 'd 杆轴方向', curve[0], (15, -100), leader=False)
     y = header+h+12
     draw.text((18,y), '实心圆：可见尖端    空心圆＋虚线引线：自遮挡    空心叉圆＋虚线引线：组织遮挡', font=small, fill="#e6edf4")
-    draw.text((18,y+38), '菱形 C / T：几何参考，不赋予表面可见性；黄色箭头沿 +d，箭头末端不是关键点。', font=small, fill="#c4ced8")
+    draw.text((18,y+38), '黄色箭头从 C 出发，沿 +d；T 只表示两尖端中点。C / T 不赋予表面可见性。', font=small, fill="#c4ced8")
     return canvas
 
 
@@ -150,7 +151,8 @@ def main():
     if original != after:
         raise RuntimeError('Saved source data changed')
     report = {'renderer_invoked': False, 'source_files_unchanged': True, 'source_file_count': len(original),
-              'preview_pairs': len(files), 'arrow_mm_relative_to_C': [-9, 6], 'arrow_direction': '+d',
+              'preview_pairs': len(files), 'arrow_mm_relative_to_C': [0, 15], 'arrow_start': 'C', 'arrow_direction': '+d',
+              'T_display': 'named midpoint marker only; no direction arrow',
               'annotation_code_sha256': sha(Path(__file__)), 'font_sha256': sha(a.font), 'files': files}
     (a.output/'annotation_report.json').write_text(json.dumps(report, indent=2)+'\n')
     print(f"Annotated {len(files)} existing pairs; all {len(original)} source files unchanged; zero renders.")
