@@ -94,6 +94,18 @@ Native USD camera attributes and endoscope light intensity are included in effec
 
 The [completed laptop validation report](validation_evidence/README.md) records 20 passing tests, all 14 checked trajectories, exactly 32 rendered pairs, and an actual resume with zero new render attempts. It includes source/effective camera settings, fingerprints, joint coverage and rendered examples. No full dataset was generated. Near-field tissue saturation in the occlusion sample remains an explicitly documented appearance finding.
 
+## Offline named annotations
+
+`tools/reannotate.py` rebuilds previews using only saved RGB PNGs and label JSON files; it never starts Isaac Sim. It requires Pillow and a Chinese-capable font. Saved images and labels remain unchanged and are checked before/after processing. Output names C, T, J1 and J2 explicitly, uses a positive-d shaft arrow (from C−9d to C+6d, millimeters), and distinguishes visible endpoints, self-occlusion and tissue occlusion. C/T use reference-point diamonds without a surface-visibility claim. The arrow endpoint is not a physical landmark.
+
+```bash
+python3 tools/reannotate.py --run /path/to/existing/run \
+  --output /path/to/existing/run/previews_labeled \
+  --font /path/to/chinese-capable-font.ttf
+```
+
+The utility lives outside the capture modules so it does not change the validated simulation-source fingerprint or require rendering the saved dataset again. `annotation_report.json` records the utility hash, unchanged source-file check and generated preview hashes.
+
 ## Sources
 
 - [ORBIT-Surgical](https://github.com/orbit-surgical/orbit-surgical): official PSM/ECM asset joint frames and limits; local `psm.py` gripper control speed 0.2 rad/s.

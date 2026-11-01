@@ -1,0 +1,175 @@
+{
+  "renderer_invoked": false,
+  "source_files_unchanged": true,
+  "source_file_count": 224,
+  "preview_pairs": 32,
+  "arrow_mm_relative_to_C": [
+    -9,
+    6
+  ],
+  "arrow_direction": "+d",
+  "annotation_code_sha256": "c7e1a61e7c16ce903a5979a5aa457700d3aa4697216ece7e3f469f77db6cfaac",
+  "font_sha256": "876af2cd4854644e7f3e7feb2f688997fdb3343c6df6693611209c9dfb47ccec",
+  "files": [
+    {
+      "file": "seq_000_validation_000.jpg",
+      "sha256": "10065488d2a1c33fde3c52c2c9d760bd7a7353697ec1175d9ec17862eeb02769",
+      "source_label": "sequences/seq_000/labels/validation_000.json"
+    },
+    {
+      "file": "seq_000_validation_001.jpg",
+      "sha256": "a7ba5912d50e76b88988b4a8d36f464545b830083810935dd48acec1dd908e9e",
+      "source_label": "sequences/seq_000/labels/validation_001.json"
+    },
+    {
+      "file": "seq_000_validation_002.jpg",
+      "sha256": "bb087f5ff5d61bd1af9ba0a6383ba9053cdb3d8701c3084d7e873a8729cd8b0a",
+      "source_label": "sequences/seq_000/labels/validation_002.json"
+    },
+    {
+      "file": "seq_000_validation_003.jpg",
+      "sha256": "3be20487fe6a91790af564a991445569ec5c65c07366239619f0e6b49af0f48f",
+      "source_label": "sequences/seq_000/labels/validation_003.json"
+    },
+    {
+      "file": "seq_000_validation_004.jpg",
+      "sha256": "b3d9d8eaf42f1a45a6e70d8ac9b2c9e94e349ca509ca958494d2b565214d3d17",
+      "source_label": "sequences/seq_000/labels/validation_004.json"
+    },
+    {
+      "file": "seq_000_validation_005.jpg",
+      "sha256": "58f4e69d8d0ad7288412c7575372e5e4a598f05fdc68705a57e1e37582508f80",
+      "source_label": "sequences/seq_000/labels/validation_005.json"
+    },
+    {
+      "file": "seq_002_validation_006.jpg",
+      "sha256": "fe4f8544744101fa6deac2bb3aa5eb4acf62e2c65893d0c3fdec766512c04e62",
+      "source_label": "sequences/seq_002/labels/validation_006.json"
+    },
+    {
+      "file": "seq_002_validation_007.jpg",
+      "sha256": "854d1e39c34a89e3cd1acaf483e40839b2aeece3999bda91d3e571edae7a6215",
+      "source_label": "sequences/seq_002/labels/validation_007.json"
+    },
+    {
+      "file": "seq_002_validation_008.jpg",
+      "sha256": "7cbfffc2f99ae089ad5e4e0c8bc86206350c09ffe413987b725991d73464f0bc",
+      "source_label": "sequences/seq_002/labels/validation_008.json"
+    },
+    {
+      "file": "seq_002_validation_009.jpg",
+      "sha256": "3a0e905e5d5a0d036dab16ed5530870f7d61fb16dffa6acca15cb46521ffba6f",
+      "source_label": "sequences/seq_002/labels/validation_009.json"
+    },
+    {
+      "file": "seq_003_validation_030.jpg",
+      "sha256": "b148b987aac0f9f05e1edc709cef48c78cb08749d1bfaad2a2a212e11c6df545",
+      "source_label": "sequences/seq_003/labels/validation_030.json"
+    },
+    {
+      "file": "seq_003_validation_031.jpg",
+      "sha256": "e409cf297b2209100bb29f8a9f46af037fb6e2219e94dd0368732b9e7665dbc6",
+      "source_label": "sequences/seq_003/labels/validation_031.json"
+    },
+    {
+      "file": "seq_004_validation_010.jpg",
+      "sha256": "bc940dc0a54b235b2028fbf88adfe266046a71f4b6a311182249543347bf0667",
+      "source_label": "sequences/seq_004/labels/validation_010.json"
+    },
+    {
+      "file": "seq_004_validation_011.jpg",
+      "sha256": "910c612048cdaa2082284d01c732c15552bcd74be39182fd2a3dbe6aefdc8aac",
+      "source_label": "sequences/seq_004/labels/validation_011.json"
+    },
+    {
+      "file": "seq_004_validation_012.jpg",
+      "sha256": "eb74bf127eb7ef0808b7896f45b2e42cfb2a8b6714bf7ef0b70c84b2fee16faa",
+      "source_label": "sequences/seq_004/labels/validation_012.json"
+    },
+    {
+      "file": "seq_004_validation_013.jpg",
+      "sha256": "1caae4c9d7ee8faf6fc3727708d9647457f2da46a0917643a17bbc43e35fc593",
+      "source_label": "sequences/seq_004/labels/validation_013.json"
+    },
+    {
+      "file": "seq_006_validation_014.jpg",
+      "sha256": "f5008c0198fe7dd2ccf8e26846d5eb87d933058198d906a4fbc5ba561a95cba1",
+      "source_label": "sequences/seq_006/labels/validation_014.json"
+    },
+    {
+      "file": "seq_006_validation_015.jpg",
+      "sha256": "aa31600458bffe34d88d7f450cd4eb4ccec049d09fc229564563809a64dd3bbf",
+      "source_label": "sequences/seq_006/labels/validation_015.json"
+    },
+    {
+      "file": "seq_006_validation_016.jpg",
+      "sha256": "d6c11604fdbc05f9ab5eb6fe22d2ad2d37d7194a68e372b8af4195fcdb2fc56f",
+      "source_label": "sequences/seq_006/labels/validation_016.json"
+    },
+    {
+      "file": "seq_006_validation_017.jpg",
+      "sha256": "e35a1f0b49120e2fb0cd6bffb2535c3f3db002087e75c9155557b79b2fb41f65",
+      "source_label": "sequences/seq_006/labels/validation_017.json"
+    },
+    {
+      "file": "seq_008_validation_018.jpg",
+      "sha256": "2d8fd91e73b3013619f6d10cdf4c41605e04328890e800456af97ac1fbccbb8d",
+      "source_label": "sequences/seq_008/labels/validation_018.json"
+    },
+    {
+      "file": "seq_008_validation_019.jpg",
+      "sha256": "645c026de15c4592ef602b3df9ea6c01ed098c4ff8832d15daa60a46a1f0fc1f",
+      "source_label": "sequences/seq_008/labels/validation_019.json"
+    },
+    {
+      "file": "seq_008_validation_020.jpg",
+      "sha256": "e427b2ed686dece31eb47410d7ab0d0748d54d655f4e806ea0f566b9055e26a3",
+      "source_label": "sequences/seq_008/labels/validation_020.json"
+    },
+    {
+      "file": "seq_008_validation_021.jpg",
+      "sha256": "dad6bfecf3c4b0b321729a9b346759ff480c6e51248676c966907279bb39dae5",
+      "source_label": "sequences/seq_008/labels/validation_021.json"
+    },
+    {
+      "file": "seq_010_validation_022.jpg",
+      "sha256": "5c3fd8950ac6302d5e7d267df04dff36313647c2fce425b61e684dc2af00002f",
+      "source_label": "sequences/seq_010/labels/validation_022.json"
+    },
+    {
+      "file": "seq_010_validation_023.jpg",
+      "sha256": "340f7b6d66d0bf1e8d7ad40f8a1b9636aca7261bda0903e5f5338cb774b1874f",
+      "source_label": "sequences/seq_010/labels/validation_023.json"
+    },
+    {
+      "file": "seq_010_validation_024.jpg",
+      "sha256": "bee4926735a45645e36ceaeb5f5bc5470f1110c80671ccdacb0c2fbe8c42e7bb",
+      "source_label": "sequences/seq_010/labels/validation_024.json"
+    },
+    {
+      "file": "seq_010_validation_025.jpg",
+      "sha256": "24b1db21e458b4092ab8b243e840b772d35cd102b051ffe11195faa2032ab47c",
+      "source_label": "sequences/seq_010/labels/validation_025.json"
+    },
+    {
+      "file": "seq_012_validation_026.jpg",
+      "sha256": "f173906d62c1ceb78a31f11b8a657e93eb75d84a8388e36e0612dadc2f4e804b",
+      "source_label": "sequences/seq_012/labels/validation_026.json"
+    },
+    {
+      "file": "seq_012_validation_027.jpg",
+      "sha256": "a2fe381cb69de5e3b50913c91d65efb10c273bb6f8188c6a36888fb3ad103f03",
+      "source_label": "sequences/seq_012/labels/validation_027.json"
+    },
+    {
+      "file": "seq_012_validation_028.jpg",
+      "sha256": "a482dcb95c0da35e50cce7e6668648215e7e41dcaf5230542f2a17aa14b35a08",
+      "source_label": "sequences/seq_012/labels/validation_028.json"
+    },
+    {
+      "file": "seq_012_validation_029.jpg",
+      "sha256": "19c62e422e40a441d3f8a0563655233e8a52471df26741bec4b3586d86478e4d",
+      "source_label": "sequences/seq_012/labels/validation_029.json"
+    }
+  ]
+}
