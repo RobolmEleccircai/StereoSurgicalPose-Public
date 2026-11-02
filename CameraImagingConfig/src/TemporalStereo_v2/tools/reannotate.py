@@ -145,9 +145,9 @@ def point_panel(image, record, eye, font_path):
     return canvas, projection
 
 
-def vector_panel(image, record, eye, font_path):
-    """Preferred view: direction arrow C->C+15d and position indicator C->T."""
-    w,h=image.size; header,footer=50,100
+def vector_panel(image, record, eye, font_path, split_jaws=False):
+    """Direction plus physical-tip arrows; optional legacy midpoint view."""
+    w,h=image.size; header,footer=50,140 if split_jaws else 100
     canvas=Image.new('RGB',(w,h+header+footer),'#101820');canvas.paste(image,(0,header))
     draw=ImageDraw.Draw(canvas);font=ImageFont.truetype(str(font_path),25);small=ImageFont.truetype(str(font_path),22)
     e=record['eyes'][eye];g=e['tool']
@@ -155,15 +155,18 @@ def vector_panel(image, record, eye, font_path):
     uvC=project(C,e['K'],e['D']);uvT=project(T,e['K'],e['D'])
     residual=max(abs(uvC[i]-g['shaft_reference_pixel'][i]) for i in range(2))
     residual=max(residual,max(abs(uvT[i]-g['tip_pixel'][i]) for i in range(2)))
-    if residual>=1e-6:raise ValueError('Saved C/T projection mismatch')
+    tips=[g['jaw1_tip_position_mm'],g['jaw2_tip_position_mm']]
+    uv_tips=[project(p,e['K'],e['D']) for p in tips]
+    residual=max(residual,max(abs(uv_tips[j][i]-g['jaw_tip_pixels'][j][i]) for j in range(2) for i in range(2)))
+    if residual>=1e-6:raise ValueError('Saved C/T/J1/J2 projection mismatch')
     endpoint=[C[i]+15*direction[i] for i in range(3)]
     def curve(end):
         result=[project([C[j]+i/60*(end[j]-C[j]) for j in range(3)],e['K'],e['D']) for i in range(61)]
         return [(x,y+header) for x,y in result]
     axis,position=curve(endpoint),curve(T)
-    blue,yellow='#3d9dff','#ffe956'
+    blue,yellow,orange='#3d9dff','#ffe956','#ffa23a'
     tissue_hidden=all(v['in_frame'] and v['occluder_kind']=='tissue' for v in e['jaw_visibility'])
-    def arrow(points,color,width=4,broken=False):
+    def arrow(points,color,width=4,broken=False,head_size=19):
         length=sum(math.dist(a,b) for a,b in zip(points,points[1:]))
         if broken:
             distance=0.
@@ -179,12 +182,19 @@ def vector_panel(image, record, eye, font_path):
         tip,previous=points[-1],points[-5];dx,dy=tip[0]-previous[0],tip[1]-previous[1]
         norm=math.hypot(dx,dy)
         if norm>1e-8:
-            dx,dy=dx/norm,dy/norm;size=min(19,length*.35)
+            dx,dy=dx/norm,dy/norm;size=min(head_size,length*.35)
             wings=[(tip[0]-size*dx+sign*size*.45*dy,tip[1]-size*dy-sign*size*.45*dx) for sign in (-1,1)]
             draw.polygon([tip,*wings],fill=color)
-    arrow(position,blue,width=5,broken=tissue_hidden)
+    jaw_curves=[curve(p) for p in tips]
+    if split_jaws:
+        # Different symbol widths keep nearly coincident closed-jaw arrows
+        # distinguishable without changing either physical endpoint.
+        arrow(jaw_curves[1],orange,width=6,broken=not e['jaw_visibility'][1]['visible'],head_size=21)
+        arrow(jaw_curves[0],blue,width=3,broken=not e['jaw_visibility'][0]['visible'],head_size=14)
+    else:
+        arrow(position,blue,width=5,broken=tissue_hidden)
     arrow(axis,yellow,width=3)
-    # Labels use thin neutral leaders, never a third colored vector or marker.
+    # Labels use thin neutral leaders, never additional vector arrows or markers.
     def label(text,point,offset,color,leader=True):
         x,y=point;box=draw.textbbox((0,0),text,font=font);bw=box[2]-box[0]+20;bh=44
         a=max(12,min(w-bw-12,x+offset[0]));b=max(header+12,min(header+h-bh-12,y+offset[1]))
@@ -195,16 +205,36 @@ def vector_panel(image, record, eye, font_path):
         draw.text((a+10,b+7),text,font=font,fill=color)
     label('C 共同起点',axis[0],(55,85),'#e5edf4')
     label('d 杆轴方向',axis[30],(65,-110),yellow,leader=False)
-    label('T 尖端位置',position[-1],(-270,-100),blue)
+    if split_jaws:
+        for j,color in enumerate((blue,orange)):
+            v=e['jaw_visibility'][j]
+            state='出画' if not v['in_frame'] else '可见' if v['visible'] else '组织遮挡' if v['occluder_kind']=='tissue' else '自遮挡'
+            upper=uv_tips[j][1]<=uv_tips[1-j][1]
+            label(f'J{j+1} 钳口{j+1}尖端 · {state}',jaw_curves[j][-1],(-390,-130 if upper else 100),color)
+    else:
+        label('T 尖端位置',position[-1],(-270,-100),blue)
     title='左目 LEFT' if eye=='left' else '右目 RIGHT'
-    draw.text((16,10),f"{title} · 双箭头真值投影   {record['sequence_id']} / {record['job_id']}",font=font,fill='white')
-    draw.text((16,header+h+10),'黄色：C → C + 15 mm × d（杆轴方向）    蓝色：C → T（尖端位置指示，位移 T−C）',font=small,fill='white')
-    note='蓝色虚线：两实际钳口尖端均被组织遮挡。' if tissue_hidden else 'T 为两实际钳口尖端的中点。'
-    draw.text((16,header+h+47),note+'保存的仿真真值投影，非模型预测；原图和真值未改动，未重新渲染。',font=small,fill='#c4ced8')
+    kind='三箭头真值投影' if split_jaws else '双箭头真值投影'
+    draw.text((16,10),f"{title} · {kind}   {record['sequence_id']} / {record['job_id']}",font=font,fill='white')
+    if split_jaws:
+        theta=record['jaw_half_angle_deg']
+        draw.text((16,header+h+10),'黄：杆轴方向 d    蓝：C → J1    橙：C → J2    |    实线：可见；虚线：遮挡，类型见标签',font=small,fill='white')
+        draw.text((16,header+h+47),f'每片钳口半开合角 θ = {theta:.2f}°    |    对称开合角 2θ = {2*theta:.2f}°',font=font,fill='#e5edf4')
+        note='闭合时两个尖端投影接近重合，未人为错开。' if theta<1e-6 else 'J1/J2 固定对应两片钳口，未用中点代替。'
+        draw.text((16,header+h+88),note+'保存真值投影，非模型预测；原图未改动，未重新渲染。',font=small,fill='#c4ced8')
+    else:
+        draw.text((16,header+h+10),'黄色：C → C + 15 mm × d（杆轴方向）    蓝色：C → T（尖端位置指示，位移 T−C）',font=small,fill='white')
+        note='蓝色虚线：两实际钳口尖端均被组织遮挡。' if tissue_hidden else 'T 为两实际钳口尖端的中点。'
+        draw.text((16,header+h+47),note+'保存的仿真真值投影，非模型预测；原图和真值未改动，未重新渲染。',font=small,fill='#c4ced8')
     result={'source':'simulation_ground_truth','C_camera_mm':C,'T_camera_mm':T,'d_unit':direction,
             'position_indicator_vector_mm':[T[i]-C[i] for i in range(3)],
             'C_pixel':uvC,'T_pixel':uvT,'axis_arrow_end_pixel':project(endpoint,e['K'],e['D']),
             'both_physical_tips_tissue_occluded':tissue_hidden,'maximum_difference_from_saved_pixels_px':residual}
+    if split_jaws:
+        result.update(J1_camera_mm=tips[0],J2_camera_mm=tips[1],J1_pixel=uv_tips[0],J2_pixel=uv_tips[1],
+                      jaw_position_indicator_vectors_mm=[[p[i]-C[i] for i in range(3)] for p in tips],
+                      jaw_visibility=e['jaw_visibility'],jaw_half_angle_deg=record['jaw_half_angle_deg'],
+                      jaw_symmetric_opening_deg=2*record['jaw_half_angle_deg'],T_displayed=False)
     return canvas,result
 
 
@@ -213,7 +243,7 @@ def main():
     p.add_argument('--run', type=Path, required=True)
     p.add_argument('--output', type=Path, required=True)
     p.add_argument('--font', type=Path, required=True, help='Chinese-capable TrueType/OpenType font')
-    p.add_argument('--style', choices=('two-arrows','points'), default='two-arrows')
+    p.add_argument('--style', choices=('three-arrows','two-arrows','points'), default='three-arrows')
     a = p.parse_args()
     labels = sorted(a.run.glob('sequences/*/labels/*.json'))
     if not labels:
@@ -230,8 +260,9 @@ def main():
             source = (path.parent/e['image']).resolve()
             if sha(source) != e['image_sha256']:
                 raise ValueError(f'Original image hash mismatch: {source}')
-            painter=vector_panel if a.style=='two-arrows' else point_panel
-            preview, projections[eye] = painter(Image.open(source).convert('RGB'), record, eye, a.font)
+            rgb=Image.open(source).convert('RGB')
+            if a.style=='points':preview,projections[eye]=point_panel(rgb,record,eye,a.font)
+            else:preview,projections[eye]=vector_panel(rgb,record,eye,a.font,split_jaws=a.style=='three-arrows')
             panels.append(preview)
         w, h = panels[0].size
         canvas = Image.new('RGB', (2*w, h))
@@ -246,7 +277,7 @@ def main():
     report = {'renderer_invoked': False, 'source_files_unchanged': True, 'source_file_count': len(original),
               'preview_pairs': len(files), 'arrow_mm_relative_to_C': [0, 15], 'arrow_start': 'C', 'arrow_direction': '+d',
               'style':a.style,
-              'T_display': 'blue position-indicator arrow C->T, vector T-C; model position remains camera-frame T' if a.style=='two-arrows' else 'midpoint projection crosshair with camera XYZ and image uv; no direction arrow',
+              'T_display': 'not displayed; physical J1/J2 are shown separately' if a.style=='three-arrows' else 'blue position-indicator arrow C->T, vector T-C; model position remains camera-frame T' if a.style=='two-arrows' else 'midpoint projection crosshair with camera XYZ and image uv; no direction arrow',
               'projection_source': 'simulation_ground_truth_not_model_inference',
               'maximum_projection_difference_px': max(v['maximum_difference_from_saved_pixels_px'] for f in files for v in f['projection_results'].values()),
               'annotation_code_sha256': sha(Path(__file__)), 'font_sha256': sha(a.font), 'files': files}
