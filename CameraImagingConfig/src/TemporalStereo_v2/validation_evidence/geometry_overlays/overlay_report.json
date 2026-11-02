@@ -5,13 +5,13 @@
   "source_file_count": 224,
   "pairs": 32,
   "geometry_sha256": "3778ec01493c86a304ba9eb61d70e1f9c85a6b607b83cb728293fb23d2623e6c",
-  "annotation_code_sha256": "873758f0e54b3ce29e240a797b04ea1a1e8ebf2620f7854f453bdcb207b0ad7b",
+  "annotation_code_sha256": "dc4e4fc97aa6aea3c07d87237f4ff2b136cae2e390de65c3efabb3de83cc2dfa",
   "source": "actual_CAD_and_saved_full_joint_truth",
   "visibility_display": "Projected contour classified by saved visible-tool mask dilated by 2 pixels; not a new per-facet visibility label. Interior line alpha 0.20; boundary-region alpha 0.95, using a 4-pixel eroded mask only to set opacity, never to move or synthesize projected edges.",
   "files": [
     {
       "file": "seq_000_validation_000.jpg",
-      "sha256": "9a77d09cceb20f70677d2e25ba7de7bb79492dc163459c989e2d7faf7257bbb7",
+      "sha256": "fe7c97220be99f1740da5cff774a51102fc94c031fa3b96c3b57bdc8544d7df1",
       "statistics": {
         "left": {
           "projected_edges": 13988,
@@ -27,7 +27,7 @@
     },
     {
       "file": "seq_000_validation_001.jpg",
-      "sha256": "7cc69171f8bb55f4bc3cd76146b4a72c49b69f1208d21720a3344003bcf843e4",
+      "sha256": "d7d6b0d92a6de07b9b31817797a995a57ef996af4ef8679b7499471c3839bed6",
       "statistics": {
         "left": {
           "projected_edges": 14212,
@@ -43,7 +43,7 @@
     },
     {
       "file": "seq_000_validation_002.jpg",
-      "sha256": "ad2a249095bb2cb4fc8c8ebc7031d306853cdf3fefc8465ce438d59604cabe93",
+      "sha256": "1e10a3feff79a28b678d793641e0125ac9fbe4621db78a3217b86b4d5785f853",
       "statistics": {
         "left": {
           "projected_edges": 15282,
@@ -59,7 +59,7 @@
     },
     {
       "file": "seq_000_validation_003.jpg",
-      "sha256": "7a10952b4ac0c8aebc69f953e04da9843e6fbe1e92595ec6eee6dc48a988d404",
+      "sha256": "0b4fb07cf49eba3e9800bcaef25616d02b6f748b9fc92c2a99bfc109d1832388",
       "statistics": {
         "left": {
           "projected_edges": 15286,
@@ -75,7 +75,7 @@
     },
     {
       "file": "seq_000_validation_004.jpg",
-      "sha256": "2cb8e8000d08c956250bc9e1d83c9f9175e2d14fbd09ffe136a16f468e8d517a",
+      "sha256": "a8c91e390285a7ea66a9662118e915ce1ceb4ae91a070f6d145107c81b51efa7",
       "statistics": {
         "left": {
           "projected_edges": 15283,
@@ -91,7 +91,7 @@
     },
     {
       "file": "seq_000_validation_005.jpg",
-      "sha256": "45f7470e5141388b7d32bdef21a4c0cc0b56885ea844d60d22ca7f50edfaae0e",
+      "sha256": "1dc5dda3b94add1142c687186f3651a80ed5a79cc7118691333ab062d6482d1a",
       "statistics": {
         "left": {
           "projected_edges": 15282,
@@ -107,7 +107,7 @@
     },
     {
       "file": "seq_002_validation_006.jpg",
-      "sha256": "ea1725a0c24bd73452bff6d83b1381c62fe76b7e433fffcb9fbdce4a7fc52d46",
+      "sha256": "5a6570afa631a9aa8dfd25ab06be0cd9bd32240ba43441a8fa85f2d3a13c5439",
       "statistics": {
         "left": {
           "projected_edges": 15026,
@@ -123,7 +123,7 @@
     },
     {
       "file": "seq_002_validation_007.jpg",
-      "sha256": "b212659d6f12c95806fa13a83aa787b6d8587045725fc59e053a6a5c8630ed6f",
+      "sha256": "4f3c71e9dd829dafdc834145d278cbe86c5026caaaa0c258e640b4b25c092afb",
       "statistics": {
         "left": {
           "projected_edges": 15034,
@@ -139,7 +139,7 @@
     },
     {
       "file": "seq_002_validation_008.jpg",
-      "sha256": "aebcff13fb66e78315ffa56ea086187bd424e4fb03c04003c7c59328feff4b82",
+      "sha256": "6ebddd79452e92e5be01fbd6e622d366d39cba494bd3d48d6cde80eef481d460",
       "statistics": {
         "left": {
           "projected_edges": 15039,
@@ -155,7 +155,7 @@
     },
     {
       "file": "seq_002_validation_009.jpg",
-      "sha256": "c68b3e6c2726264c4520832ee7924dfe277d8fa155402640d7872e360de0ceed",
+      "sha256": "2d92b4c621b03b1a6306ef0e37d2ed0bf3261a39d924152990d8f4703273f18e",
       "statistics": {
         "left": {
           "projected_edges": 15041,
@@ -171,7 +171,7 @@
     },
     {
       "file": "seq_003_validation_030.jpg",
-      "sha256": "f740c9378c37595f48d7ab0431b6f742476e768ccddeeb76ac639852a1a30318",
+      "sha256": "d0fb8db096c795d3bcfbc2434fb0fe70c544028d09e27687cf3ea6f383d6c42a",
       "statistics": {
         "left": {
           "projected_edges": 15222,
@@ -187,7 +187,7 @@
     },
     {
       "file": "seq_003_validation_031.jpg",
-      "sha256": "eb836f69741787e6e45c821f52595105d087d568bf1a3bb74146ba4d1767f091",
+      "sha256": "5cc65e8fa5f408e8ab2d5b0d1001105d799423d4874514cad47254d10b085538",
       "statistics": {
         "left": {
           "projected_edges": 15215,
@@ -203,7 +203,7 @@
     },
     {
       "file": "seq_004_validation_010.jpg",
-      "sha256": "c97a78571c30014e32a25d3a4aefadeab84d1ebb72c39f3f3cbcbac0959a01f4",
+      "sha256": "d3d946bb767e129d8ac5b6162e287b7f902a2ee1986e45bc8271b35b336eb3a9",
       "statistics": {
         "left": {
           "projected_edges": 15476,
@@ -219,7 +219,7 @@
     },
     {
       "file": "seq_004_validation_011.jpg",
-      "sha256": "004fa13b5ebfa2f191ad9dfbac9e5e54504c2804075fae30bc22b962cb33c240",
+      "sha256": "82127fed347328636a8a937f9ccc13c1587174e465b95e6f8ec0933154dcf0c2",
       "statistics": {
         "left": {
           "projected_edges": 15475,
@@ -235,7 +235,7 @@
     },
     {
       "file": "seq_004_validation_012.jpg",
-      "sha256": "7179835c9b188355fe0e076b530b5d8a7aa8a03b1b3eae90b106be6985a6125c",
+      "sha256": "0e750bf59e0a74c130c3d97be57e6e00804d2a8a4518ffba6dfd56a8a7a2f27b",
       "statistics": {
         "left": {
           "projected_edges": 15466,
@@ -251,7 +251,7 @@
     },
     {
       "file": "seq_004_validation_013.jpg",
-      "sha256": "214357a64db9a3a73ccfb8e24c7a278ef9092163fa16660bc5f99fcdaebeb2ad",
+      "sha256": "79fa268c8f1610644a00ac84db7dac9365864b11ff5994ba2253fa37cd2ed84e",
       "statistics": {
         "left": {
           "projected_edges": 15479,
@@ -267,7 +267,7 @@
     },
     {
       "file": "seq_006_validation_014.jpg",
-      "sha256": "d8aa1e9943cdf8725163ddf8adc3256cc1818d6f5b7533982cf7f36324200b92",
+      "sha256": "1fe11f294737f3fabae58c298bb2aa4918f73b12f8af21cb0f1a9fec208094bf",
       "statistics": {
         "left": {
           "projected_edges": 15000,
@@ -283,7 +283,7 @@
     },
     {
       "file": "seq_006_validation_015.jpg",
-      "sha256": "f5234f1832cd7eb5ae74d00eca38dc466602299d8d51861b6d853da2b7a029a7",
+      "sha256": "afc2f23ed995709488c1fe97f383a81e21b9c32d2aee37e83bf3f0b5e50c515c",
       "statistics": {
         "left": {
           "projected_edges": 15000,
@@ -299,7 +299,7 @@
     },
     {
       "file": "seq_006_validation_016.jpg",
-      "sha256": "e7cc6ddb5eb6e541cf35cdbd27b088f6b6e9f20fdc6d64ab7270138cf1fbc2f6",
+      "sha256": "e65adc18953b47d4e6338ec4b7f297cb7d3b97cf4f83b9ed31bf4c9d09003a7a",
       "statistics": {
         "left": {
           "projected_edges": 15000,
@@ -315,7 +315,7 @@
     },
     {
       "file": "seq_006_validation_017.jpg",
-      "sha256": "9c8598fa02be0b6648892f7c9c1e4df0ed8deb4581a8c32b3fd37c1bf73371d6",
+      "sha256": "2e38c1f7c0c05b5190f08ef4c29d64adc9fe3af27a4cf2cbabe7650ec4e4817d",
       "statistics": {
         "left": {
           "projected_edges": 15004,
@@ -331,7 +331,7 @@
     },
     {
       "file": "seq_008_validation_018.jpg",
-      "sha256": "5c29ba50b141b87df66f46c6c8064fd56b143d3b1aada94940a4cdfb40c6bd74",
+      "sha256": "074f845e0e6afdbeb7a3668770abbe275d82f80c692a04a582054dbbd365bd52",
       "statistics": {
         "left": {
           "projected_edges": 15610,
@@ -347,7 +347,7 @@
     },
     {
       "file": "seq_008_validation_019.jpg",
-      "sha256": "744678858e78add91c182e92670216efa742ec16a6674e445cbd620c1b3df705",
+      "sha256": "20ad9e52a41e57778af0593a607650c556f11ce610c8a5dd838aa931f51bcdec",
       "statistics": {
         "left": {
           "projected_edges": 15611,
@@ -363,7 +363,7 @@
     },
     {
       "file": "seq_008_validation_020.jpg",
-      "sha256": "a29084d174e469ac739fb4c9548f6da13229eee0c54eeb9cc5b4796552964bde",
+      "sha256": "47bbf69ed47c98dd55d5664aaf70d44e1b278dc407ebaa245568bd32f1289f6e",
       "statistics": {
         "left": {
           "projected_edges": 15619,
@@ -379,7 +379,7 @@
     },
     {
       "file": "seq_008_validation_021.jpg",
-      "sha256": "86058ec4ea0da72a928db36672f8dc1f4763d4859610669bcf3d2a09283cfea7",
+      "sha256": "465c2a37ff4e74173b0cf7c4b8500f7aca11b99b496a94d110484c1e3c5b306b",
       "statistics": {
         "left": {
           "projected_edges": 15630,
@@ -395,7 +395,7 @@
     },
     {
       "file": "seq_010_validation_022.jpg",
-      "sha256": "b9fcb23df74aa56a443c750f9650ffb06d16fb957c62c2b4ec262a40d432e45c",
+      "sha256": "2aea4ddc0738c50289ae65733ba2aa17ce16e135bf3b0d4c8ae5b3a9276d2673",
       "statistics": {
         "left": {
           "projected_edges": 14905,
@@ -411,7 +411,7 @@
     },
     {
       "file": "seq_010_validation_023.jpg",
-      "sha256": "c45b7993bc7ff8076873138afdf796d9eb433f0f641c35eacf976fea95416d09",
+      "sha256": "cc01967a3986ce0a34f98ad03a0c71b85e0ce716c46a715963e3a0cefac6990e",
       "statistics": {
         "left": {
           "projected_edges": 14903,
@@ -427,7 +427,7 @@
     },
     {
       "file": "seq_010_validation_024.jpg",
-      "sha256": "df808d987b6c7e3b4a51bbd842c9b965c2dbf8469caf78329723d53b39590e38",
+      "sha256": "e0b197f37e71ae42d2b24b65798f2358cebfe9103acfa7f782e4285a08508a38",
       "statistics": {
         "left": {
           "projected_edges": 14911,
@@ -443,7 +443,7 @@
     },
     {
       "file": "seq_010_validation_025.jpg",
-      "sha256": "318686d64fef61ae1692c76e8ed51fb9e4c4b2478fb74d6e08bb89e1d5c82ed4",
+      "sha256": "d01ff1a2ca8b5b515c92c5dffc6833c72fce2916c2ef321e15cab0e314414488",
       "statistics": {
         "left": {
           "projected_edges": 14903,
@@ -459,7 +459,7 @@
     },
     {
       "file": "seq_012_validation_026.jpg",
-      "sha256": "16ddb6cc9ddf249066984bd3ff697a4cb1c66dcc5af5772a4178eeb58255d6a2",
+      "sha256": "21675bd5659c407ea1374f2a15c574d3bd3a9795c174e79c0b6cca65d053616d",
       "statistics": {
         "left": {
           "projected_edges": 15456,
@@ -475,7 +475,7 @@
     },
     {
       "file": "seq_012_validation_027.jpg",
-      "sha256": "8e4a950eec4e98c0f9624cbe741e4b816c072e22fceb8eb66f2f1de8447dd142",
+      "sha256": "d894567ce56433c5827d0e3ce4e61870be0ea705d16c84829c6e4444a470ae1c",
       "statistics": {
         "left": {
           "projected_edges": 15457,
@@ -491,7 +491,7 @@
     },
     {
       "file": "seq_012_validation_028.jpg",
-      "sha256": "034afd3cba7d25d88f38464d9f4a2746c4c088e9d6da7e3212ed518b9910243b",
+      "sha256": "27c13a5687b49b4906d8d14286ffa33f1884d26c61425ed9d2d74d13d8abb2b9",
       "statistics": {
         "left": {
           "projected_edges": 15479,
@@ -507,7 +507,7 @@
     },
     {
       "file": "seq_012_validation_029.jpg",
-      "sha256": "0b46ad5562e90af9cd660f86c9429974e576249f9154123f80571c6ed71accdb",
+      "sha256": "a29d4d14620b8873c95a82539d41c0314a322e059fe1303d84a358f9857e9552",
       "statistics": {
         "left": {
           "projected_edges": 15473,

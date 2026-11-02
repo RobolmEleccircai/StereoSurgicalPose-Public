@@ -101,7 +101,7 @@ def draw_panel(rgb, mask, label, frame, eye, meshes, geometry, font_path):
         draw.line((tuple(q),near),fill=color,width=2)
         draw.rounded_rectangle((x,y,x+bw,y+bh),radius=5,fill='#101820',outline=color,width=1)
         draw.text((x+9,y+6),text,font=font,fill=color)
-    name('C / d 杆轴',g['shaft_reference_pixel'],(55,90),'#ffe956')
+    name('C 杆轴参考',g['shaft_reference_pixel'],(55,90),'#4ddce8')
     name('T 两尖端中点',g['tip_pixel'],(-300,-100),'#ff9de2')
     draw.text((16,head+h+10),'青色：器械 CAD 投影（内部线框半透明）    紫色虚线：遮挡区域投影    黄色：从 C 出发的杆轴 d',font=small,fill='white')
     draw.text((16,head+h+47),'使用同一帧的原 CAD、关节与相机真值；不是模型预测。原始 RGB 保持不变，未重新渲染。',font=small,fill='#c4ced8')
