@@ -146,8 +146,8 @@ def point_panel(image, record, eye, font_path):
 
 
 def vector_panel(image, record, eye, font_path, split_jaws=False):
-    """Direction plus physical-tip arrows; optional legacy midpoint view."""
-    w,h=image.size; header,footer=50,140 if split_jaws else 100
+    """Direction/tip arrows with per-camera XYZ; optional legacy midpoint view."""
+    w,h=image.size; header,footer=50,370 if split_jaws else 100
     canvas=Image.new('RGB',(w,h+header+footer),'#101820');canvas.paste(image,(0,header))
     draw=ImageDraw.Draw(canvas);font=ImageFont.truetype(str(font_path),25);small=ImageFont.truetype(str(font_path),22)
     e=record['eyes'][eye];g=e['tool']
@@ -218,10 +218,24 @@ def vector_panel(image, record, eye, font_path, split_jaws=False):
     draw.text((16,10),f"{title} · {kind}   {record['sequence_id']} / {record['job_id']}",font=font,fill='white')
     if split_jaws:
         theta=record['jaw_half_angle_deg']
-        draw.text((16,header+h+10),'黄：杆轴方向 d    蓝：C → J1    橙：C → J2    |    实线：可见；虚线：遮挡，类型见标签',font=small,fill='white')
-        draw.text((16,header+h+47),f'每片钳口半开合角 θ = {theta:.2f}°    |    对称开合角 2θ = {2*theta:.2f}°',font=font,fill='#e5edf4')
+        y=header+h
+        fmt=lambda v,digits=2: '('+', '.join(f'{x:+.{digits}f}' for x in v)+')'
+        draw.text((16,y+10),'黄：杆轴方向 d    蓝：C → J1    橙：C → J2    |    实线：可见；虚线：遮挡，类型见标签',font=small,fill='white')
+        draw.text((16,y+44),f'{title}光学坐标系：X 向右，Y 向下，Z 向前；位置原点为本目相机光心。',font=small,fill='#c4ced8')
+        rows=[('C  杆轴参考点位置',C,'mm','#e5edf4',2),
+              ('d  杆轴单位方向',direction,'无单位',yellow,4),
+              ('J1 钳口1尖端位置',tips[0],'mm',blue,2),
+              ('J2 钳口2尖端位置',tips[1],'mm',orange,2)]
+        for i,(name,values,unit,color,digits) in enumerate(rows):
+            draw.text((16,y+79+34*i),f'{name}    (X, Y, Z) = {fmt(values,digits)} {unit}',font=font,fill=color)
+        # Camera-origin positions and C-origin arrow displacements are different
+        # vectors. Display both explicitly; never relabel J1/J2 as J1-C/J2-C.
+        for j,color in enumerate((blue,orange)):
+            delta=[tips[j][i]-C[i] for i in range(3)]
+            draw.text((16,y+222+31*j),f'C → J{j+1} 箭头位移  (ΔX, ΔY, ΔZ) = {fmt(delta)} mm',font=small,fill=color)
+        draw.text((16,y+291),f'每片钳口半开合角 θ = {theta:.2f}°    |    对称开合角 2θ = {2*theta:.2f}°',font=font,fill='#e5edf4')
         note='闭合时两个尖端投影接近重合，未人为错开。' if theta<1e-6 else 'J1/J2 固定对应两片钳口，未用中点代替。'
-        draw.text((16,header+h+88),note+'保存真值投影，非模型预测；原图未改动，未重新渲染。',font=small,fill='#c4ced8')
+        draw.text((16,y+333),note+'保存真值投影，非模型预测；原图未改动，未重新渲染。',font=small,fill='#c4ced8')
     else:
         draw.text((16,header+h+10),'黄色：C → C + 15 mm × d（杆轴方向）    蓝色：C → T（尖端位置指示，位移 T−C）',font=small,fill='white')
         note='蓝色虚线：两实际钳口尖端均被组织遮挡。' if tissue_hidden else 'T 为两实际钳口尖端的中点。'
@@ -234,7 +248,14 @@ def vector_panel(image, record, eye, font_path, split_jaws=False):
         result.update(J1_camera_mm=tips[0],J2_camera_mm=tips[1],J1_pixel=uv_tips[0],J2_pixel=uv_tips[1],
                       jaw_position_indicator_vectors_mm=[[p[i]-C[i] for i in range(3)] for p in tips],
                       jaw_visibility=e['jaw_visibility'],jaw_half_angle_deg=record['jaw_half_angle_deg'],
-                      jaw_symmetric_opening_deg=2*record['jaw_half_angle_deg'],T_displayed=False)
+                      jaw_symmetric_opening_deg=2*record['jaw_half_angle_deg'],T_displayed=False,
+                      xyz_annotations={'frame':f'{eye}_optical','axes':'X right, Y down, Z forward',
+                          'position_origin':'camera optical center','position_unit':'mm',
+                          'direction_unit':'unit vector, dimensionless',
+                          'positions_displayed':['C','J1','J2'],'direction_displayed':'d',
+                          'arrow_displacements_displayed':['J1-C','J2-C'],
+                          'display_decimal_places':{'position_and_displacement':2,'direction':4},
+                          'rounded_for_display_only':True})
     return canvas,result
 
 
@@ -277,6 +298,7 @@ def main():
     report = {'renderer_invoked': False, 'source_files_unchanged': True, 'source_file_count': len(original),
               'preview_pairs': len(files), 'arrow_mm_relative_to_C': [0, 15], 'arrow_start': 'C', 'arrow_direction': '+d',
               'style':a.style,
+              'camera_xyz_annotations':a.style=='three-arrows',
               'T_display': 'not displayed; physical J1/J2 are shown separately' if a.style=='three-arrows' else 'blue position-indicator arrow C->T, vector T-C; model position remains camera-frame T' if a.style=='two-arrows' else 'midpoint projection crosshair with camera XYZ and image uv; no direction arrow',
               'projection_source': 'simulation_ground_truth_not_model_inference',
               'maximum_projection_difference_px': max(v['maximum_difference_from_saved_pixels_px'] for f in files for v in f['projection_results'].values()),
