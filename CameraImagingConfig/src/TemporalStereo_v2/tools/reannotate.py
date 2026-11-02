@@ -36,7 +36,7 @@ def overlap(a, b):
     return max(0, min(a[2], b[2])-max(a[0], b[0])) * max(0, min(a[3], b[3])-max(a[1], b[1]))
 
 
-def panel(image, record, eye, font_path):
+def point_panel(image, record, eye, font_path):
     w, h = image.size
     header, footer = 52, 264
     canvas = Image.new("RGB", (w, h+header+footer), "#101820")
@@ -145,11 +145,75 @@ def panel(image, record, eye, font_path):
     return canvas, projection
 
 
+def vector_panel(image, record, eye, font_path):
+    """Preferred view: direction arrow C->C+15d and position indicator C->T."""
+    w,h=image.size; header,footer=50,100
+    canvas=Image.new('RGB',(w,h+header+footer),'#101820');canvas.paste(image,(0,header))
+    draw=ImageDraw.Draw(canvas);font=ImageFont.truetype(str(font_path),25);small=ImageFont.truetype(str(font_path),22)
+    e=record['eyes'][eye];g=e['tool']
+    C=g['shaft_reference_position_mm'];T=g['tip_position_mm'];direction=g['shaft_direction_unit']
+    uvC=project(C,e['K'],e['D']);uvT=project(T,e['K'],e['D'])
+    residual=max(abs(uvC[i]-g['shaft_reference_pixel'][i]) for i in range(2))
+    residual=max(residual,max(abs(uvT[i]-g['tip_pixel'][i]) for i in range(2)))
+    if residual>=1e-6:raise ValueError('Saved C/T projection mismatch')
+    endpoint=[C[i]+15*direction[i] for i in range(3)]
+    def curve(end):
+        result=[project([C[j]+i/60*(end[j]-C[j]) for j in range(3)],e['K'],e['D']) for i in range(61)]
+        return [(x,y+header) for x,y in result]
+    axis,position=curve(endpoint),curve(T)
+    blue,yellow='#3d9dff','#ffe956'
+    tissue_hidden=all(v['in_frame'] and v['occluder_kind']=='tissue' for v in e['jaw_visibility'])
+    def arrow(points,color,width=4,broken=False):
+        length=sum(math.dist(a,b) for a,b in zip(points,points[1:]))
+        if broken:
+            distance=0.
+            for a,b in zip(points,points[1:]):
+                step=math.dist(a,b)
+                if int(distance/9)%2==0:
+                    draw.line((a,b),fill='#111111',width=width+3)
+                    draw.line((a,b),fill=color,width=width)
+                distance+=step
+        else:
+            draw.line(points,fill='#111111',width=width+3)
+            draw.line(points,fill=color,width=width)
+        tip,previous=points[-1],points[-5];dx,dy=tip[0]-previous[0],tip[1]-previous[1]
+        norm=math.hypot(dx,dy)
+        if norm>1e-8:
+            dx,dy=dx/norm,dy/norm;size=min(19,length*.35)
+            wings=[(tip[0]-size*dx+sign*size*.45*dy,tip[1]-size*dy-sign*size*.45*dx) for sign in (-1,1)]
+            draw.polygon([tip,*wings],fill=color)
+    arrow(position,blue,width=5,broken=tissue_hidden)
+    arrow(axis,yellow,width=3)
+    # Labels use thin neutral leaders, never a third colored vector or marker.
+    def label(text,point,offset,color,leader=True):
+        x,y=point;box=draw.textbbox((0,0),text,font=font);bw=box[2]-box[0]+20;bh=44
+        a=max(12,min(w-bw-12,x+offset[0]));b=max(header+12,min(header+h-bh-12,y+offset[1]))
+        if leader:
+            anchor=(max(a,min(a+bw,x)),max(b,min(b+bh,y)))
+            draw.line((point,anchor),fill='#d3d9e0',width=1)
+        draw.rounded_rectangle((a,b,a+bw,b+bh),radius=5,fill='#101820',outline=color,width=1)
+        draw.text((a+10,b+7),text,font=font,fill=color)
+    label('C 共同起点',axis[0],(55,85),'#e5edf4')
+    label('d 杆轴方向',axis[30],(65,-110),yellow,leader=False)
+    label('T 尖端位置',position[-1],(-270,-100),blue)
+    title='左目 LEFT' if eye=='left' else '右目 RIGHT'
+    draw.text((16,10),f"{title} · 双箭头真值投影   {record['sequence_id']} / {record['job_id']}",font=font,fill='white')
+    draw.text((16,header+h+10),'黄色：C → C + 15 mm × d（杆轴方向）    蓝色：C → T（尖端位置指示，位移 T−C）',font=small,fill='white')
+    note='蓝色虚线：两实际钳口尖端均被组织遮挡。' if tissue_hidden else 'T 为两实际钳口尖端的中点。'
+    draw.text((16,header+h+47),note+'保存的仿真真值投影，非模型预测；原图和真值未改动，未重新渲染。',font=small,fill='#c4ced8')
+    result={'source':'simulation_ground_truth','C_camera_mm':C,'T_camera_mm':T,'d_unit':direction,
+            'position_indicator_vector_mm':[T[i]-C[i] for i in range(3)],
+            'C_pixel':uvC,'T_pixel':uvT,'axis_arrow_end_pixel':project(endpoint,e['K'],e['D']),
+            'both_physical_tips_tissue_occluded':tissue_hidden,'maximum_difference_from_saved_pixels_px':residual}
+    return canvas,result
+
+
 def main():
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument('--run', type=Path, required=True)
     p.add_argument('--output', type=Path, required=True)
     p.add_argument('--font', type=Path, required=True, help='Chinese-capable TrueType/OpenType font')
+    p.add_argument('--style', choices=('two-arrows','points'), default='two-arrows')
     a = p.parse_args()
     labels = sorted(a.run.glob('sequences/*/labels/*.json'))
     if not labels:
@@ -166,7 +230,8 @@ def main():
             source = (path.parent/e['image']).resolve()
             if sha(source) != e['image_sha256']:
                 raise ValueError(f'Original image hash mismatch: {source}')
-            preview, projections[eye] = panel(Image.open(source).convert('RGB'), record, eye, a.font)
+            painter=vector_panel if a.style=='two-arrows' else point_panel
+            preview, projections[eye] = painter(Image.open(source).convert('RGB'), record, eye, a.font)
             panels.append(preview)
         w, h = panels[0].size
         canvas = Image.new('RGB', (2*w, h))
@@ -180,7 +245,8 @@ def main():
         raise RuntimeError('Saved source data changed')
     report = {'renderer_invoked': False, 'source_files_unchanged': True, 'source_file_count': len(original),
               'preview_pairs': len(files), 'arrow_mm_relative_to_C': [0, 15], 'arrow_start': 'C', 'arrow_direction': '+d',
-              'T_display': 'midpoint projection crosshair with camera XYZ and image uv; no direction arrow',
+              'style':a.style,
+              'T_display': 'blue position-indicator arrow C->T, vector T-C; model position remains camera-frame T' if a.style=='two-arrows' else 'midpoint projection crosshair with camera XYZ and image uv; no direction arrow',
               'projection_source': 'simulation_ground_truth_not_model_inference',
               'maximum_projection_difference_px': max(v['maximum_difference_from_saved_pixels_px'] for f in files for v in f['projection_results'].values()),
               'annotation_code_sha256': sha(Path(__file__)), 'font_sha256': sha(a.font), 'files': files}
