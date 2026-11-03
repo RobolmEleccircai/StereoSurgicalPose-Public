@@ -335,41 +335,14 @@ def vector_panel(image, record, eye, font_path, split_jaws=False, coordinate_axe
     else:
         arrow(position,blue,width=5,broken=tissue_hidden)
     arrow(axis,yellow,width=3)
-    # Jaw orientation diagrams move to separate corners in screen space only.
-    # All physical hinge/tip positions and 3D geometry stay unchanged.
+    # Orientation diagrams move in screen space only: jaws above, shaft below.
+    # All physical C/hinge/tip positions and 3D geometry stay unchanged.
     inset_rectangles=[(16,12,296,252),(w-296,12,w-16,252)] if split_jaws else []
-    protected_labels=[(a,b+header,c,d+header) for a,b,c,d in inset_rectangles]
+    shaft_inset_rectangle=(16,h-252,296,h-12)
+    protected_labels=[(a,b+header,c,d+header) for a,b,c,d in
+                      (inset_rectangles+[shaft_inset_rectangle] if split_jaws else [])]
     jaw_axis_insets=[]
-    if split_jaws:
-        axis_groups=[]
-        for part,suffix in [(triad,'')]:
-            for item,color in zip(part['axes'],XYZ_COLORS):
-                points=[(x,y+header) for x,y in item['projected_polyline_pixels']]
-                arrow(points,color,width=3 if suffix!='2' else 2,head_size=10)
-                same=next((group for group in axis_groups if group['item']['name']==item['name']
-                    and math.dist(group['item']['start_camera_mm'],item['start_camera_mm'])<1e-4
-                    and math.dist(group['item']['end_camera_mm'],item['end_camera_mm'])<1e-4),None)
-                if same:same['names'].append(item['name']+suffix)
-                else:axis_groups.append({'item':item,'points':points,'color':color,'names':[item['name']+suffix]})
-        for group in axis_groups:
-            points,color=group['points'],group['color'];text='+'+'/'.join(group['names'])
-            dx,dy=points[-1][0]-points[0][0],points[-1][1]-points[0][1]
-            norm=math.hypot(dx,dy)
-            ux,uy=(dx/norm,dy/norm) if norm>1e-8 else (0.,-1.)
-            # Only text moves for readability. Real axis endpoints and shared
-            # hinge positions are never offset to separate coincident frames.
-            choices=[]
-            for i,(along,side) in enumerate(((20,0),(32,0),(22,22),(22,-22),(35,35),(35,-35),(50,0))):
-                x=max(60,min(w-60,points[-1][0]+along*ux-side*uy))
-                y=max(header+18,min(header+h-18,points[-1][1]+along*uy+side*ux))
-                box=draw.textbbox((x,y),text,font=small,anchor='mm',stroke_width=3)
-                choices.append((sum(overlap(box,p) for p in protected_labels)*1000+i,x,y,box))
-            _,x,y,box=min(choices)
-            if math.dist((x,y),points[-1])>30:
-                draw.line((points[-1],(x,y)),fill=color,width=1)
-            draw.text((x,y),text,font=small,anchor='mm',fill=color,
-                      stroke_width=3,stroke_fill='#101820')
-            protected_labels.append((box[0]-8,box[1]-8,box[2]+8,box[3]+8))
+    shaft_axis_inset=None
     # Labels use thin neutral leaders, never additional vector arrows or markers.
     def label(text,point,offset,color,leader=True):
         x,y=point;box=draw.textbbox((0,0),text,font=font);bw=box[2]-box[0]+20;bh=44
@@ -404,13 +377,19 @@ def vector_panel(image, record, eye, font_path, split_jaws=False, coordinate_axe
         label('T 尖端位置',position[-1],(-270,-100),blue)
     if split_jaws:
         inset_font=ImageFont.truetype(str(font_path),18)
-        for v,rect,border in zip(triad['jaw_frames'],inset_rectangles,(blue,orange)):
-            a,b,c,d=rect;j=v['jaw_index']
+        inset_specs=[(v,rect,border) for v,rect,border in
+                     zip(triad['jaw_frames'],inset_rectangles,(blue,orange))]
+        inset_specs.append((triad,shaft_inset_rectangle,yellow))
+        for v,rect,border in inset_specs:
+            a,b,c,d=rect;j=v.get('jaw_index')
+            physical_origin=v['hinge_pixel'] if j is not None else uvC
+            anchor=v['anchor']
             origin=[(a+c)/2,b+126]
-            offset=[origin[k]-v['hinge_pixel'][k] for k in range(2)]
+            offset=[origin[k]-physical_origin[k] for k in range(2)]
             draw.rounded_rectangle((a,b+header,c,d+header),radius=9,fill='#111d2a',outline=border,width=2)
-            draw.text((a+14,b+header+10),f'钳口 {j} · XYZ 姿态',font=small,fill=border)
-            draw.text((a+12,d+header-29),f'仅移位显示；真实 H{j} 见器械',font=inset_font,fill='#d3dce7')
+            heading=f'钳口 {j} · XYZ 姿态' if j is not None else '杆体 · XYZ 姿态'
+            draw.text((a+14,b+header+10),heading,font=small,fill=border)
+            draw.text((a+12,d+header-29),f'仅移位显示；真实 {anchor} 见器械',font=inset_font,fill='#d3dce7')
             inset_axes=[];label_boxes=[]
             for item,color in zip(v['axes'],XYZ_COLORS):
                 translated=[[p[k]+offset[k] for k in range(2)] for p in item['projected_polyline_pixels']]
@@ -418,7 +397,7 @@ def vector_panel(image, record, eye, font_path, split_jaws=False, coordinate_axe
                 arrow(points,color,width=3,head_size=10)
                 dx,dy=translated[-1][0]-origin[0],translated[-1][1]-origin[1]
                 norm=math.hypot(dx,dy);ux,uy=(dx/norm,dy/norm) if norm>1e-8 else (0.,-1.)
-                text=f"+{item['name']}{j}";choices=[]
+                text=f"+{item['name']}"+(str(j) if j is not None else '');choices=[]
                 for i,(along,side) in enumerate(((20,0),(32,0),(22,20),(22,-20),(34,30),(34,-30))):
                     x=max(a+32,min(c-32,translated[-1][0]+along*ux-side*uy))
                     y=max(b+51,min(d-48,translated[-1][1]+along*uy+side*ux))+header
@@ -429,11 +408,17 @@ def vector_panel(image, record, eye, font_path, split_jaws=False, coordinate_axe
                 draw.text((x,y),text,font=small,anchor='mm',fill=color,stroke_width=2,stroke_fill='#111d2a')
                 label_boxes.append((box[0]-5,box[1]-5,box[2]+5,box[3]+5))
                 inset_axes.append({'name':item['name'],'display_polyline_pixels':translated})
-            jaw_axis_insets.append({'jaw_index':j,'physical_anchor':v['anchor'],
-                'placement':'top_left' if j==1 else 'top_right','bounds_image_pixels':list(rect),
-                'physical_hinge_pixel':v['hinge_pixel'],'display_origin_pixel':origin,
+            inset={'physical_anchor':anchor,
+                'placement':'bottom_left' if j is None else 'top_left' if j==1 else 'top_right',
+                'bounds_image_pixels':list(rect),'display_origin_pixel':origin,
                 'screen_translation_px':offset,'screen_scale':1.,'display_position_is_truth':False,
-                'projected_directions_and_lengths_unchanged':True,'axes':inset_axes})
+                'projected_directions_and_lengths_unchanged':True,'axes':inset_axes}
+            if j is None:
+                inset['physical_origin_pixel']=physical_origin
+                shaft_axis_inset=inset
+            else:
+                inset.update(jaw_index=j,physical_hinge_pixel=physical_origin)
+                jaw_axis_insets.append(inset)
     title='左目 LEFT' if eye=='left' else '右目 RIGHT'
     kind='杆体 / 双钳口局部坐标轴' if split_jaws else '双箭头真值投影'
     draw.text((16,10),f"{title} · {kind}   {record['sequence_id']} / {record['job_id']}",font=font,fill='white')
@@ -442,7 +427,7 @@ def vector_panel(image, record, eye, font_path, split_jaws=False, coordinate_axe
         y=header+h
         fmt=lambda v,digits=2: '('+', '.join(f'{x:+.{digits}f}' for x in v)+')'
         draw.text((16,y+10),'黄：C → C+15d    蓝：H1 → J1    橙：H2 → J2    |    尖端箭头：实线可见、虚线遮挡',font=small,fill='white')
-        draw.text((16,y+44),'杆体 XYZ 在 C；钳口1姿态在左上角，钳口2在右上角（仅移位显示）。红 X、绿 Y、蓝紫 Z。',font=small,fill='#e5edf4')
+        draw.text((16,y+44),'杆体 XYZ 在左下方；钳口1在左上角，钳口2在右上角（仅移位显示）。红 X、绿 Y、蓝紫 Z。',font=small,fill='#e5edf4')
         hinge_note='H1/H2 为模型共用的真实铰接位置，未人为错开。' if triad['shared_hinge_within_1e_4_mm'] else 'H1/H2 取自模型真实关节定义。'
         draw.text((16,y+78),hinge_note+f'下方 XYZ 数值仍属于{title}相机坐标系。',font=small,fill='#c4ced8')
         rows=[('C  杆轴参考点位置',C,'mm','#e5edf4',2),
@@ -478,6 +463,7 @@ def vector_panel(image, record, eye, font_path, split_jaws=False, coordinate_axe
                       jaw_symmetric_opening_deg=2*record['jaw_half_angle_deg'],T_displayed=False,
                       coordinate_axis_arrows=triad,
                       jaw_axis_insets=jaw_axis_insets,
+                      shaft_axis_inset=shaft_axis_inset,
                       xyz_annotations={'frame':f'{eye}_optical','axes':'X right, Y down, Z forward',
                           'position_origin':'camera optical center','position_unit':'mm',
                           'direction_unit':'unit vector, dimensionless',
@@ -567,6 +553,7 @@ def main():
               'jaw_hinges_unchanged':True if hinge_path else None,
               'jaw_xyz_axis_arrows':a.style=='three-arrows',
               'jaw_xyz_display_layout':'top_left_jaw1_top_right_jaw2_per_eye' if a.style=='three-arrows' else None,
+              'shaft_xyz_display_layout':'bottom_left_per_eye' if a.style=='three-arrows' else None,
               'jaw_tip_arrow_origins':['H1','H2'] if a.style=='three-arrows' else None,
               'T_display': 'not displayed; physical J1/J2 are shown separately' if a.style=='three-arrows' else 'blue position-indicator arrow C->T, vector T-C; model position remains camera-frame T' if a.style=='two-arrows' else 'midpoint projection crosshair with camera XYZ and image uv; no direction arrow',
               'projection_source': 'simulation_ground_truth_not_model_inference',
