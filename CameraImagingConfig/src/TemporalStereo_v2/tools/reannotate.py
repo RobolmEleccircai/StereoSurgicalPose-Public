@@ -8,6 +8,8 @@ from pathlib import Path
 from PIL import Image, ImageDraw, ImageFont
 
 COLORS = {"C": "#33d5ee", "T": "#ff68dd", "J1": "#66ee55", "J2": "#ffb43e", "d": "#ffe956"}
+XYZ_COLORS = ('#ff554f', '#56ef77', '#8796ff')
+XYZ_MAX_PROJECTED_RATIO = 0.55
 
 
 def sha(path):
@@ -34,6 +36,47 @@ def dashed(draw, a, b, fill, width=2):
 
 def overlap(a, b):
     return max(0, min(a[2], b[2])-max(a[0], b[0])) * max(0, min(a[3], b[3])-max(a[1], b[1]))
+
+
+def camera_axis_geometry(record):
+    """Short camera-basis triads anchored at C, with one length for both eyes.
+
+    Each actual 3D axis is projected through K/D. Length is display-only and
+    bounded in 3D and in both images; no screen-space axis direction is invented.
+    """
+    def path(C, end, e):
+        return [project([C[j]+i/60*(end[j]-C[j]) for j in range(3)], e['K'], e['D']) for i in range(61)]
+
+    def length(points):
+        return sum(math.dist(a,b) for a,b in zip(points,points[1:]))
+
+    references={}
+    for eye,e in record['eyes'].items():
+        g=e['tool'];C=g['shaft_reference_position_mm'];d=g['shaft_direction_unit']
+        ends=[[C[i]+15*d[i] for i in range(3)], g['jaw1_tip_position_mm'], g['jaw2_tip_position_mm']]
+        references[eye]={'mm':min(math.dist(C,p) for p in ends),
+                         'px':min(length(path(C,p,e)) for p in ends)}
+    axis_mm=0.5*min(r['mm'] for r in references.values())
+    if axis_mm<=0 or any(r['px']<=1e-8 for r in references.values()):
+        raise ValueError('Cannot size coordinate axes against a zero-length pose arrow')
+    for _ in range(100):
+        panels={};fits=True
+        for eye,e in record['eyes'].items():
+            C=e['tool']['shaft_reference_position_mm'];axes=[]
+            for j,name in enumerate('XYZ'):
+                end=[C[i]+(axis_mm if i==j else 0.) for i in range(3)]
+                points=path(C,end,e);pixels=length(points)
+                axes.append({'name':name,'start_camera_mm':C,'end_camera_mm':end,
+                             'projected_polyline_pixels':points,'projected_length_px':pixels})
+                fits &= pixels <= XYZ_MAX_PROJECTED_RATIO*references[eye]['px']
+            panels[eye]={'frame':eye+'_optical','anchor':'C','length_mm':axis_mm,
+                         'reference_shortest_pose_arrow_mm':references[eye]['mm'],
+                         'reference_shortest_pose_arrow_px':references[eye]['px'],
+                         'max_projected_length_ratio':XYZ_MAX_PROJECTED_RATIO,
+                         'display_only':True,'axes':axes}
+        if fits:return panels
+        axis_mm*=0.9
+    raise ValueError('Unable to size projected coordinate axes')
 
 
 def point_panel(image, record, eye, font_path):
@@ -145,9 +188,9 @@ def point_panel(image, record, eye, font_path):
     return canvas, projection
 
 
-def vector_panel(image, record, eye, font_path, split_jaws=False):
+def vector_panel(image, record, eye, font_path, split_jaws=False, coordinate_axes=None):
     """Direction/tip arrows with per-camera XYZ; optional legacy midpoint view."""
-    w,h=image.size; header,footer=50,370 if split_jaws else 100
+    w,h=image.size; header,footer=50,404 if split_jaws else 100
     canvas=Image.new('RGB',(w,h+header+footer),'#101820');canvas.paste(image,(0,header))
     draw=ImageDraw.Draw(canvas);font=ImageFont.truetype(str(font_path),25);small=ImageFont.truetype(str(font_path),22)
     e=record['eyes'][eye];g=e['tool']
@@ -194,6 +237,20 @@ def vector_panel(image, record, eye, font_path, split_jaws=False):
     else:
         arrow(position,blue,width=5,broken=tissue_hidden)
     arrow(axis,yellow,width=3)
+    if split_jaws:
+        triad=(coordinate_axes or camera_axis_geometry(record))[eye]
+        for item,color in zip(triad['axes'],XYZ_COLORS):
+            points=[(x,y+header) for x,y in item['projected_polyline_pixels']]
+            arrow(points,color,width=3,head_size=10)
+            dx,dy=points[-1][0]-points[0][0],points[-1][1]-points[0][1]
+            norm=math.hypot(dx,dy)
+            # Labels sit beyond the projected endpoint; endpoints themselves
+            # remain the K/D projections of C + length * camera basis vectors.
+            ux,uy=(dx/norm,dy/norm) if norm>1e-8 else (0.,-1.)
+            x=max(28,min(w-28,points[-1][0]+19*ux))
+            y=max(header+18,min(header+h-18,points[-1][1]+19*uy))
+            draw.text((x,y),'+'+item['name'],font=font,anchor='mm',fill=color,
+                      stroke_width=3,stroke_fill='#101820')
     # Labels use thin neutral leaders, never additional vector arrows or markers.
     def label(text,point,offset,color,leader=True):
         x,y=point;box=draw.textbbox((0,0),text,font=font);bw=box[2]-box[0]+20;bh=44
@@ -214,7 +271,7 @@ def vector_panel(image, record, eye, font_path, split_jaws=False):
     else:
         label('T 尖端位置',position[-1],(-270,-100),blue)
     title='左目 LEFT' if eye=='left' else '右目 RIGHT'
-    kind='三箭头真值投影' if split_jaws else '双箭头真值投影'
+    kind='三箭头 + XYZ 轴真值投影' if split_jaws else '双箭头真值投影'
     draw.text((16,10),f"{title} · {kind}   {record['sequence_id']} / {record['job_id']}",font=font,fill='white')
     if split_jaws:
         theta=record['jaw_half_angle_deg']
@@ -222,20 +279,21 @@ def vector_panel(image, record, eye, font_path, split_jaws=False):
         fmt=lambda v,digits=2: '('+', '.join(f'{x:+.{digits}f}' for x in v)+')'
         draw.text((16,y+10),'黄：杆轴方向 d    蓝：C → J1    橙：C → J2    |    实线：可见；虚线：遮挡，类型见标签',font=small,fill='white')
         draw.text((16,y+44),f'{title}光学坐标系：X 向右，Y 向下，Z 向前；位置原点为本目相机光心。',font=small,fill='#c4ced8')
+        draw.text((16,y+78),'C 点短坐标轴：+X 红、+Y 绿、+Z 蓝紫；沿本目相机坐标方向，长度仅用于显示。',font=small,fill='#e5edf4')
         rows=[('C  杆轴参考点位置',C,'mm','#e5edf4',2),
               ('d  杆轴单位方向',direction,'无单位',yellow,4),
               ('J1 钳口1尖端位置',tips[0],'mm',blue,2),
               ('J2 钳口2尖端位置',tips[1],'mm',orange,2)]
         for i,(name,values,unit,color,digits) in enumerate(rows):
-            draw.text((16,y+79+34*i),f'{name}    (X, Y, Z) = {fmt(values,digits)} {unit}',font=font,fill=color)
+            draw.text((16,y+113+34*i),f'{name}    (X, Y, Z) = {fmt(values,digits)} {unit}',font=font,fill=color)
         # Camera-origin positions and C-origin arrow displacements are different
         # vectors. Display both explicitly; never relabel J1/J2 as J1-C/J2-C.
         for j,color in enumerate((blue,orange)):
             delta=[tips[j][i]-C[i] for i in range(3)]
-            draw.text((16,y+222+31*j),f'C → J{j+1} 箭头位移  (ΔX, ΔY, ΔZ) = {fmt(delta)} mm',font=small,fill=color)
-        draw.text((16,y+291),f'每片钳口半开合角 θ = {theta:.2f}°    |    对称开合角 2θ = {2*theta:.2f}°',font=font,fill='#e5edf4')
+            draw.text((16,y+256+31*j),f'C → J{j+1} 箭头位移  (ΔX, ΔY, ΔZ) = {fmt(delta)} mm',font=small,fill=color)
+        draw.text((16,y+325),f'每片钳口半开合角 θ = {theta:.2f}°    |    对称开合角 2θ = {2*theta:.2f}°',font=font,fill='#e5edf4')
         note='闭合时两个尖端投影接近重合，未人为错开。' if theta<1e-6 else 'J1/J2 固定对应两片钳口，未用中点代替。'
-        draw.text((16,y+333),note+'保存真值投影，非模型预测；原图未改动，未重新渲染。',font=small,fill='#c4ced8')
+        draw.text((16,y+367),note+'保存真值投影，非模型预测；原图未改动，未重新渲染。',font=small,fill='#c4ced8')
     else:
         draw.text((16,header+h+10),'黄色：C → C + 15 mm × d（杆轴方向）    蓝色：C → T（尖端位置指示，位移 T−C）',font=small,fill='white')
         note='蓝色虚线：两实际钳口尖端均被组织遮挡。' if tissue_hidden else 'T 为两实际钳口尖端的中点。'
@@ -249,6 +307,7 @@ def vector_panel(image, record, eye, font_path, split_jaws=False):
                       jaw_position_indicator_vectors_mm=[[p[i]-C[i] for i in range(3)] for p in tips],
                       jaw_visibility=e['jaw_visibility'],jaw_half_angle_deg=record['jaw_half_angle_deg'],
                       jaw_symmetric_opening_deg=2*record['jaw_half_angle_deg'],T_displayed=False,
+                      coordinate_axis_arrows=triad,
                       xyz_annotations={'frame':f'{eye}_optical','axes':'X right, Y down, Z forward',
                           'position_origin':'camera optical center','position_unit':'mm',
                           'direction_unit':'unit vector, dimensionless',
@@ -276,6 +335,7 @@ def main():
         record = json.loads(path.read_text())
         panels = []
         projections = {}
+        coordinate_axes=camera_axis_geometry(record) if a.style=='three-arrows' else None
         for eye in ('left', 'right'):
             e = record['eyes'][eye]
             source = (path.parent/e['image']).resolve()
@@ -283,7 +343,7 @@ def main():
                 raise ValueError(f'Original image hash mismatch: {source}')
             rgb=Image.open(source).convert('RGB')
             if a.style=='points':preview,projections[eye]=point_panel(rgb,record,eye,a.font)
-            else:preview,projections[eye]=vector_panel(rgb,record,eye,a.font,split_jaws=a.style=='three-arrows')
+            else:preview,projections[eye]=vector_panel(rgb,record,eye,a.font,split_jaws=a.style=='three-arrows',coordinate_axes=coordinate_axes)
             panels.append(preview)
         w, h = panels[0].size
         canvas = Image.new('RGB', (2*w, h))
@@ -299,6 +359,7 @@ def main():
               'preview_pairs': len(files), 'arrow_mm_relative_to_C': [0, 15], 'arrow_start': 'C', 'arrow_direction': '+d',
               'style':a.style,
               'camera_xyz_annotations':a.style=='three-arrows',
+              'camera_xyz_axis_arrows':a.style=='three-arrows',
               'T_display': 'not displayed; physical J1/J2 are shown separately' if a.style=='three-arrows' else 'blue position-indicator arrow C->T, vector T-C; model position remains camera-frame T' if a.style=='two-arrows' else 'midpoint projection crosshair with camera XYZ and image uv; no direction arrow',
               'projection_source': 'simulation_ground_truth_not_model_inference',
               'maximum_projection_difference_px': max(v['maximum_difference_from_saved_pixels_px'] for f in files for v in f['projection_results'].values()),
