@@ -10,6 +10,7 @@ from PIL import Image, ImageDraw, ImageFont
 COLORS = {"C": "#33d5ee", "T": "#ff68dd", "J1": "#66ee55", "J2": "#ffb43e", "d": "#ffe956"}
 XYZ_COLORS = ('#ff554f', '#56ef77', '#8796ff')
 XYZ_MAX_PROJECTED_RATIO = 0.55
+XYZ_PANEL_BG_RGBA = (17, 29, 42, 102)  # 40% opaque; original image remains visible.
 
 
 def sha(path):
@@ -386,7 +387,9 @@ def vector_panel(image, record, eye, font_path, split_jaws=False, coordinate_axe
             anchor=v['anchor']
             origin=[(a+c)/2,b+126]
             offset=[origin[k]-physical_origin[k] for k in range(2)]
-            draw.rounded_rectangle((a,b+header,c,d+header),radius=9,fill='#111d2a',outline=border,width=2)
+            # Blend only the panel background; arrows, border and text stay opaque.
+            ImageDraw.Draw(canvas,'RGBA').rounded_rectangle(
+                (a,b+header,c,d+header),radius=9,fill=XYZ_PANEL_BG_RGBA,outline=border,width=2)
             heading=f'钳口 {j} · XYZ 姿态' if j is not None else '杆体 · XYZ 姿态'
             draw.text((a+14,b+header+10),heading,font=small,fill=border)
             draw.text((a+12,d+header-29),f'仅移位显示；真实 {anchor} 见器械',font=inset_font,fill='#d3dce7')
@@ -554,6 +557,8 @@ def main():
               'jaw_xyz_axis_arrows':a.style=='three-arrows',
               'jaw_xyz_display_layout':'top_left_jaw1_top_right_jaw2_per_eye' if a.style=='three-arrows' else None,
               'shaft_xyz_display_layout':'bottom_left_per_eye' if a.style=='three-arrows' else None,
+              'xyz_panel_background':{'color':'#111d2a','opacity':XYZ_PANEL_BG_RGBA[3]/255,
+                  'alpha_8bit':XYZ_PANEL_BG_RGBA[3],'foreground_opacity':1.0} if a.style=='three-arrows' else None,
               'jaw_tip_arrow_origins':['H1','H2'] if a.style=='three-arrows' else None,
               'T_display': 'not displayed; physical J1/J2 are shown separately' if a.style=='three-arrows' else 'blue position-indicator arrow C->T, vector T-C; model position remains camera-frame T' if a.style=='two-arrows' else 'midpoint projection crosshair with camera XYZ and image uv; no direction arrow',
               'projection_source': 'simulation_ground_truth_not_model_inference',
