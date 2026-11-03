@@ -1,0 +1,11 @@
+{
+  "pairs_verified": 32,
+  "jaw_orientation_insets_verified": 128,
+  "all_physical_pose_geometry_unchanged": true,
+  "screen_scale": 1,
+  "maximum_screen_translation_roundtrip_error_px": 1.1368683772161603e-13,
+  "separate_left_right_panels": true,
+  "unchanged_source_files": 224,
+  "new_rgb_renders": 0,
+  "annotation_code_sha256": "e07884c7ba95eafcad66a0140250bc36fbacad4875d6b15b7ce3b0ebee08d749"
+}
