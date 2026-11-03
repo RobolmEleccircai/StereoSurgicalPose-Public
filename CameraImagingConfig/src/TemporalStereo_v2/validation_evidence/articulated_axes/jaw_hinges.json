@@ -1,0 +1,159 @@
+{
+  "schema_version": 1,
+  "unit": "mm",
+  "source": "authored_USD_physics_localPos0_localPos1",
+  "exporter_sha256": "8ebd744a99f5e1c776a55d38c3ed6a0ed322a129c7151cab2819499b30fbf6e7",
+  "pose_geometry_sha256": "3778ec01493c86a304ba9eb61d70e1f9c85a6b607b83cb728293fb23d2623e6c",
+  "source_scene_sha256": "103131ce17df7e2dd218ed5389d62ea16313c5441b30bef4c36a4aefb691b126",
+  "source_layers_sha256": {
+    "/home/leorobot/PoseProject/CameraImagingConfig/TemporalStereo_v2/server_assets_20261108/scene.usdc": "103131ce17df7e2dd218ed5389d62ea16313c5441b30bef4c36a4aefb691b126"
+  },
+  "jaws": {
+    "jaw1": {
+      "joint_path": "/SurgicalTools/PSM_Right/Robot/psm_tool_yaw_link/psm_tool_gripper1_joint",
+      "joint_name": "psm_tool_gripper1_joint",
+      "axis": "X",
+      "jaw_body": "/SurgicalTools/PSM_Right/Robot/psm_tool_gripper1_link",
+      "parent_body": "/SurgicalTools/PSM_Right/Robot/psm_tool_yaw_link",
+      "T_body0_from_joint0_mm": [
+        [
+          -1.3435883850802393e-07,
+          0.0,
+          -0.9999999999999908,
+          0.0
+        ],
+        [
+          -0.0,
+          1.0,
+          2.2284829497583926e-17,
+          -0.0
+        ],
+        [
+          0.999999999999991,
+          0.0,
+          -1.3435883829723324e-07,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "authored_localPos0": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "T_body1_from_joint1_mm": [
+        [
+          -1.3435883850802393e-07,
+          0.0,
+          -0.9999999999999908,
+          0.0
+        ],
+        [
+          -0.0,
+          1.0,
+          2.2284829497583926e-17,
+          -0.0
+        ],
+        [
+          0.999999999999991,
+          0.0,
+          -1.3435883829723324e-07,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "authored_localPos1": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    "jaw2": {
+      "joint_path": "/SurgicalTools/PSM_Right/Robot/psm_tool_yaw_link/psm_tool_gripper2_joint",
+      "joint_name": "psm_tool_gripper2_joint",
+      "axis": "X",
+      "jaw_body": "/SurgicalTools/PSM_Right/Robot/psm_tool_gripper2_link",
+      "parent_body": "/SurgicalTools/PSM_Right/Robot/psm_tool_yaw_link",
+      "T_body0_from_joint0_mm": [
+        [
+          -1.3435883850802393e-07,
+          0.0,
+          -0.9999999999999908,
+          0.0
+        ],
+        [
+          -0.0,
+          1.0,
+          2.2284829497583926e-17,
+          -0.0
+        ],
+        [
+          0.999999999999991,
+          0.0,
+          -1.3435883829723324e-07,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "authored_localPos0": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "T_body1_from_joint1_mm": [
+        [
+          -1.3435883850802393e-07,
+          0.0,
+          -0.9999999999999908,
+          0.0
+        ],
+        [
+          -0.0,
+          1.0,
+          2.2284829497583926e-17,
+          -0.0
+        ],
+        [
+          0.999999999999991,
+          0.0,
+          -1.3435883829723324e-07,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "authored_localPos1": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    }
+  },
+  "axis_orientation": "native_jaw_body_XYZ_translated_to_physical_hinge",
+  "frames_verified": 32,
+  "max_parent_child_anchor_gap_mm": 6.365646477964495e-06,
+  "max_revolute_axis_direction_difference": 1.5748959722151287e-14,
+  "max_H1_H2_separation_mm": 6.365646477964495e-06,
+  "source_files_unchanged": true,
+  "simulation_app_started": false,
+  "new_rgb_renders": 0
+}

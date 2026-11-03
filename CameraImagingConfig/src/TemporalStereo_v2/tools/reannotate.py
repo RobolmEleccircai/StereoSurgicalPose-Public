@@ -106,6 +106,71 @@ def instrument_axis_geometry(record, pose_frame):
     raise ValueError('Unable to size projected coordinate axes')
 
 
+def articulated_axis_geometry(record, pose_frame, hinges):
+    """Shaft axes at C; native jaw axes at their authored USD hinge centers."""
+    import numpy as np
+    result=instrument_axis_geometry(record,pose_frame)
+    world_poses=pose_frame['T_world_from_body_mm']
+    jaws={eye:[] for eye in record['eyes']}
+    for j in (1,2):
+        definition=hinges['jaws'][f'jaw{j}']
+        if not definition['jaw_body'].endswith(f'/psm_tool_gripper{j}_link'):
+            raise ValueError('Jaw hinge definition has the wrong physical identity')
+        world_body=np.array(world_poses[definition['jaw_body']])
+        world_child_joint=world_body@np.array(definition['T_body1_from_joint1_mm'])
+        world_parent_joint=np.array(world_poses[definition['parent_body']])@np.array(definition['T_body0_from_joint0_mm'])
+        gap=float(np.linalg.norm(world_child_joint[:3,3]-world_parent_joint[:3,3]))
+        if gap>1e-4:raise ValueError('Saved jaw body does not meet its physical USD hinge')
+        world_hinge_frame=world_body.copy()
+        # Use the jaw's native XYZ orientation, translated to the actual hinge.
+        # The body origin is never assumed to be the joint center.
+        world_hinge_frame[:3,3]=world_child_joint[:3,3]
+        for eye,e in record['eyes'].items():
+            optical=np.linalg.solve(np.array(pose_frame['camera_truth']['T_world_from_optical_mm'][eye]),world_hinge_frame)
+            R=optical[:3,:3];H=optical[:3,3].tolist();tip=e['tool'][f'jaw{j}_tip_position_mm']
+            if not np.isfinite(optical).all() or not np.allclose(R.T@R,np.eye(3),atol=1e-6,rtol=0) or abs(np.linalg.det(R)-1)>1e-6:
+                raise ValueError('Saved jaw orientation is not a proper rotation')
+            if H[2]<=0 or tip[2]<=0:raise ValueError('Jaw annotation is behind the optical center')
+            path=[project([H[k]+i/60*(tip[k]-H[k]) for k in range(3)],e['K'],e['D']) for i in range(61)]
+            jaws[eye].append({'frame':definition['jaw_body'],'expressed_in_frame':eye+'_optical',
+                'anchor':f'H{j}','jaw_index':j,'hinge_camera_mm':H,'hinge_pixel':project(H,e['K'],e['D']),
+                'tip_camera_mm':tip,'tip_pixel':project(tip,e['K'],e['D']),
+                'hinge_to_tip_vector_mm':[tip[k]-H[k] for k in range(3)],
+                'hinge_to_tip_polyline_pixels':path,
+                'hinge_to_tip_length_mm':math.dist(H,tip),
+                'hinge_to_tip_projected_length_px':sum(math.dist(a,b) for a,b in zip(path,path[1:])),
+                'T_optical_from_hinge_frame_mm':optical.tolist(),
+                'joint_path':definition['joint_path'],'origin_source':'USD physics:localPos1 on body1',
+                'orientation_source':'saved native jaw-body rotation, translated to hinge',
+                'max_parent_child_anchor_gap_mm':gap,'surface_visibility':'not_assigned_joint_reference'})
+    # Equal short lengths for both jaws and both eyes; preserve overlaps.
+    axis_mm=.5*min(v['hinge_to_tip_length_mm'] for values in jaws.values() for v in values)
+    if axis_mm<=0:raise ValueError('Hinge-to-tip arrow has zero length')
+    for _ in range(100):
+        fits=True
+        for eye,values in jaws.items():
+            e=record['eyes'][eye]
+            for v in values:
+                H=v['hinge_camera_mm'];R=np.array(v['T_optical_from_hinge_frame_mm'])[:3,:3]
+                axes=[]
+                for j,name in enumerate('XYZ'):
+                    direction=R[:,j].tolist();end=[H[k]+axis_mm*direction[k] for k in range(3)]
+                    path=[project([H[k]+i/60*(end[k]-H[k]) for k in range(3)],e['K'],e['D']) for i in range(61)]
+                    length=sum(math.dist(a,b) for a,b in zip(path,path[1:]))
+                    axes.append({'name':name,'start_camera_mm':H,'end_camera_mm':end,
+                        'direction_camera_unit':direction,'projected_polyline_pixels':path,'projected_length_px':length})
+                    fits &= length<=XYZ_MAX_PROJECTED_RATIO*v['hinge_to_tip_projected_length_px']
+                v.update(axes=axes,length_mm=axis_mm,max_projected_length_ratio=XYZ_MAX_PROJECTED_RATIO,display_only=True)
+        if fits:break
+        axis_mm*=.9
+    else:raise ValueError('Unable to size jaw coordinate axes')
+    for eye,values in jaws.items():
+        result[eye]['jaw_frames']=values
+        result[eye]['H1_H2_separation_mm']=math.dist(values[0]['hinge_camera_mm'],values[1]['hinge_camera_mm'])
+        result[eye]['shared_hinge_within_1e_4_mm']=result[eye]['H1_H2_separation_mm']<1e-4
+    return result
+
+
 def point_panel(image, record, eye, font_path):
     w, h = image.size
     header, footer = 52, 264
@@ -216,8 +281,8 @@ def point_panel(image, record, eye, font_path):
 
 
 def vector_panel(image, record, eye, font_path, split_jaws=False, coordinate_axes=None):
-    """Direction/tip arrows and the instrument's own XYZ orientation at C."""
-    w,h=image.size; header,footer=50,404 if split_jaws else 100
+    """Shaft frame at C and articulated jaw frames/arrows at physical hinges."""
+    w,h=image.size; header,footer=50,472 if split_jaws else 100
     canvas=Image.new('RGB',(w,h+header+footer),'#101820');canvas.paste(image,(0,header))
     draw=ImageDraw.Draw(canvas);font=ImageFont.truetype(str(font_path),25);small=ImageFont.truetype(str(font_path),22)
     e=record['eyes'][eye];g=e['tool']
@@ -226,12 +291,18 @@ def vector_panel(image, record, eye, font_path, split_jaws=False, coordinate_axe
     residual=max(abs(uvC[i]-g['shaft_reference_pixel'][i]) for i in range(2))
     residual=max(residual,max(abs(uvT[i]-g['tip_pixel'][i]) for i in range(2)))
     tips=[g['jaw1_tip_position_mm'],g['jaw2_tip_position_mm']]
+    if split_jaws:
+        if coordinate_axes is None or 'jaw_frames' not in coordinate_axes[eye]:
+            raise ValueError('Separate jaw annotations require real hinge definitions and full pose truth')
+        triad=coordinate_axes[eye]
+        hinge_points=[v['hinge_camera_mm'] for v in triad['jaw_frames']]
     uv_tips=[project(p,e['K'],e['D']) for p in tips]
     residual=max(residual,max(abs(uv_tips[j][i]-g['jaw_tip_pixels'][j][i]) for j in range(2) for i in range(2)))
     if residual>=1e-6:raise ValueError('Saved C/T/J1/J2 projection mismatch')
     endpoint=[C[i]+15*direction[i] for i in range(3)]
-    def curve(end):
-        result=[project([C[j]+i/60*(end[j]-C[j]) for j in range(3)],e['K'],e['D']) for i in range(61)]
+    def curve(end,start=None):
+        start=C if start is None else start
+        result=[project([start[j]+i/60*(end[j]-start[j]) for j in range(3)],e['K'],e['D']) for i in range(61)]
         return [(x,y+header) for x,y in result]
     axis,position=curve(endpoint),curve(T)
     blue,yellow,orange='#3d9dff','#ffe956','#ffa23a'
@@ -255,7 +326,7 @@ def vector_panel(image, record, eye, font_path, split_jaws=False, coordinate_axe
             dx,dy=dx/norm,dy/norm;size=min(head_size,length*.35)
             wings=[(tip[0]-size*dx+sign*size*.45*dy,tip[1]-size*dy-sign*size*.45*dx) for sign in (-1,1)]
             draw.polygon([tip,*wings],fill=color)
-    jaw_curves=[curve(p) for p in tips]
+    jaw_curves=[curve(p,hinge_points[j] if split_jaws else C) for j,p in enumerate(tips)]
     if split_jaws:
         # Different symbol widths keep nearly coincident closed-jaw arrows
         # distinguishable without changing either physical endpoint.
@@ -266,22 +337,34 @@ def vector_panel(image, record, eye, font_path, split_jaws=False, coordinate_axe
     arrow(axis,yellow,width=3)
     protected_labels=[]
     if split_jaws:
-        if coordinate_axes is None:
-            raise ValueError('Instrument axes require saved full body-pose truth')
-        triad=coordinate_axes[eye]
-        for item,color in zip(triad['axes'],XYZ_COLORS):
-            points=[(x,y+header) for x,y in item['projected_polyline_pixels']]
-            arrow(points,color,width=3,head_size=10)
+        axis_groups=[]
+        for part,suffix in [(triad,'')]+[(v,str(v['jaw_index'])) for v in triad['jaw_frames']]:
+            for item,color in zip(part['axes'],XYZ_COLORS):
+                points=[(x,y+header) for x,y in item['projected_polyline_pixels']]
+                arrow(points,color,width=3 if suffix!='2' else 2,head_size=10)
+                same=next((group for group in axis_groups if group['item']['name']==item['name']
+                    and math.dist(group['item']['start_camera_mm'],item['start_camera_mm'])<1e-4
+                    and math.dist(group['item']['end_camera_mm'],item['end_camera_mm'])<1e-4),None)
+                if same:same['names'].append(item['name']+suffix)
+                else:axis_groups.append({'item':item,'points':points,'color':color,'names':[item['name']+suffix]})
+        for group in axis_groups:
+            points,color=group['points'],group['color'];text='+'+'/'.join(group['names'])
             dx,dy=points[-1][0]-points[0][0],points[-1][1]-points[0][1]
             norm=math.hypot(dx,dy)
-            # Labels sit beyond the projected endpoint; endpoints themselves
-            # remain the K/D projections of C + length * body rotation columns.
             ux,uy=(dx/norm,dy/norm) if norm>1e-8 else (0.,-1.)
-            x=max(28,min(w-28,points[-1][0]+19*ux))
-            y=max(header+18,min(header+h-18,points[-1][1]+19*uy))
-            draw.text((x,y),'+'+item['name'],font=font,anchor='mm',fill=color,
+            # Only text moves for readability. Real axis endpoints and shared
+            # hinge positions are never offset to separate coincident frames.
+            choices=[]
+            for i,(along,side) in enumerate(((20,0),(32,0),(22,22),(22,-22),(35,35),(35,-35),(50,0))):
+                x=max(60,min(w-60,points[-1][0]+along*ux-side*uy))
+                y=max(header+18,min(header+h-18,points[-1][1]+along*uy+side*ux))
+                box=draw.textbbox((x,y),text,font=small,anchor='mm',stroke_width=3)
+                choices.append((sum(overlap(box,p) for p in protected_labels)*1000+i,x,y,box))
+            _,x,y,box=min(choices)
+            if math.dist((x,y),points[-1])>30:
+                draw.line((points[-1],(x,y)),fill=color,width=1)
+            draw.text((x,y),text,font=small,anchor='mm',fill=color,
                       stroke_width=3,stroke_fill='#101820')
-            box=draw.textbbox((x,y),'+'+item['name'],font=font,anchor='mm',stroke_width=3)
             protected_labels.append((box[0]-8,box[1]-8,box[2]+8,box[3]+8))
     # Labels use thin neutral leaders, never additional vector arrows or markers.
     def label(text,point,offset,color,leader=True):
@@ -300,9 +383,14 @@ def vector_panel(image, record, eye, font_path, split_jaws=False, coordinate_axe
             draw.line((point,anchor),fill='#d3d9e0',width=1)
         draw.rounded_rectangle((a,b,a+bw,b+bh),radius=5,fill='#101820',outline=color,width=1)
         draw.text((a+10,b+7),text,font=font,fill=color)
-    label('C 共同起点',axis[0],(55,85),'#e5edf4')
+    label('C 杆体坐标原点',axis[0],(55,85),'#e5edf4')
     label('d 杆轴方向',axis[30],(65,-110),yellow,leader=False)
     if split_jaws:
+        if triad['shared_hinge_within_1e_4_mm']:
+            label('H1 / H2 真实铰接中心',jaw_curves[0][0],(-270,155),'#e5edf4')
+        else:
+            for j,color in enumerate((blue,orange)):
+                label(f'H{j+1} 钳口{j+1}铰接中心',jaw_curves[j][0],(-270,155+60*j),color)
         for j,color in enumerate((blue,orange)):
             v=e['jaw_visibility'][j]
             state='出画' if not v['in_frame'] else '可见' if v['visible'] else '组织遮挡' if v['occluder_kind']=='tissue' else '自遮挡'
@@ -311,29 +399,31 @@ def vector_panel(image, record, eye, font_path, split_jaws=False, coordinate_axe
     else:
         label('T 尖端位置',position[-1],(-270,-100),blue)
     title='左目 LEFT' if eye=='left' else '右目 RIGHT'
-    kind='器械自身 XYZ 轴真值投影' if split_jaws else '双箭头真值投影'
+    kind='杆体 / 双钳口局部坐标轴' if split_jaws else '双箭头真值投影'
     draw.text((16,10),f"{title} · {kind}   {record['sequence_id']} / {record['job_id']}",font=font,fill='white')
     if split_jaws:
         theta=record['jaw_half_angle_deg']
         y=header+h
         fmt=lambda v,digits=2: '('+', '.join(f'{x:+.{digits}f}' for x in v)+')'
-        draw.text((16,y+10),'黄：杆轴方向 d    蓝：C → J1    橙：C → J2    |    实线：可见；虚线：遮挡，类型见标签',font=small,fill='white')
-        draw.text((16,y+44),'C 点为器械自身坐标原点：+X 红、+Y 绿、+Z 蓝紫；随杆体转动，+Z 与 d 同向。',font=small,fill='#e5edf4')
-        draw.text((16,y+78),f'下方数值仍在{title}相机坐标系中：X 右、Y 下、Z 前；器械轴取自完整杆体旋转真值。',font=small,fill='#c4ced8')
+        draw.text((16,y+10),'黄：C → C+15d    蓝：H1 → J1    橙：H2 → J2    |    尖端箭头：实线可见、虚线遮挡',font=small,fill='white')
+        draw.text((16,y+44),'XYZ 杆体；X1/Y1/Z1 钳口1；X2/Y2/Z2 钳口2。红 X、绿 Y、蓝紫 Z。',font=small,fill='#e5edf4')
+        hinge_note='H1/H2 为模型共用的真实铰接位置，未人为错开。' if triad['shared_hinge_within_1e_4_mm'] else 'H1/H2 取自模型真实关节定义。'
+        draw.text((16,y+78),hinge_note+f'下方 XYZ 数值仍属于{title}相机坐标系。',font=small,fill='#c4ced8')
         rows=[('C  杆轴参考点位置',C,'mm','#e5edf4',2),
               ('d  杆轴单位方向',direction,'无单位',yellow,4),
               ('J1 钳口1尖端位置',tips[0],'mm',blue,2),
-              ('J2 钳口2尖端位置',tips[1],'mm',orange,2)]
+              ('J2 钳口2尖端位置',tips[1],'mm',orange,2),
+              ('H1 钳口1铰接中心',hinge_points[0],'mm',blue,2),
+              ('H2 钳口2铰接中心',hinge_points[1],'mm',orange,2)]
         for i,(name,values,unit,color,digits) in enumerate(rows):
             draw.text((16,y+113+34*i),f'{name}    (X, Y, Z) = {fmt(values,digits)} {unit}',font=font,fill=color)
-        # Camera-origin positions and C-origin arrow displacements are different
-        # vectors. Display both explicitly; never relabel J1/J2 as J1-C/J2-C.
+        # Tip positions are camera-relative; displayed jaw arrows start at H1/H2.
         for j,color in enumerate((blue,orange)):
-            delta=[tips[j][i]-C[i] for i in range(3)]
-            draw.text((16,y+256+31*j),f'C → J{j+1} 箭头位移  (ΔX, ΔY, ΔZ) = {fmt(delta)} mm',font=small,fill=color)
-        draw.text((16,y+325),f'每片钳口半开合角 θ = {theta:.2f}°    |    对称开合角 2θ = {2*theta:.2f}°',font=font,fill='#e5edf4')
+            delta=[tips[j][i]-hinge_points[j][i] for i in range(3)]
+            draw.text((16,y+324+31*j),f'H{j+1} → J{j+1} 箭头位移  (ΔX, ΔY, ΔZ) = {fmt(delta)} mm',font=small,fill=color)
+        draw.text((16,y+393),f'每片钳口半开合角 θ = {theta:.2f}°    |    对称开合角 2θ = {2*theta:.2f}°',font=font,fill='#e5edf4')
         note='闭合时两个尖端投影接近重合，未人为错开。' if theta<1e-6 else 'J1/J2 固定对应两片钳口，未用中点代替。'
-        draw.text((16,y+367),note+'保存真值投影，非模型预测；原图未改动，未重新渲染。',font=small,fill='#c4ced8')
+        draw.text((16,y+435),note+'保存真值投影，非模型预测；原图未改动，未重新渲染。',font=small,fill='#c4ced8')
     else:
         draw.text((16,header+h+10),'黄色：C → C + 15 mm × d（杆轴方向）    蓝色：C → T（尖端位置指示，位移 T−C）',font=small,fill='white')
         note='蓝色虚线：两实际钳口尖端均被组织遮挡。' if tissue_hidden else 'T 为两实际钳口尖端的中点。'
@@ -344,15 +434,18 @@ def vector_panel(image, record, eye, font_path, split_jaws=False, coordinate_axe
             'both_physical_tips_tissue_occluded':tissue_hidden,'maximum_difference_from_saved_pixels_px':residual}
     if split_jaws:
         result.update(J1_camera_mm=tips[0],J2_camera_mm=tips[1],J1_pixel=uv_tips[0],J2_pixel=uv_tips[1],
-                      jaw_position_indicator_vectors_mm=[[p[i]-C[i] for i in range(3)] for p in tips],
+                      jaw_position_indicator_vectors_mm=[[p[i]-hinge_points[j][i] for i in range(3)] for j,p in enumerate(tips)],
+                      jaw_position_indicator_origins=['H1','H2'],
+                      H1_camera_mm=hinge_points[0],H2_camera_mm=hinge_points[1],
+                      H1_pixel=triad['jaw_frames'][0]['hinge_pixel'],H2_pixel=triad['jaw_frames'][1]['hinge_pixel'],
                       jaw_visibility=e['jaw_visibility'],jaw_half_angle_deg=record['jaw_half_angle_deg'],
                       jaw_symmetric_opening_deg=2*record['jaw_half_angle_deg'],T_displayed=False,
                       coordinate_axis_arrows=triad,
                       xyz_annotations={'frame':f'{eye}_optical','axes':'X right, Y down, Z forward',
                           'position_origin':'camera optical center','position_unit':'mm',
                           'direction_unit':'unit vector, dimensionless',
-                          'positions_displayed':['C','J1','J2'],'direction_displayed':'d',
-                          'arrow_displacements_displayed':['J1-C','J2-C'],
+                          'positions_displayed':['C','J1','J2','H1','H2'],'direction_displayed':'d',
+                          'arrow_displacements_displayed':['J1-H1','J2-H2'],
                           'display_decimal_places':{'position_and_displacement':2,'direction':4},
                           'rounded_for_display_only':True})
     return canvas,result
@@ -365,11 +458,12 @@ def main():
     p.add_argument('--font', type=Path, required=True, help='Chinese-capable TrueType/OpenType font')
     p.add_argument('--style', choices=('three-arrows','two-arrows','points'), default='three-arrows')
     p.add_argument('--pose-geometry',type=Path,help='Saved full body transforms; default: RUN/pose_geometry/geometry.json')
+    p.add_argument('--jaw-hinges',type=Path,help='Authored USD joint anchors; default: RUN/pose_geometry/jaw_hinges.json')
     a = p.parse_args()
     labels = sorted(a.run.glob('sequences/*/labels/*.json'))
     if not labels:
         raise ValueError('No saved labels found')
-    pose_path=None;pose_frames={};pose_hash=None
+    pose_path=None;pose_frames={};pose_hash=None;hinge_path=None;hinge_hash=None;hinges=None
     if a.style=='three-arrows':
         pose_path=a.pose_geometry or a.run/'pose_geometry/geometry.json'
         if not pose_path.is_file():
@@ -377,6 +471,12 @@ def main():
         pose_hash=sha(pose_path)
         geometry=json.loads(pose_path.read_text())
         if geometry['unit']!='mm':raise ValueError('Saved body transforms must use millimeters')
+        hinge_path=a.jaw_hinges or a.run/'pose_geometry/jaw_hinges.json'
+        if not hinge_path.is_file():
+            raise FileNotFoundError(f'Real jaw hinges require {hinge_path}. Export USD anchors with tools/export_jaw_hinges.py; no rendering is needed.')
+        hinge_hash=sha(hinge_path);hinges=json.loads(hinge_path.read_text())
+        if hinges['unit']!='mm' or hinges['pose_geometry_sha256']!=pose_hash or hinges['source_scene_sha256']!=geometry['source_scene_sha256']:
+            raise ValueError('Jaw hinge definitions do not match the saved pose geometry')
         for frame in geometry['frames']:
             key=(frame['sequence_id'],frame['job_id'])
             if key in pose_frames:raise ValueError('Duplicate body-pose frame')
@@ -393,7 +493,7 @@ def main():
             pose_frame=pose_frames[(record['sequence_id'],record['job_id'])]
             if pose_frame['label_sha256']!=sha(path):
                 raise ValueError('Saved full body-pose truth does not match the source label')
-            coordinate_axes=instrument_axis_geometry(record,pose_frame)
+            coordinate_axes=articulated_axis_geometry(record,pose_frame,hinges)
         for eye in ('left', 'right'):
             e = record['eyes'][eye]
             source = (path.parent/e['image']).resolve()
@@ -415,6 +515,8 @@ def main():
         raise RuntimeError('Saved source data changed')
     if pose_path and sha(pose_path)!=pose_hash:
         raise RuntimeError('Saved full body-pose truth changed')
+    if hinge_path and sha(hinge_path)!=hinge_hash:
+        raise RuntimeError('USD jaw hinge definitions changed')
     report = {'renderer_invoked': False, 'source_files_unchanged': True, 'source_file_count': len(original),
               'preview_pairs': len(files), 'arrow_mm_relative_to_C': [0, 15], 'arrow_start': 'C', 'arrow_direction': '+d',
               'style':a.style,
@@ -424,6 +526,10 @@ def main():
               'instrument_axis_body':'psm_tool_roll_link' if pose_path else None,
               'pose_geometry_sha256':pose_hash,
               'pose_geometry_unchanged':True if pose_path else None,
+              'jaw_hinges_sha256':hinge_hash,
+              'jaw_hinges_unchanged':True if hinge_path else None,
+              'jaw_xyz_axis_arrows':a.style=='three-arrows',
+              'jaw_tip_arrow_origins':['H1','H2'] if a.style=='three-arrows' else None,
               'T_display': 'not displayed; physical J1/J2 are shown separately' if a.style=='three-arrows' else 'blue position-indicator arrow C->T, vector T-C; model position remains camera-frame T' if a.style=='two-arrows' else 'midpoint projection crosshair with camera XYZ and image uv; no direction arrow',
               'projection_source': 'simulation_ground_truth_not_model_inference',
               'maximum_projection_difference_px': max(v['maximum_difference_from_saved_pixels_px'] for f in files for v in f['projection_results'].values()),
