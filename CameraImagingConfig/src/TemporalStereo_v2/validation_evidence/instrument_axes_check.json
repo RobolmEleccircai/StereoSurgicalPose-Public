@@ -1,0 +1,12 @@
+{
+  "pairs_checked": 32,
+  "axis_arrows_checked": 192,
+  "max_independent_projection_error_px": 3.353761712787673e-12,
+  "max_instrument_local_axis_error_mm": 3.2313702931590676e-13,
+  "max_Z_vs_d_component_error": 1.020840445509208e-08,
+  "original_pose_arrows_unchanged": true,
+  "source_files_unchanged": 224,
+  "pose_geometry_unchanged": true,
+  "invalid_body_truth_rejected": true,
+  "new_renders": 0
+}

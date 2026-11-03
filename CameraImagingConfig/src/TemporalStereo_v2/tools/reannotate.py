@@ -38,12 +38,34 @@ def overlap(a, b):
     return max(0, min(a[2], b[2])-max(a[0], b[0])) * max(0, min(a[3], b[3])-max(a[1], b[1]))
 
 
-def camera_axis_geometry(record):
-    """Short camera-basis triads anchored at C, with one length for both eyes.
+def instrument_axis_geometry(record, pose_frame):
+    """Project the saved roll-link XYZ frame at C, including axial rotation.
 
-    Each actual 3D axis is projected through K/D. Length is display-only and
-    bounded in 3D and in both images; no screen-space axis direction is invented.
+    Use full rigid-body truth, not camera basis vectors or an invented roll
+    inferred from the shaft direction. One display length is used in both eyes.
     """
+    import numpy as np
+    body=pose_frame['roll_body']
+    if not body.endswith('/psm_tool_roll_link'):
+        raise ValueError('Expected the saved PSM roll-link frame at C')
+    world_from_body=np.asarray(pose_frame['T_world_from_body_mm'][body],dtype=float)
+    body_poses={}
+    for eye,e in record['eyes'].items():
+        world_from_camera=np.asarray(pose_frame['camera_truth']['T_world_from_optical_mm'][eye],dtype=float)
+        if world_from_body.shape!=(4,4) or world_from_camera.shape!=(4,4):
+            raise ValueError('Expected homogeneous 4x4 body and camera transforms')
+        camera_from_body=np.linalg.inv(world_from_camera)@world_from_body
+        R=camera_from_body[:3,:3];C=camera_from_body[:3,3]
+        # USD-authored transforms retain about 1e-7 orthogonality roundoff.
+        # Keep the saved rotation unchanged instead of silently refitting it.
+        if not np.isfinite(camera_from_body).all() or not np.allclose(R.T@R,np.eye(3),atol=1e-6,rtol=0) or abs(np.linalg.det(R)-1)>1e-6:
+            raise ValueError('Saved instrument frame is not a proper rigid rotation')
+        if not np.allclose(C,e['tool']['shaft_reference_position_mm'],atol=1e-8,rtol=0):
+            raise ValueError('Saved instrument origin disagrees with C')
+        if not np.allclose(R[:,2],e['tool']['shaft_direction_unit'],atol=1e-7,rtol=0):
+            raise ValueError('Saved instrument +Z disagrees with shaft direction d')
+        body_poses[eye]=camera_from_body
+
     def path(C, end, e):
         return [project([C[j]+i/60*(end[j]-C[j]) for j in range(3)], e['K'], e['D']) for i in range(61)]
 
@@ -64,12 +86,17 @@ def camera_axis_geometry(record):
         for eye,e in record['eyes'].items():
             C=e['tool']['shaft_reference_position_mm'];axes=[]
             for j,name in enumerate('XYZ'):
-                end=[C[i]+(axis_mm if i==j else 0.) for i in range(3)]
+                direction=body_poses[eye][:3,j].tolist()
+                end=[C[i]+axis_mm*direction[i] for i in range(3)]
                 points=path(C,end,e);pixels=length(points)
                 axes.append({'name':name,'start_camera_mm':C,'end_camera_mm':end,
+                             'direction_camera_unit':direction,
                              'projected_polyline_pixels':points,'projected_length_px':pixels})
                 fits &= pixels <= XYZ_MAX_PROJECTED_RATIO*references[eye]['px']
-            panels[eye]={'frame':eye+'_optical','anchor':'C','length_mm':axis_mm,
+            panels[eye]={'frame':body,'expressed_in_frame':eye+'_optical','anchor':'C','length_mm':axis_mm,
+                         'source':'saved_full_instrument_body_pose_truth',
+                         'T_optical_from_body_mm':body_poses[eye].tolist(),
+                         'Z_axis_matches_shaft_direction':True,
                          'reference_shortest_pose_arrow_mm':references[eye]['mm'],
                          'reference_shortest_pose_arrow_px':references[eye]['px'],
                          'max_projected_length_ratio':XYZ_MAX_PROJECTED_RATIO,
@@ -189,7 +216,7 @@ def point_panel(image, record, eye, font_path):
 
 
 def vector_panel(image, record, eye, font_path, split_jaws=False, coordinate_axes=None):
-    """Direction/tip arrows with per-camera XYZ; optional legacy midpoint view."""
+    """Direction/tip arrows and the instrument's own XYZ orientation at C."""
     w,h=image.size; header,footer=50,404 if split_jaws else 100
     canvas=Image.new('RGB',(w,h+header+footer),'#101820');canvas.paste(image,(0,header))
     draw=ImageDraw.Draw(canvas);font=ImageFont.truetype(str(font_path),25);small=ImageFont.truetype(str(font_path),22)
@@ -237,24 +264,37 @@ def vector_panel(image, record, eye, font_path, split_jaws=False, coordinate_axe
     else:
         arrow(position,blue,width=5,broken=tissue_hidden)
     arrow(axis,yellow,width=3)
+    protected_labels=[]
     if split_jaws:
-        triad=(coordinate_axes or camera_axis_geometry(record))[eye]
+        if coordinate_axes is None:
+            raise ValueError('Instrument axes require saved full body-pose truth')
+        triad=coordinate_axes[eye]
         for item,color in zip(triad['axes'],XYZ_COLORS):
             points=[(x,y+header) for x,y in item['projected_polyline_pixels']]
             arrow(points,color,width=3,head_size=10)
             dx,dy=points[-1][0]-points[0][0],points[-1][1]-points[0][1]
             norm=math.hypot(dx,dy)
             # Labels sit beyond the projected endpoint; endpoints themselves
-            # remain the K/D projections of C + length * camera basis vectors.
+            # remain the K/D projections of C + length * body rotation columns.
             ux,uy=(dx/norm,dy/norm) if norm>1e-8 else (0.,-1.)
             x=max(28,min(w-28,points[-1][0]+19*ux))
             y=max(header+18,min(header+h-18,points[-1][1]+19*uy))
             draw.text((x,y),'+'+item['name'],font=font,anchor='mm',fill=color,
                       stroke_width=3,stroke_fill='#101820')
+            box=draw.textbbox((x,y),'+'+item['name'],font=font,anchor='mm',stroke_width=3)
+            protected_labels.append((box[0]-8,box[1]-8,box[2]+8,box[3]+8))
     # Labels use thin neutral leaders, never additional vector arrows or markers.
     def label(text,point,offset,color,leader=True):
         x,y=point;box=draw.textbbox((0,0),text,font=font);bw=box[2]-box[0]+20;bh=44
-        a=max(12,min(w-bw-12,x+offset[0]));b=max(header+12,min(header+h-bh-12,y+offset[1]))
+        offsets=[offset,(offset[0]+80,offset[1]-55),(offset[0]+120,offset[1]+55),
+                 (-bw-80,-140),(70,130),(-bw/2,-180)]
+        choices=[]
+        for i,(ox,oy) in enumerate(offsets):
+            a=max(12,min(w-bw-12,x+ox));b=max(header+12,min(header+h-bh-12,y+oy))
+            rect=(a,b,a+bw,b+bh)
+            choices.append((sum(overlap(rect,p) for p in protected_labels)*1000+i,rect))
+        _,(a,b,_,_)=min(choices)
+        protected_labels.append((a-5,b-5,a+bw+5,b+bh+5))
         if leader:
             anchor=(max(a,min(a+bw,x)),max(b,min(b+bh,y)))
             draw.line((point,anchor),fill='#d3d9e0',width=1)
@@ -271,15 +311,15 @@ def vector_panel(image, record, eye, font_path, split_jaws=False, coordinate_axe
     else:
         label('T 尖端位置',position[-1],(-270,-100),blue)
     title='左目 LEFT' if eye=='left' else '右目 RIGHT'
-    kind='三箭头 + XYZ 轴真值投影' if split_jaws else '双箭头真值投影'
+    kind='器械自身 XYZ 轴真值投影' if split_jaws else '双箭头真值投影'
     draw.text((16,10),f"{title} · {kind}   {record['sequence_id']} / {record['job_id']}",font=font,fill='white')
     if split_jaws:
         theta=record['jaw_half_angle_deg']
         y=header+h
         fmt=lambda v,digits=2: '('+', '.join(f'{x:+.{digits}f}' for x in v)+')'
         draw.text((16,y+10),'黄：杆轴方向 d    蓝：C → J1    橙：C → J2    |    实线：可见；虚线：遮挡，类型见标签',font=small,fill='white')
-        draw.text((16,y+44),f'{title}光学坐标系：X 向右，Y 向下，Z 向前；位置原点为本目相机光心。',font=small,fill='#c4ced8')
-        draw.text((16,y+78),'C 点短坐标轴：+X 红、+Y 绿、+Z 蓝紫；沿本目相机坐标方向，长度仅用于显示。',font=small,fill='#e5edf4')
+        draw.text((16,y+44),'C 点为器械自身坐标原点：+X 红、+Y 绿、+Z 蓝紫；随杆体转动，+Z 与 d 同向。',font=small,fill='#e5edf4')
+        draw.text((16,y+78),f'下方数值仍在{title}相机坐标系中：X 右、Y 下、Z 前；器械轴取自完整杆体旋转真值。',font=small,fill='#c4ced8')
         rows=[('C  杆轴参考点位置',C,'mm','#e5edf4',2),
               ('d  杆轴单位方向',direction,'无单位',yellow,4),
               ('J1 钳口1尖端位置',tips[0],'mm',blue,2),
@@ -324,10 +364,23 @@ def main():
     p.add_argument('--output', type=Path, required=True)
     p.add_argument('--font', type=Path, required=True, help='Chinese-capable TrueType/OpenType font')
     p.add_argument('--style', choices=('three-arrows','two-arrows','points'), default='three-arrows')
+    p.add_argument('--pose-geometry',type=Path,help='Saved full body transforms; default: RUN/pose_geometry/geometry.json')
     a = p.parse_args()
     labels = sorted(a.run.glob('sequences/*/labels/*.json'))
     if not labels:
         raise ValueError('No saved labels found')
+    pose_path=None;pose_frames={};pose_hash=None
+    if a.style=='three-arrows':
+        pose_path=a.pose_geometry or a.run/'pose_geometry/geometry.json'
+        if not pose_path.is_file():
+            raise FileNotFoundError(f'Instrument XYZ axes require existing full body-pose truth: {pose_path}. No camera-axis fallback or new rendering is performed.')
+        pose_hash=sha(pose_path)
+        geometry=json.loads(pose_path.read_text())
+        if geometry['unit']!='mm':raise ValueError('Saved body transforms must use millimeters')
+        for frame in geometry['frames']:
+            key=(frame['sequence_id'],frame['job_id'])
+            if key in pose_frames:raise ValueError('Duplicate body-pose frame')
+            pose_frames[key]=frame
     original = {str(f.relative_to(a.run)): sha(f) for f in (a.run/'sequences').rglob('*') if f.is_file()}
     a.output.mkdir(parents=True, exist_ok=True)
     files = []
@@ -335,7 +388,12 @@ def main():
         record = json.loads(path.read_text())
         panels = []
         projections = {}
-        coordinate_axes=camera_axis_geometry(record) if a.style=='three-arrows' else None
+        coordinate_axes=None
+        if a.style=='three-arrows':
+            pose_frame=pose_frames[(record['sequence_id'],record['job_id'])]
+            if pose_frame['label_sha256']!=sha(path):
+                raise ValueError('Saved full body-pose truth does not match the source label')
+            coordinate_axes=instrument_axis_geometry(record,pose_frame)
         for eye in ('left', 'right'):
             e = record['eyes'][eye]
             source = (path.parent/e['image']).resolve()
@@ -355,11 +413,17 @@ def main():
     after = {str(f.relative_to(a.run)): sha(f) for f in (a.run/'sequences').rglob('*') if f.is_file()}
     if original != after:
         raise RuntimeError('Saved source data changed')
+    if pose_path and sha(pose_path)!=pose_hash:
+        raise RuntimeError('Saved full body-pose truth changed')
     report = {'renderer_invoked': False, 'source_files_unchanged': True, 'source_file_count': len(original),
               'preview_pairs': len(files), 'arrow_mm_relative_to_C': [0, 15], 'arrow_start': 'C', 'arrow_direction': '+d',
               'style':a.style,
               'camera_xyz_annotations':a.style=='three-arrows',
-              'camera_xyz_axis_arrows':a.style=='three-arrows',
+              'camera_xyz_axis_arrows':False,
+              'instrument_xyz_axis_arrows':a.style=='three-arrows',
+              'instrument_axis_body':'psm_tool_roll_link' if pose_path else None,
+              'pose_geometry_sha256':pose_hash,
+              'pose_geometry_unchanged':True if pose_path else None,
               'T_display': 'not displayed; physical J1/J2 are shown separately' if a.style=='three-arrows' else 'blue position-indicator arrow C->T, vector T-C; model position remains camera-frame T' if a.style=='two-arrows' else 'midpoint projection crosshair with camera XYZ and image uv; no direction arrow',
               'projection_source': 'simulation_ground_truth_not_model_inference',
               'maximum_projection_difference_px': max(v['maximum_difference_from_saved_pixels_px'] for f in files for v in f['projection_results'].values()),
