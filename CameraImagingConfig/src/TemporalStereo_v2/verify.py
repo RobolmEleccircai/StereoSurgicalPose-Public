@@ -1,5 +1,6 @@
 """Independent projection arithmetic, temporal integrity, coverage and preview videos."""
 import json
+from pathlib import Path
 import numpy as np
 import cv2
 from PIL import Image
@@ -15,6 +16,9 @@ def project_independent(points,K,D):
 def validate_record(label,fp,c):
     if not frame_valid(label,fp):raise ValueError('Incomplete/corrupt pair: '+str(label))
     r=read(label);truth=read(label.parent/r['camera_truth']);relative=np.array(truth['T_right_from_left_mm']);R=relative[:3,:3];t=relative[:3,3]
+    if r.get('schema_version',2)>=3:
+        from pose_truth import validate_body_truth
+        validate_body_truth(r,truth)
     if abs(r['time_s']-r['frame_index']/c['fps'])>1e-12 or r['timestamp_ns']!=round(r['frame_index']*1e9/c['fps']):raise ValueError('Timestamp mismatch')
     if r['fps']!=60 or r['position_unit']!='mm':raise ValueError('Unexpected time/length units')
     if not -1e-6<=r['jaw_half_angle_deg']<=30+1e-6:raise ValueError('Jaw angle out of range')
@@ -49,10 +53,18 @@ def validate_record(label,fp,c):
 def main():
     a=arguments();c=a.settings_data;run=a.run;m=read(run/'config/manifest.json');inv=read(run/'validation/render_inventory.json')
     require_seal(run/'trajectories/index.json',m['fingerprint'])
-    rows=[];clips={};max_projection=0.;max_stereo=0.;tip_distances=[];key_masks={};mask_change_counts={}
+    rows=[];clips={};max_projection=0.;max_stereo=0.;tip_distances=[];key_masks={};mask_change_counts={};full_pose_count=0
     for job in inv['jobs']:
         label=run/'sequences'/job['sequence_id']/'labels'/f"{job['job_id']}.json"
         r,result,_=validate_record(label,m['fingerprint'],c)
+        if r.get('schema_version',2)>=3:
+            full_pose_count+=1
+            preview=run/'previews'/f"{r['sequence_id']}_{r['job_id']}.json"
+            info=read(preview)
+            if info['source_label_sha256']!=sha(label) or sha(preview.parent/info['image'])!=info['image_sha256']:
+                raise ValueError('Missing or stale full-pose preview')
+            if info['annotation_code_sha256']!=sha(Path(__file__).parent/'tools/reannotate.py'):
+                raise ValueError('Preview annotation code changed')
         max_projection=max(max_projection,result['projection_error_px']);max_stereo=max(max_stereo,result['stereo_position_error_mm'])
         tip_distances.extend(result['visible_tip_mask_distance_px'])
         if r['reason'] in ('closed_jaw','maximum_opening'):
@@ -101,7 +113,10 @@ def main():
     lower=joints[insertion_name]['lower'];near_lower=sum(abs(x-lower)<1e-6 for x in insertion)
     if near_lower>max(1,len(insertion)//100):raise ValueError('Insertion samples accumulate at their lower limit')
     report={'mode':a.mode,'passed':True,'rendered_pairs':len(rows),'planned_sequences':len(sequences),'planned_frames':index['total_pairs'],
-        'fps':60,'per_eye_resolution':[c['width'],c['height']],'main_target_scalars':18,
+        'fps':60,'per_eye_resolution':[c['width'],c['height']],
+        'landmark_fields_per_eye':['C','d','J1','J2'],'landmark_scalars_both_eyes':24,
+        'full_pose_frames_verified':full_pose_count,
+        'full_pose_frames_per_eye':['shaft_at_C','jaw1_at_H1','jaw2_at_H2'],
         'maximum_projection_error_px':max_projection,'maximum_stereo_consistency_error_mm':max_stereo,
         'visible_tip_checks':len(tip_distances),'maximum_visible_tip_mask_distance_px':max(tip_distances) if tip_distances else None,
         'mask_changed_pixels_by_sequence':mask_change_counts,'jaw_limit_changed_mask_pixels':jaw_change,

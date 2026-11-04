@@ -490,7 +490,8 @@ def main():
     if not labels:
         raise ValueError('No saved labels found')
     pose_path=None;pose_frames={};pose_hash=None;hinge_path=None;hinge_hash=None;hinges=None
-    if a.style=='three-arrows':
+    inline_truth=all('body_pose_truth' in json.loads(path.read_text()) for path in labels)
+    if a.style=='three-arrows' and not inline_truth:
         pose_path=a.pose_geometry or a.run/'pose_geometry/geometry.json'
         if not pose_path.is_file():
             raise FileNotFoundError(f'Instrument XYZ axes require existing full body-pose truth: {pose_path}. No camera-axis fallback or new rendering is performed.')
@@ -516,10 +517,19 @@ def main():
         projections = {}
         coordinate_axes=None
         if a.style=='three-arrows':
-            pose_frame=pose_frames[(record['sequence_id'],record['job_id'])]
-            if pose_frame['label_sha256']!=sha(path):
-                raise ValueError('Saved full body-pose truth does not match the source label')
-            coordinate_axes=articulated_axis_geometry(record,pose_frame,hinges)
+            if 'body_pose_truth' in record:
+                import sys
+                root=str(Path(__file__).resolve().parents[1])
+                if root not in sys.path:sys.path.insert(0,root)
+                from pose_truth import validate_body_truth
+                truth_path=path.parent/record['camera_truth']
+                if sha(truth_path)!=record['camera_truth_sha256']:raise ValueError('Camera truth hash mismatch')
+                coordinate_axes=validate_body_truth(record,json.loads(truth_path.read_text()))
+            else:
+                pose_frame=pose_frames[(record['sequence_id'],record['job_id'])]
+                if pose_frame['label_sha256']!=sha(path):
+                    raise ValueError('Saved full body-pose truth does not match the source label')
+                coordinate_axes=articulated_axis_geometry(record,pose_frame,hinges)
         for eye in ('left', 'right'):
             e = record['eyes'][eye]
             source = (path.parent/e['image']).resolve()
@@ -549,7 +559,8 @@ def main():
               'camera_xyz_annotations':a.style=='three-arrows',
               'camera_xyz_axis_arrows':False,
               'instrument_xyz_axis_arrows':a.style=='three-arrows',
-              'instrument_axis_body':'psm_tool_roll_link' if pose_path else None,
+              'instrument_axis_body':'psm_tool_roll_link' if a.style=='three-arrows' else None,
+              'inline_body_pose_truth':inline_truth,
               'pose_geometry_sha256':pose_hash,
               'pose_geometry_unchanged':True if pose_path else None,
               'jaw_hinges_sha256':hinge_hash,

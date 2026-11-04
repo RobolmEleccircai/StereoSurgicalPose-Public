@@ -97,6 +97,24 @@ def main():
     for group,q in [('psm',qp),('ecm',qe)]:
         for body,T in getattr(scene,group).fk(q).items():assert np.max(abs(rigid_mm(usd_world(scene.stage,body))-T))<1e-6
     results.append('authored_psm_ecm_and_camera_poses_match_independent_fk')
+    from pose_truth import jaw_definitions,attach_body_truth,validate_body_truth
+    from pxr import UsdGeom
+    hinges=jaw_definitions(scene.stage,scene.c['psm_root'])
+    ground=scene.labels(qp,qe,spec)
+    record={'eyes':{eye:{'K':scene.profile[eye]['K'],'D':scene.profile[eye]['D'],'tool':ground[eye]}
+                    for eye in ('left','right')}}
+    cameras={'T_world_from_optical_mm':{k:v.tolist() for k,v in truth.items()},
+             'T_right_from_left_mm':(np.linalg.inv(truth['right'])@truth['left']).tolist()}
+    attach_body_truth(record,scene.psm.fk(qp),scene.roll,hinges,cameras,sha(scene.paths['source_scene']))
+    validate_body_truth(record,cameras)
+    for eye,e in record['eyes'].items():
+        for name,frame in e['local_frames'].items():
+            actual=np.linalg.inv(truth[eye])@rigid_mm(usd_world(scene.stage,frame['body']))
+            assert np.allclose(actual[:3,:3],np.array(frame['T_optical_from_local_mm'])[:3,:3],atol=1e-6,rtol=0)
+    results.append('full_local_rotation_truth_matches_authored_USD_in_both_eyes')
+    corrupt=copy.deepcopy(record)
+    corrupt['eyes']['left']['local_frames']['jaw1']['T_optical_from_local_mm'][0][0]+=.1
+    test('corrupt_full_local_rotation_rejected',lambda:rejected(lambda:validate_body_truth(corrupt,cameras)))
     write(a.run/'validation/unit_tests.json',{'passed':True,'tests':results,'rendered_pairs':0})
     print('TESTS_COMPLETE',len(results),'NO_RENDER',flush=True)
 

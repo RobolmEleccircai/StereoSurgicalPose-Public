@@ -17,12 +17,15 @@ def main():
         require_seal(run/'trajectories'/f'{sid}.json',fp)
     jobs=index['validation_jobs'] if a.mode=='validate' else [{'sequence_id':sid,'frame_index':i,'job_id':f'{i:06d}','reason':'dataset_frame'} for sid in index['sequences'] for i in range(c['frames_per_sequence'])]
     if a.mode=='validate' and len(jobs)>min(32,c['validation_render_limit']):raise ValueError('Validation cap exceeded')
+    from live_preview import LivePreview,preview_font
+    from pose_truth import jaw_definitions,attach_body_truth
+    preview_writer=LivePreview(run/'previews',preview_font(m))
     from isaacsim import SimulationApp
     app=SimulationApp({'headless':True,'renderer':c['renderer'],'width':c['width'],'height':c['height'],'multi_gpu':False,
         'anti_aliasing':0,'samples_per_pixel_per_frame':c['samples_per_pixel_per_frame'],'disable_viewport_updates':True})
     import numpy as np
     import cv2
-    from PIL import Image,ImageDraw
+    from PIL import Image
     import carb,omni.usd,omni.timeline,omni.replicator.core as rep
     from pxr import UsdGeom,UsdLux,Sdf
     from isaacsim.sensors.camera import Camera
@@ -38,6 +41,8 @@ def main():
     layer.Clear();layer.subLayerPaths=[manifest['source_paths']['source_scene']];layer.Save()
     if not omni.usd.get_context().open_stage(str(scene_file)):raise RuntimeError('Stage open failed')
     scene=Scene(m,c,omni.usd.get_context().get_stage());stage=scene.stage
+    hinges=jaw_definitions(stage,c['psm_root'])
+    source_scene_sha256=sha(manifest['source_paths']['source_scene'])
     for attr,path in manifest['dependencies']['asset_overrides'].items():stage.GetAttributeAtPath(attr).Set(Sdf.AssetPath(path))
     stage.SetTimeCodesPerSecond(c['fps']);stage.SetFramesPerSecond(c['fps']);omni.timeline.get_timeline_interface().stop()
     settings=carb.settings.get_settings()
@@ -67,12 +72,18 @@ def main():
     completed=0;times=[]
     for job in jobs:
         seq=sequences[job['sequence_id']];frame=seq['frames'][job['frame_index']];folder=run/'sequences'/seq['sequence_id'];ident=job['job_id'];label=folder/'labels'/f'{ident}.json'
-        if frame_valid(label,fp):completed+=1;continue
+        if frame_valid(label,fp):
+            preview_writer.publish_saved(label)
+            completed+=1;continue
         qp=np.array(frame['q_psm']);qe=np.array(frame['q_ecm']);path=Trajectory(seq['path']);vp,ve=path.velocity(frame['time_s'])
         if 'q_psm_override' in job:qp=np.array(job['q_psm_override']);vp*=0;ve*=0
         scene.apply(qp,qe,seq,vp,ve);check=safety.check(qp,qe)
         if not check['safe']:raise ValueError('Unsafe render state: '+str(check))
         ground=scene.labels(qp,qe,seq);cams=scene.cameras(qe,seq);_,_,physical_tips=scene.points(qp)
+        poses=scene.psm.fk(qp)
+        for body in {scene.roll,*(j['jaw_body'] for j in hinges['jaws'].values())}:
+            if not np.allclose(rigid_mm(usd_world(stage,body)),poses[body],atol=1e-6,rtol=0):
+                raise ValueError('Authored body pose and full rotation truth disagree: '+body)
         for eye in ('left','right'):
             observed=rigid_mm(usd_world(stage,scene.rig+'/'+eye.capitalize()))@AXES
             if not np.allclose(observed,cams[eye],atol=1e-6):raise ValueError('Camera pose and labels disagree')
@@ -82,7 +93,7 @@ def main():
         UsdLux.LightAPI(stage.GetPrimAtPath(scene.rig+'/EndoscopePointLight')).GetIntensityAttr().Set(c['endoscope_light_intensity']*effects['light_multiplier'])
         reserve_render(m,c,run.name,seq['sequence_id']+'/'+ident);started=time.monotonic()
         rep.orchestrator.step(rt_subframes=c['rt_subframes'],pause_timeline=True,delta_time=0.,wait_for_render=True)
-        record={'schema_version':2,'fingerprint':fp,'mode':a.mode,'sequence_id':seq['sequence_id'],'job_id':ident,
+        record={'schema_version':3,'fingerprint':fp,'mode':a.mode,'sequence_id':seq['sequence_id'],'job_id':ident,
             'frame_index':frame['frame_index'],'time_s':frame['time_s'],'timestamp_ns':frame['timestamp_ns'],'fps':c['fps'],
             'reason':job['reason'],'category':seq['category'],'phase':frame['phase'],'split':seq['split'],
             'isolated_validation_pose_override':'q_psm_override' in job,
@@ -93,7 +104,7 @@ def main():
             'joint_velocities':{'psm':scene.psm.positions(vp),'ecm':scene.ecm.positions(ve)},
             'contact':{'geometric_contact':check['organ_distance_mm']<=c['contact_max_mm'],'distance_mm':check['organ_distance_mm'],
                 'closest_pair':check['organ_pair'],'model':'near_zero_gap_not_force_simulation'},'appearance':effects,'eyes':{}}
-        panels=[]
+        images={}
         for eye in ('left','right'):
             uv=rays[eye];raw=anns[eye]['HdrColor'].get_data();hdr=np.asarray(raw['data'] if isinstance(raw,dict) else raw)[...,:3].astype(np.float32)
             if hdr.shape!=(meta['height'],meta['width'],3) or not np.isfinite(hdr).all():raise ValueError('Invalid HDR render')
@@ -119,17 +130,13 @@ def main():
             record['eyes'][eye]={'image':f'../images/{eye}/{ident}.png','image_sha256':sha(ip),'mask':f'../masks/{eye}/{ident}.png','mask_sha256':sha(mp),
                 'K':scene.profile[eye]['K'],'D':scene.profile[eye]['D'],'tool':ground[eye],'jaw_visibility':visibility,
                 'visible_bbox_xyxy':[int(xs.min()),int(ys.min()),int(xs.max()+1),int(ys.max()+1)],'visible_mask_area_px':int(len(xs))}
-            im=Image.fromarray(rgb);draw=ImageDraw.Draw(im);g=ground[eye]
-            draw.line([tuple(x) for x in g['shaft_polyline_pixels']],fill='yellow',width=3)
-            for point,color in [(g['shaft_reference_pixel'],'cyan'),(g['tip_pixel'],'magenta'),(g['jaw_tip_pixels'][0],'lime'),(g['jaw_tip_pixels'][1],'orange')]:
-                x,y=point;draw.ellipse((x-4,y-4,x+4,y+4),fill=color)
-            draw.text((12,12),f"{seq['sequence_id']} {ident} {eye} t={frame['time_s']:.6f}s",fill='white');panels.append(im)
+            images[eye]=Image.fromarray(rgb)
         relative=np.linalg.inv(cams['right'])@cams['left'];truth={'T_world_from_optical_mm':{k:v.tolist() for k,v in cams.items()},
              'T_right_from_left_mm':relative.tolist(),'baseline_mm':float(np.linalg.norm(relative[:3,3]))}
         tp=folder/'camera_truth'/f'{ident}.json';write(tp,truth);record['camera_truth']=f'../camera_truth/{ident}.json';record['camera_truth_sha256']=sha(tp)
+        attach_body_truth(record,poses,scene.roll,hinges,truth,source_scene_sha256)
         commit_label(label,record) # Receipt is the final commit marker for a complete pair.
-        canvas=Image.new('RGB',(2*c['width'],c['height']));canvas.paste(panels[0],(0,0));canvas.paste(panels[1],(c['width'],0))
-        preview=run/'previews'/f"{seq['sequence_id']}_{ident}.jpg";preview.parent.mkdir(exist_ok=True);canvas.save(preview,quality=90)
+        preview_writer.publish(record,truth,images,sha(label))
         completed+=1;times.append(time.monotonic()-started)
         write(run/'status.json',{'state':'rendering','mode':a.mode,'completed_pairs':completed,'target_pairs':len(jobs),'nominal_fps':c['fps'],
             'seconds_last_pair':times[-1],'complete':False})

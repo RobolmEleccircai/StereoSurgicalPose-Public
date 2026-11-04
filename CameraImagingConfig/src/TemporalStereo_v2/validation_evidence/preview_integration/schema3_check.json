@@ -1,0 +1,8 @@
+{
+  "passed": true,
+  "schema_version": 3,
+  "resume_preview_from_committed_label": true,
+  "offline_reannotation_without_external_pose_geometry": true,
+  "approved_preview_byte_equality": true,
+  "new_rgb_renders": 0
+}

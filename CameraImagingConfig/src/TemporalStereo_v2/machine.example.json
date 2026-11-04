@@ -4,5 +4,6 @@
   "asset_root": "~/PoseProject/CameraImagingConfig",
   "output_root": "~/PoseProject/CameraImagingConfig/TemporalStereo_v2/runs",
   "deps_root": ".deps",
-  "expected_isaac_version": "5.1.0"
+  "expected_isaac_version": "5.1.0",
+  "preview_font": null
 }

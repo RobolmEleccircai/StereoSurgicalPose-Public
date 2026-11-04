@@ -24,7 +24,8 @@ def canonical_hash(value):
     return hashlib.sha256(json.dumps(value,sort_keys=True,allow_nan=False,separators=(',',':')).encode()).hexdigest()
 
 def source_hash():
-    return canonical_hash({p.name:sha(p) for p in sorted(HERE.glob('*.py'))})
+    files=list(HERE.glob('*.py'))+[HERE/'tools/reannotate.py']
+    return canonical_hash({str(p.relative_to(HERE)):sha(p) for p in sorted(files)})
 
 def load_machine(path):
     path=Path(path).resolve();m=read(path)
@@ -32,6 +33,9 @@ def load_machine(path):
     for key in ('isaac_root','asset_root','output_root','deps_root'):
         p=Path(os.path.expandvars(os.path.expanduser(m[key])))
         m[key]=str((path.parent/p).resolve() if not p.is_absolute() else p.resolve())
+    if m.get('preview_font'):
+        p=Path(os.path.expandvars(os.path.expanduser(m['preview_font'])))
+        m['preview_font']=str((path.parent/p).resolve() if not p.is_absolute() else p.resolve())
     return m
 
 def assert_mode(mode,machine):

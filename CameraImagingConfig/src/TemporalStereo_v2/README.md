@@ -72,6 +72,8 @@ Frame intervals are checked using conservative articulated point-motion bounds a
 
 Each output includes RGB PNGs, visible tool masks, per-eye C/d/T (18 main numbers), both physical jaw endpoints, K/D, joint positions and velocities, timestamps, contact state and physical endpoint visibility. C is the internal roll-link origin; d follows the shaft +Z axis; T is the midpoint of the two actual jaw endpoints. C and T are not assigned fictitious surface-visibility labels. Direction alone does not specify axial roll or a complete 6D rotation.
 
+New captures use label schema 3 and additionally save `body_pose_truth` (full PSM body transforms, authored jaw anchors, source scene hash) and `eyes.left/right.local_frames.shaft/jaw1/jaw2.T_optical_from_local_mm`. These are 4×4 transforms with physical origins C/H1/H2. Their rotation columns are the part's local +X/+Y/+Z directions expressed in the corresponding camera's optical coordinates. They are obtained from the same frozen joint state used for RGB, checked against authored USD transforms, and independently checked between eyes. They are not inferred from silhouette pixels or from d alone. Earlier schema-2 samples remain unchanged; their saved joint truth and asset version permit offline recovery.
+
 Pose coordinates use optical X right/Y down/Z forward, positions in millimeters and unit directions. Joint positions use radians for revolute joints and meters for prismatic insertion; joint velocities use rad/s and m/s respectively. The separate jaw half-angle field is in degrees. Camera transforms and baseline are separate evaluation records, not required model inputs. Each left/right pair is rendered from one frozen state. Timestamps advance by 1/60 second, irrespective of offline rendering time. There is no shutter integration or motion blur.
 
 The existing DRENDS ExVivo K/D calibration is retained. At 720p, focal lengths scale by 2/3, principal points by `(c+0.5)*2/3-0.5`, and distortion coefficients remain unchanged. Native ideal rendering is inverse-mapped into the distorted output. PathTracing remains 64 samples/frame and four rendering subframes (total setting 256), with native depth of field. Existing 4 mm, f/5.6, 100 mm focus settings are simulation starting values, not measured dVRK optics.
@@ -112,7 +114,11 @@ Jaw triads similarly project H1/H2 plus their own rotation columns. Their shared
 
 XYZ values also remain below each eye: C, J1, J2, H1 and H2 are positions in that eye's optical frame (millimeters); d is a dimensionless unit direction. The numeric camera frame has X right, Y down and Z forward, with position origin at that eye's optical center. These numeric coordinates are distinct from the local axis arrows at C/H1/H2. Separate color-matched rows show the displayed jaw-arrow displacement vectors J1-H1 and J2-H2 in millimeters. Position/displacement display uses two decimal places and direction uses four; projection and saved numeric reports retain full precision.
 
-The current downstream supervision selection is per-eye C, d, J1 and J2, plus the shared jaw half-angle θ; T can be derived as an auxiliary midpoint. Existing captures already contain all these fields. The historical validation report's 18-scalar C/d/T summary describes the earlier selection and is preserved as historical evidence; saved capture files and their fingerprints are not rewritten to change the visualization or training-field selection.
+For landmark supervision, per-eye C, d, J1 and J2 are 12 scalars per eye (24 across both eyes), plus shared jaw half-angle θ. T is an auxiliary derived midpoint. These landmarks alone do not guarantee unique axial roll or full articulation in every configuration. For a model intended to reproduce shaft roll, wrist motion and symmetric jaw opening on this known instrument, the proposed nonredundant physical target is per-eye C and full shaft rotation R, plus shared `psm_tool_pitch_joint`, `psm_tool_yaw_joint` and jaw half-angle. R must represent a proper rotation, not nine unconstrained independent directions. All underlying supervision is now saved; this is a target contract, not a trained model or a claim of solved visual observability.
+
+With the versioned official kinematic chain, C/R and those articulation angles determine d (R's third column), physical H1/H2, both jaw rotations and J1/J2; T is `(J1+J2)/2`. These redundant quantities remain saved for losses, projection checks and evaluation, without requiring independent prediction heads for every derived field. Symmetric current jaw commands are q1=−θ, q2=+θ; independent asymmetric jaw motion is not part of this capture profile. Position errors are measured in mm, orientation/shaft/wrist/opening errors in degrees, and reprojection errors in pixels, with visible/self-occluded/tissue-occluded results separated. Temporal jitter and end-to-end inference throughput must be measured separately; none is demonstrated by ground-truth previews.
+
+Model inputs are synchronized unannotated images (or consecutive clips) and the known per-eye K/D as needed. Relative camera transform/baseline and global poses remain evaluation truth, not mandatory model inputs. Outputs are explicitly camera-relative; driving another robot later additionally needs a mapping to that robot's base/control frame and its inverse kinematics. The historical validation report's 18-scalar C/d/T summary is retained as evidence from that version.
 
 `tools/reannotate.py` rebuilds previews using saved RGB PNGs, label JSON files, saved full body transforms and the exported USD hinge definitions; it never starts Isaac Sim. It requires Pillow, NumPy and a Chinese-capable font. Saved images, labels, pose geometry and hinge definitions remain unchanged and are checked before/after processing. Missing or mismatched hinge provenance is an error; the script does not substitute C or guessed jaw origins. The shaft arrow starts exactly at C and ends at C+15d (millimeters); its length is solely a display choice and its endpoint is not a physical landmark. In the optional `--style points` diagnostic, C/T are reference markers, without a surface-visibility claim; J1/J2 retain their actual saved visibility labels.
 
@@ -130,7 +136,24 @@ python3 tools/reannotate.py --run /path/to/existing/run \
   --font /path/to/chinese-capable-font.ttf
 ```
 
-The utility lives outside the capture modules so it does not change the validated simulation-source fingerprint or require rendering the saved dataset again. `annotation_report.json` records the utility hash, unchanged source-file check and generated preview hashes.
+The capture pipeline now imports the same `vector_panel` and geometry functions rather than maintaining a second drawing implementation. The annotation source is included in new run fingerprints. Changed capture source requires a new run ID; do not rewrite an old manifest or reset the laptop render budget. Offline reannotation still requires no new RGB rendering. `annotation_report.json` records the utility hash, unchanged source-file check and generated preview hashes.
+
+## Capture-time preview
+
+After each complete stereo pair is committed, `live_preview.py` saves the approved translucent XYZ overlay to `previews/SEQ_FRAME.jpg`, its projection/provenance JSON, and atomically replaces `previews/latest.jpg` and `latest.json`. `previews/live.html` reloads the latest completed pair every two seconds. Sequence/frame identifiers and numeric values are embedded in the same stereo preview. This is progress monitoring at completed-render speed, not 60 Hz rendering or inference. The raw training PNGs never contain these overlays. Interrupted/missing previews are rebuilt from committed pairs during resume without another RGB render.
+
+Set optional `machine.preview_font` to a Chinese-capable font. If omitted, the publisher checks installed Noto CJK, WenQuanYi and macOS Arial Unicode locations; missing fonts fail before capture starts. Font and annotation hashes are recorded in preview metadata. The shaft XYZ remains at the lower left, jaw1/jaw2 at upper left/right, and all three backgrounds remain 60% transparent.
+
+The page can be opened locally, or served from the run directory using `python3 -m http.server --bind 127.0.0.1 8765 --directory /path/to/run` and viewed at `/previews/live.html` through an SSH tunnel. No server job or HTTP listener is started automatically.
+
+Replay existing pairs through exactly the same publisher without opening Isaac Sim:
+
+```bash
+python3 tools/replay_previews.py --run /path/to/existing/run \
+  --output /path/to/new/preview_review --font /path/to/chinese-font.ttf
+```
+
+The integration replay used all 32 saved pairs and produced byte-identical JPGs to the approved offline overlays with the same font. It also rejected corrupt rotation truth and repaired a missing latest preview; source data remained unchanged. This does not claim a new GPU capture or server full-dataset acceptance. The earlier laptop verification and its coverage limitations remain applicable: only 2 of 128 selected physical endpoint observations were directly visible, the stereo-configuration variation was narrow, and the existing optics/mount remain documented simulation assumptions. Broader training coverage and real-camera validation remain separate from correct truth export and preview integration.
 
 ## CAD pose overlays from saved frames
 
