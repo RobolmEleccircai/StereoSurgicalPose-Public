@@ -70,6 +70,8 @@ Frame intervals are checked using conservative articulated point-motion bounds a
 
 ## Image formation and labels
 
+The [model input/output and kinematic decoding specification](MODEL_INPUT_OUTPUT.md) defines the proposed 17-value network output, its existing training-label sources, and the fixed USD geometry required to derive d, H1/H2, J1/J2, T and complete jaw frames. A separate no-render check reconstructed all 14 new stereo pairs without giving the decoder camera extrinsics or saved jaw poses. This is a numerical decoding check, not a trained-network accuracy claim.
+
 Each output includes RGB PNGs, visible tool masks, per-eye C/d/T (18 main numbers), both physical jaw endpoints, K/D, joint positions and velocities, timestamps, contact state and physical endpoint visibility. C is the internal roll-link origin; d follows the shaft +Z axis; T is the midpoint of the two actual jaw endpoints. C and T are not assigned fictitious surface-visibility labels. Direction alone does not specify axial roll or a complete 6D rotation.
 
 New captures use label schema 4, retaining the schema-3 `body_pose_truth` (full PSM body transforms, authored jaw anchors, source scene hash) and `eyes.left/right.local_frames.shaft/jaw1/jaw2.T_optical_from_local_mm`. These are 4×4 transforms with physical origins C/H1/H2. Their rotation columns are the part's local +X/+Y/+Z directions expressed in the corresponding camera's optical coordinates. They are obtained from the same frozen joint state used for RGB, checked against authored USD transforms, and independently checked between eyes. They are not inferred from silhouette pixels or from d alone. Earlier samples remain unchanged; their saved joint truth and asset version permit offline recovery.
