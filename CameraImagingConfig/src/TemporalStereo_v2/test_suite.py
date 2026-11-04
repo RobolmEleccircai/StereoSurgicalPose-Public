@@ -24,6 +24,13 @@ def main():
         p=Path(temporary);machine={'role':'laptop','output_root':str(p)};c={'validation_render_limit':2,'validation_budget_scope':'test'}
         reserve_render(machine,c,'run_a','0');reserve_render(machine,c,'run_a','1')
         test('budget_survives_new_run_id',lambda:rejected(lambda:reserve_render(machine,c,'run_b','0')))
+        ledger_path=p/'test.budget.json';ledger=read(ledger_path);original_attempts=copy.deepcopy(ledger['attempts'])
+        ledger['additional_authorizations']=[{'id':'explicit-test-extension','run_id':'new_authorized_run','additional_attempts':1}]
+        write(ledger_path,ledger)
+        test('extension_cannot_be_used_by_other_run',lambda:rejected(lambda:reserve_render(machine,c,'wrong_run','0')))
+        reserve_render(machine,c,'new_authorized_run','0')
+        assert read(ledger_path)['attempts'][:2]==original_attempts
+        test('additional_authorization_is_finite',lambda:rejected(lambda:reserve_render(machine,c,'new_authorized_run','1')))
         image=p/'image.png';mask=p/'mask.png';truth=p/'truth.json';image.write_bytes(b'image');mask.write_bytes(b'mask');write(truth,{'test':True})
         label=p/'label.json';commit_label(label,{'fingerprint':'f','camera_truth':'truth.json','camera_truth_sha256':sha(truth),
             'eyes':{'left':{'image':'image.png','image_sha256':sha(image),'mask':'mask.png','mask_sha256':sha(mask)},'right':{'image':'image.png','image_sha256':sha(image),'mask':'mask.png','mask_sha256':sha(mask)}}})
@@ -97,6 +104,22 @@ def main():
     for group,q in [('psm',qp),('ecm',qe)]:
         for body,T in getattr(scene,group).fk(q).items():assert np.max(abs(rigid_mm(usd_world(scene.stage,body))-T))<1e-6
     results.append('authored_psm_ecm_and_camera_poses_match_independent_fk')
+    from quality_labels import image_quality,TipRegions
+    rgb=np.zeros((10,10,3),np.uint8);mask=np.ones((10,10),np.uint8)
+    assert not image_quality(rgb,mask)['overexposed']
+    rgb[0,0]=255
+    assert image_quality(rgb,mask)['overexposed']
+    rgb[0,0]=[255,255,100]
+    assert not image_quality(rgb,mask)['overexposed']
+    results.append('exposure_threshold_and_all_channel_condition')
+    definitions=TipRegions(safety).definitions()
+    assert definitions==TipRegions(safety).definitions()
+    for region in definitions['jaws']:
+        samples=np.array(region['sample_points_body_mm'])
+        shape=next(s for s in safety.moving if s.body==region['body'])
+        _,dist,_=shape.mesh.nearest.on_surface(samples)
+        assert len(samples)==128 and max(dist)<1e-8 and min(samples[:,1])>=region['local_Y_cutoff_mm']-1e-9
+    results.append('distal_region_samples_fixed_on_actual_jaw_surface')
     from pose_truth import jaw_definitions,attach_body_truth,validate_body_truth
     from pxr import UsdGeom
     hinges=jaw_definitions(scene.stage,scene.c['psm_root'])

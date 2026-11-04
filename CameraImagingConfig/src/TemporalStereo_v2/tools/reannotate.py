@@ -284,6 +284,8 @@ def point_panel(image, record, eye, font_path):
 def vector_panel(image, record, eye, font_path, split_jaws=False, coordinate_axes=None):
     """Shaft frame at C and articulated jaw frames/arrows at physical hinges."""
     w,h=image.size; header,footer=50,472 if split_jaws else 100
+    has_quality=split_jaws and 'jaw_tip_region_visibility' in record['eyes'][eye]
+    if has_quality:footer+=80
     canvas=Image.new('RGB',(w,h+header+footer),'#101820');canvas.paste(image,(0,header))
     draw=ImageDraw.Draw(canvas);font=ImageFont.truetype(str(font_path),25);small=ImageFont.truetype(str(font_path),22)
     e=record['eyes'][eye];g=e['tool']
@@ -373,7 +375,8 @@ def vector_panel(image, record, eye, font_path, split_jaws=False, coordinate_axe
             v=e['jaw_visibility'][j]
             state='出画' if not v['in_frame'] else '可见' if v['visible'] else '组织遮挡' if v['occluder_kind']=='tissue' else '自遮挡'
             upper=uv_tips[j][1]<=uv_tips[1-j][1]
-            label(f'J{j+1} 钳口{j+1}尖端 · {state}',jaw_curves[j][-1],(-390,-130 if upper else 100),color)
+            name=f'J{j+1} 固定尖端点' if has_quality else f'J{j+1} 钳口{j+1}尖端'
+            label(f'{name} · {state}',jaw_curves[j][-1],(-390,-130 if upper else 100),color)
     else:
         label('T 尖端位置',position[-1],(-270,-100),blue)
     if split_jaws:
@@ -448,6 +451,15 @@ def vector_panel(image, record, eye, font_path, split_jaws=False, coordinate_axe
         draw.text((16,y+393),f'每片钳口半开合角 θ = {theta:.2f}°    |    对称开合角 2θ = {2*theta:.2f}°',font=font,fill='#e5edf4')
         note='闭合时两个尖端投影接近重合，未人为错开。' if theta<1e-6 else 'J1/J2 固定对应两片钳口，未用中点代替。'
         draw.text((16,y+435),note+'保存真值投影，非模型预测；原图未改动，未重新渲染。',font=small,fill='#c4ced8')
+        if has_quality:
+            parts=[]
+            for region in e['jaw_tip_region_visibility']:
+                state='区域可见' if region['region_visible'] else '区域未见'
+                parts.append(f"钳口{region['jaw_index']}：{state}，可见表面采样 {region['sample_counts']['visible']}/{region['surface_sample_count']}")
+            draw.text((16,y+475),'；'.join(parts),font=small,fill='#c4f0da')
+            quality=e['image_quality'];state='过曝标记' if quality['overexposed'] else '未触发过曝标记'
+            draw.text((16,y+511),f"{state}：近白像素 {quality['near_white_fraction']*100:.2f}%（阈值 {quality['frame_fraction_threshold']*100:.1f}%）；与点/区域可见性分别记录。",
+                      font=small,fill='#ffb460' if quality['overexposed'] else '#c4ced8')
     else:
         draw.text((16,header+h+10),'黄色：C → C + 15 mm × d（杆轴方向）    蓝色：C → T（尖端位置指示，位移 T−C）',font=small,fill='white')
         note='蓝色虚线：两实际钳口尖端均被组织遮挡。' if tissue_hidden else 'T 为两实际钳口尖端的中点。'

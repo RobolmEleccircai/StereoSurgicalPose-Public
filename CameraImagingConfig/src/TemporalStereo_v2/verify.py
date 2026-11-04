@@ -19,6 +19,9 @@ def validate_record(label,fp,c):
     if r.get('schema_version',2)>=3:
         from pose_truth import validate_body_truth
         validate_body_truth(r,truth)
+    if r.get('schema_version',2)>=4:
+        from quality_labels import validate_quality_fields,image_quality
+        validate_quality_fields(r)
     if abs(r['time_s']-r['frame_index']/c['fps'])>1e-12 or r['timestamp_ns']!=round(r['frame_index']*1e9/c['fps']):raise ValueError('Timestamp mismatch')
     if r['fps']!=60 or r['position_unit']!='mm':raise ValueError('Unexpected time/length units')
     if not -1e-6<=r['jaw_half_angle_deg']<=30+1e-6:raise ValueError('Jaw angle out of range')
@@ -27,6 +30,11 @@ def validate_record(label,fp,c):
         im=np.asarray(Image.open(label.parent/e['image']));mask=np.asarray(Image.open(label.parent/e['mask']))
         if im.shape!=(c['height'],c['width'],3) or mask.shape!=im.shape[:2] or not set(np.unique(mask)).issubset({0,255}):raise ValueError('Image/mask shape or encoding')
         if np.count_nonzero(mask)<c['minimum_visible_mask_pixels']:raise ValueError('Empty instrument')
+        if r.get('schema_version',2)>=4:
+            if e['image_quality']!=image_quality(im,mask,c.get('overexposure')):raise ValueError('Exposure statistics disagree with raw RGB')
+            for region in e['jaw_tip_region_visibility']:
+                if region['region_visible'] and region['mask_supported_visible_sample_count']==0:
+                    raise ValueError('Visible distal surface has no rendered mask support')
         g=e['tool'];points=np.array([g[k] for k in ['shaft_reference_position_mm','tip_position_mm','jaw1_tip_position_mm','jaw2_tip_position_mm']])
         if not np.isfinite(points).all() or abs(np.linalg.norm(g['shaft_direction_unit'])-1)>1e-8:raise ValueError('Invalid pose target')
         if not np.allclose(points[1],points[2:].mean(0),atol=1e-8):raise ValueError('Virtual tip definition changed')
@@ -54,9 +62,17 @@ def main():
     a=arguments();c=a.settings_data;run=a.run;m=read(run/'config/manifest.json');inv=read(run/'validation/render_inventory.json')
     require_seal(run/'trajectories/index.json',m['fingerprint'])
     rows=[];clips={};max_projection=0.;max_stereo=0.;tip_distances=[];key_masks={};mask_change_counts={};full_pose_count=0
+    quality_rows=[];categories=set()
     for job in inv['jobs']:
         label=run/'sequences'/job['sequence_id']/'labels'/f"{job['job_id']}.json"
         r,result,_=validate_record(label,m['fingerprint'],c)
+        categories.add(r['category'])
+        if r.get('schema_version',2)>=4:
+            quality_rows.append({'sequence_id':r['sequence_id'],'job_id':r['job_id'],'category':r['category'],
+                'overexposed_any_eye':r['quality_flags']['overexposed_any_eye'],
+                'eyes':{eye:{'fixed_point_visible':[v['visible'] for v in e['fixed_tip_visibility']],
+                    'tip_region_visible':[v['region_visible'] for v in e['jaw_tip_region_visibility']],
+                    'near_white_fraction':e['image_quality']['near_white_fraction']} for eye,e in r['eyes'].items()}})
         if r.get('schema_version',2)>=3:
             full_pose_count+=1
             preview=run/'previews'/f"{r['sequence_id']}_{r['job_id']}.json"
@@ -94,11 +110,16 @@ def main():
         mask_change_counts[sid]=changed
         if len(labels)>1 and changed==0:raise ValueError('Rendered tool masks did not update across the moving sequence: '+sid)
     jaw_change=None
-    if a.mode=='validate':
+    small=c.get('validation_selection','standard_32')=='categories_14'
+    if a.mode=='validate' and not small:
         if not tip_distances:raise ValueError('No visible physical endpoint was available for the image-alignment check')
         if set(key_masks)!={'closed_jaw','maximum_opening'}:raise ValueError('Missing jaw limit keyframes')
         jaw_change={eye:int(np.count_nonzero(key_masks['closed_jaw'][eye]!=key_masks['maximum_opening'][eye])) for eye in ('left','right')}
         if min(jaw_change.values())<100:raise ValueError('Jaw pose change did not update both rendered masks')
+    if a.mode=='validate' and small and (len(rows)!=14 or len(categories)!=7 or any(len(v)!=2 for v in clips.values())):
+        raise ValueError('Small validation must retain all seven two-frame category clips')
+    write(run/'validation/visibility_and_exposure.json',{'records':quality_rows,'overexposed_pair_count':sum(r['overexposed_any_eye'] for r in quality_rows)})
+    write(run/'validation/overexposed_frames.json',[r for r in quality_rows if r['overexposed_any_eye']])
     (run/'index.jsonl').write_text(''.join(json.dumps(r)+'\n' for r in rows))
     # Verify source assets remain byte-identical after the full pipeline.
     for entry in m['dependencies']['files']:
@@ -114,6 +135,8 @@ def main():
     if near_lower>max(1,len(insertion)//100):raise ValueError('Insertion samples accumulate at their lower limit')
     report={'mode':a.mode,'passed':True,'rendered_pairs':len(rows),'planned_sequences':len(sequences),'planned_frames':index['total_pairs'],
         'fps':60,'per_eye_resolution':[c['width'],c['height']],
+        'validation_selection':c.get('validation_selection','standard_32'),'categories':sorted(categories),
+        'quality_labeled_pairs':len(quality_rows),'overexposed_pair_count':sum(r['overexposed_any_eye'] for r in quality_rows),
         'landmark_fields_per_eye':['C','d','J1','J2'],'landmark_scalars_both_eyes':24,
         'full_pose_frames_verified':full_pose_count,
         'full_pose_frames_per_eye':['shaft_at_C','jaw1_at_H1','jaw2_at_H2'],

@@ -230,11 +230,17 @@ class Planner:
 
 def select_jobs(sequences,c):
     jobs=[];selected={}
+    small=c.get('validation_selection','standard_32')=='categories_14'
     for seq in sequences:
         if seq['category'] in selected:continue
         selected[seq['category']]=seq
         start=c['frames_per_sequence']//2
-        for i in range(start,start+4):jobs.append({'sequence_id':seq['sequence_id'],'frame_index':i,'reason':'continuous_category_clip'})
+        for i in range(start,start+(2 if small else 4)):jobs.append({'sequence_id':seq['sequence_id'],'frame_index':i,'reason':'continuous_category_clip'})
+    if small:
+        if len(selected)!=7 or len(jobs)!=14:raise ValueError('Small validation must include exactly seven two-frame categories')
+        for i,j in enumerate(jobs):j['job_id']=f'validation_{i:03d}'
+        if len(jobs)>min(32,c['validation_render_limit']):raise ValueError('Validation selection exceeds render cap')
+        return jobs
     free=sequences[0];contact=next(s for s in sequences if s['kind'] in ('contact','slide'))
     jobs.extend([{'sequence_id':free['sequence_id'],'frame_index':0,'jaw_override_deg':0.,'reason':'closed_jaw'},
                  {'sequence_id':free['sequence_id'],'frame_index':0,'jaw_override_deg':30.,'reason':'maximum_opening'},
@@ -250,6 +256,7 @@ def jaw_keyframes(scene,safety,sequences,jobs):
 
     These are isolated validation states, not samples inserted into a sequence.
     """
+    if not any('jaw_override_deg' in j for j in jobs):return
     free=sequences[0];frame=free['frames'][0];base=np.array(frame['q_psm']);qe=np.array(frame['q_ecm'])
     pitch=scene.psm.names.index('psm_tool_pitch_joint');roll=scene.psm.names.index('psm_tool_roll_joint')
     for angle in (base[pitch],np.deg2rad(60),np.deg2rad(-60),np.deg2rad(75),np.deg2rad(-75)):

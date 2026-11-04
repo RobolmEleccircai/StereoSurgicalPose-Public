@@ -59,8 +59,17 @@ def reserve_render(machine,settings,run_id,job_id):
     path=Path(machine['output_root'])/(settings['validation_budget_scope']+'.budget.json')
     with lock(path.with_suffix('.lock')):
         ledger=read(path) if path.exists() else {'attempts':[],'limit':limit}
-        if len(ledger['attempts'])>=limit:raise RuntimeError('Laptop validation render budget exhausted; no more images will be rendered.')
-        ledger['attempts'].append({'run_id':run_id,'job_id':job_id,'utc_unix':time.time()})
+        grants=[g for g in ledger.get('additional_authorizations',[]) if g['run_id']==run_id]
+        if len(grants)>1:raise ValueError('Ambiguous additional render authorization')
+        grant=grants[0] if grants else None
+        if grant:
+            used=sum(a.get('authorization_id')==grant['id'] for a in ledger['attempts'])
+            if used>=min(limit,int(grant['additional_attempts'])):raise RuntimeError('Additional laptop render authorization exhausted')
+        elif len(ledger['attempts'])>=limit:
+            raise RuntimeError('Laptop validation render budget exhausted; no more images will be rendered.')
+        attempt={'run_id':run_id,'job_id':job_id,'utc_unix':time.time()}
+        if grant:attempt['authorization_id']=grant['id']
+        ledger['attempts'].append(attempt)
         write(path,ledger)
 
 def frame_valid(label_path,expected_fingerprint):
@@ -77,6 +86,9 @@ def frame_valid(label_path,expected_fingerprint):
                 target=p.parent/e[key]
                 if not target.is_file() or sha(target)!=e[key+'_sha256']:return False
         truth=p.parent/d['camera_truth']
+        if d.get('schema_version',2)>=4:
+            definition=p.parent/d['tip_region_definition']
+            if not definition.is_file() or sha(definition)!=d['tip_region_definition_sha256']:return False
         return truth.is_file() and sha(truth)==d['camera_truth_sha256']
     except (OSError,ValueError,KeyError,TypeError):return False
 
@@ -98,6 +110,12 @@ def validate_settings(c):
     if c['renderer']!='PathTracing' or c['rt_subframes']<4 or c['samples_per_pixel_per_frame']<64:raise ValueError('Approved path-tracing quality cannot be reduced')
     if not 0<c['contact_target_mm']<c['contact_max_mm'] or c['free_clearance_mm']<2:raise ValueError('Invalid tissue-clearance configuration')
     if c['jaw_speed_rad_s']>.2 or c['jaw_half_angle_deg']!=[0.,30.]:raise ValueError('Jaw limits exceed the agreed physical range')
+    if c.get('validation_selection','standard_32') not in ('standard_32','categories_14'):raise ValueError('Unknown validation selection')
+    from quality_labels import DEFAULT_REGION,DEFAULT_EXPOSURE
+    region=dict(DEFAULT_REGION,**c.get('tip_region',{}));exposure=dict(DEFAULT_EXPOSURE,**c.get('overexposure',{}))
+    if not 0<region['distal_length_mm']<=3 or not 16<=region['surface_samples']<=1024:raise ValueError('Invalid distal region design')
+    if not 0<=region['ray_endpoint_tolerance_mm']<=.1 or region['mask_support_tolerance_px']<0:raise ValueError('Invalid region tolerance')
+    if not 0<exposure['channel_threshold']<=255 or not 0<exposure['frame_fraction_threshold']<1:raise ValueError('Invalid overexposure labeling threshold')
 
 def failure(run,phase,error):
     write(Path(run)/'status.json',{'state':'failed','phase':phase,'error':str(error),'complete':False})

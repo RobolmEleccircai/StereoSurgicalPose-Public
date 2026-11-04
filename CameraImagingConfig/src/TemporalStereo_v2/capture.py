@@ -35,6 +35,7 @@ def main():
     from paths import Trajectory,jaw_positions,smoother
     from kinematics import rigid_mm,usd_world,AXES
     from imaging import maps,image_effects
+    from quality_labels import TipRegions,image_quality,validate_quality_fields
     cv2.setNumThreads(3)
     scene_file=run/'config/capture_scene.usda'
     layer=Sdf.Layer.CreateNew(str(scene_file)) if not scene_file.exists() else Sdf.Layer.FindOrOpen(str(scene_file))
@@ -54,6 +55,8 @@ def main():
     for prim in stage.Traverse():
         if str(prim.GetPath()).startswith(c['psm_root']+'/') and prim.IsA(UsdGeom.Mesh):add_update_semantics(prim,'surgical_instrument')
     safety=Safety(scene);rays,meta=maps(scene.profile,c['native_camera']['focalLength']);write(run/'config/render_map.json',meta)
+    regions=TipRegions(safety,c.get('tip_region'))
+    region_path=run/'config/tip_regions.json';write(region_path,regions.definitions())
     anns={};cameras={}
     for eye in ('left','right'):
         cam=Camera(prim_path=scene.rig+'/'+eye.capitalize(),resolution=(meta['width'],meta['height']),name='temporal_v2_'+eye)
@@ -93,7 +96,7 @@ def main():
         UsdLux.LightAPI(stage.GetPrimAtPath(scene.rig+'/EndoscopePointLight')).GetIntensityAttr().Set(c['endoscope_light_intensity']*effects['light_multiplier'])
         reserve_render(m,c,run.name,seq['sequence_id']+'/'+ident);started=time.monotonic()
         rep.orchestrator.step(rt_subframes=c['rt_subframes'],pause_timeline=True,delta_time=0.,wait_for_render=True)
-        record={'schema_version':3,'fingerprint':fp,'mode':a.mode,'sequence_id':seq['sequence_id'],'job_id':ident,
+        record={'schema_version':4,'fingerprint':fp,'mode':a.mode,'sequence_id':seq['sequence_id'],'job_id':ident,
             'frame_index':frame['frame_index'],'time_s':frame['time_s'],'timestamp_ns':frame['timestamp_ns'],'fps':c['fps'],
             'reason':job['reason'],'category':seq['category'],'phase':frame['phase'],'split':seq['split'],
             'isolated_validation_pose_override':'q_psm_override' in job,
@@ -129,12 +132,18 @@ def main():
                     if inside_distance[y,x]>2.:raise ValueError('Tissue-hidden endpoint contradicts the rendered mask')
             record['eyes'][eye]={'image':f'../images/{eye}/{ident}.png','image_sha256':sha(ip),'mask':f'../masks/{eye}/{ident}.png','mask_sha256':sha(mp),
                 'K':scene.profile[eye]['K'],'D':scene.profile[eye]['D'],'tool':ground[eye],'jaw_visibility':visibility,
+                'fixed_tip_visibility':visibility,
+                'jaw_tip_region_visibility':regions.evaluate(cams[eye],scene.profile,eye,mask),
+                'image_quality':image_quality(rgb,mask,c.get('overexposure')),
                 'visible_bbox_xyxy':[int(xs.min()),int(ys.min()),int(xs.max()+1),int(ys.max()+1)],'visible_mask_area_px':int(len(xs))}
             images[eye]=Image.fromarray(rgb)
         relative=np.linalg.inv(cams['right'])@cams['left'];truth={'T_world_from_optical_mm':{k:v.tolist() for k,v in cams.items()},
              'T_right_from_left_mm':relative.tolist(),'baseline_mm':float(np.linalg.norm(relative[:3,3]))}
         tp=folder/'camera_truth'/f'{ident}.json';write(tp,truth);record['camera_truth']=f'../camera_truth/{ident}.json';record['camera_truth_sha256']=sha(tp)
         attach_body_truth(record,poses,scene.roll,hinges,truth,source_scene_sha256)
+        record['tip_region_definition']='../../../config/tip_regions.json';record['tip_region_definition_sha256']=sha(region_path)
+        record['quality_flags']={'overexposed_any_eye':any(e['image_quality']['overexposed'] for e in record['eyes'].values())}
+        validate_quality_fields(record)
         commit_label(label,record) # Receipt is the final commit marker for a complete pair.
         preview_writer.publish(record,truth,images,sha(label))
         completed+=1;times.append(time.monotonic()-started)

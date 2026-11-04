@@ -72,7 +72,35 @@ Frame intervals are checked using conservative articulated point-motion bounds a
 
 Each output includes RGB PNGs, visible tool masks, per-eye C/d/T (18 main numbers), both physical jaw endpoints, K/D, joint positions and velocities, timestamps, contact state and physical endpoint visibility. C is the internal roll-link origin; d follows the shaft +Z axis; T is the midpoint of the two actual jaw endpoints. C and T are not assigned fictitious surface-visibility labels. Direction alone does not specify axial roll or a complete 6D rotation.
 
-New captures use label schema 3 and additionally save `body_pose_truth` (full PSM body transforms, authored jaw anchors, source scene hash) and `eyes.left/right.local_frames.shaft/jaw1/jaw2.T_optical_from_local_mm`. These are 4×4 transforms with physical origins C/H1/H2. Their rotation columns are the part's local +X/+Y/+Z directions expressed in the corresponding camera's optical coordinates. They are obtained from the same frozen joint state used for RGB, checked against authored USD transforms, and independently checked between eyes. They are not inferred from silhouette pixels or from d alone. Earlier schema-2 samples remain unchanged; their saved joint truth and asset version permit offline recovery.
+New captures use label schema 4, retaining the schema-3 `body_pose_truth` (full PSM body transforms, authored jaw anchors, source scene hash) and `eyes.left/right.local_frames.shaft/jaw1/jaw2.T_optical_from_local_mm`. These are 4×4 transforms with physical origins C/H1/H2. Their rotation columns are the part's local +X/+Y/+Z directions expressed in the corresponding camera's optical coordinates. They are obtained from the same frozen joint state used for RGB, checked against authored USD transforms, and independently checked between eyes. They are not inferred from silhouette pixels or from d alone. Earlier samples remain unchanged; their saved joint truth and asset version permit offline recovery.
+
+### Separate fixed-point, distal-region and exposure labels
+
+Each eye now has three independent fields:
+
+| Field | Meaning |
+|---|---|
+| `fixed_tip_visibility` | Original J1/J2 material-point visibility, occluder identity and in-frame state. `jaw_visibility` remains an identical compatibility alias. |
+| `jaw_tip_region_visibility` | Per-jaw distal surface visibility, sample-state counts and fractions, and visible-mask support. |
+| `image_quality` | Raw RGB near-white fraction, separate instrument-mask fraction and explicit overexposure flag. |
+
+The distal region is the last **1.0 mm** along the native jaw body's +Y axis, clipped from the actual visual triangle mesh. **128 deterministic equal-area-stratified samples** lie on this fixed surface patch and move with the jaw. They are not selected from the camera-facing silhouette. `region_visible` means at least one in-frame sampled surface point is geometrically visible; the count/fraction records how many. The denominator covers the entire 3D patch, including its naturally hidden back surface, and is not a fraction of image pixels. Every geometrically visible patch must have visible-instrument mask support; sample support uses a 2 px tolerance. Ray hits within 0.05 mm of their target surface point are excluded, consistently with the existing endpoint test. The exact body-local samples and hashes are saved in `config/tip_regions.json` and referenced by every new committed label. This patch size, sampling count and tolerances are recorded dataset-label design settings, not manufacturer parameters or a claim of continuous exact surface visibility.
+
+The `overexposed` flag is a documented RGB heuristic: **at least 1% of saved image pixels have R, G and B all ≥250** on an 8-bit scale. This is not a measured sensor saturation threshold. `quality_flags.overexposed_any_eye` summarizes the pair. All flagged images are retained; `validation/overexposed_frames.json` is a separate index. Exposure labels do not change fixed-point visibility, region visibility, rendering parameters or training targets. Approved XYZ panels keep their positions and transparency; preview footers display the region and exposure fields separately.
+
+`tools/annotate_saved_quality.py` derives sidecars and previews from existing RGB, masks, joint states and USD geometry without starting SimulationApp. It preserves all original images and labels:
+
+```bash
+python3 tools/annotate_saved_quality.py --machine machine.local.json \
+  --settings /path/to/existing/run/config/effective_settings.json \
+  --run /path/to/existing/run --output /path/to/new/quality_review
+```
+
+The 32-pair regression retained **2/128 visible fixed points**, found **112/128 visible distal regions**, and separately flagged the four seq_006 overexposed pairs. All 224 original data files remained unchanged. The 26 no-render tests include actual surface sampling, exposure thresholds, full pose truth, safety and the finite render-authorization extension.
+
+For an explicitly authorized small new capture, `validation_selection: "categories_14"` selects **seven categories × two adjacent frames**, while `validation_render_limit: 14` caps that invocation. The normal selection remains 32 pairs with additional isolated jaw/contact keyframes. The small profile does not claim to rerun those isolated keyframes; all planned trajectories and normal safety/temporal checks still apply. Full `generate` remains forbidden on laptops.
+
+The laptop budget ledger is never reset. A later explicit user request for additional renders is recorded as an `additional_authorizations` entry bound to one run ID and a finite attempt count; attempts retain their authorization ID. The November 8 quality-label validation uses 14 additional attempts after the original 32. The extension cannot be reused by another run or replenish itself after a crash. No code path automatically grants more attempts.
 
 Pose coordinates use optical X right/Y down/Z forward, positions in millimeters and unit directions. Joint positions use radians for revolute joints and meters for prismatic insertion; joint velocities use rad/s and m/s respectively. The separate jaw half-angle field is in degrees. Camera transforms and baseline are separate evaluation records, not required model inputs. Each left/right pair is rendered from one frozen state. Timestamps advance by 1/60 second, irrespective of offline rendering time. There is no shutter integration or motion blur.
 
