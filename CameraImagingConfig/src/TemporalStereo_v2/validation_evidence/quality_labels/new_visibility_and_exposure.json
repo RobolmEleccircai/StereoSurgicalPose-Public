@@ -1,0 +1,425 @@
+{
+  "records": [
+    {
+      "sequence_id": "seq_000",
+      "job_id": "validation_000",
+      "category": "pose_motion",
+      "overexposed_any_eye": false,
+      "eyes": {
+        "left": {
+          "fixed_point_visible": [
+            false,
+            false
+          ],
+          "tip_region_visible": [
+            true,
+            true
+          ],
+          "near_white_fraction": 0.00023980034722222222
+        },
+        "right": {
+          "fixed_point_visible": [
+            false,
+            false
+          ],
+          "tip_region_visible": [
+            true,
+            true
+          ],
+          "near_white_fraction": 0.00012803819444444446
+        }
+      }
+    },
+    {
+      "sequence_id": "seq_000",
+      "job_id": "validation_001",
+      "category": "pose_motion",
+      "overexposed_any_eye": false,
+      "eyes": {
+        "left": {
+          "fixed_point_visible": [
+            false,
+            false
+          ],
+          "tip_region_visible": [
+            true,
+            true
+          ],
+          "near_white_fraction": 0.0003298611111111111
+        },
+        "right": {
+          "fixed_point_visible": [
+            false,
+            false
+          ],
+          "tip_region_visible": [
+            true,
+            true
+          ],
+          "near_white_fraction": 0.00018771701388888888
+        }
+      }
+    },
+    {
+      "sequence_id": "seq_002",
+      "job_id": "validation_002",
+      "category": "lighting",
+      "overexposed_any_eye": false,
+      "eyes": {
+        "left": {
+          "fixed_point_visible": [
+            false,
+            false
+          ],
+          "tip_region_visible": [
+            true,
+            true
+          ],
+          "near_white_fraction": 0.0008322482638888889
+        },
+        "right": {
+          "fixed_point_visible": [
+            false,
+            false
+          ],
+          "tip_region_visible": [
+            true,
+            true
+          ],
+          "near_white_fraction": 0.00060546875
+        }
+      }
+    },
+    {
+      "sequence_id": "seq_002",
+      "job_id": "validation_003",
+      "category": "lighting",
+      "overexposed_any_eye": false,
+      "eyes": {
+        "left": {
+          "fixed_point_visible": [
+            false,
+            false
+          ],
+          "tip_region_visible": [
+            true,
+            true
+          ],
+          "near_white_fraction": 0.0008387586805555556
+        },
+        "right": {
+          "fixed_point_visible": [
+            false,
+            false
+          ],
+          "tip_region_visible": [
+            true,
+            true
+          ],
+          "near_white_fraction": 0.0006065538194444444
+        }
+      }
+    },
+    {
+      "sequence_id": "seq_004",
+      "job_id": "validation_004",
+      "category": "sensor_quality",
+      "overexposed_any_eye": false,
+      "eyes": {
+        "left": {
+          "fixed_point_visible": [
+            false,
+            false
+          ],
+          "tip_region_visible": [
+            true,
+            true
+          ],
+          "near_white_fraction": 0.00044813368055555557
+        },
+        "right": {
+          "fixed_point_visible": [
+            false,
+            false
+          ],
+          "tip_region_visible": [
+            true,
+            true
+          ],
+          "near_white_fraction": 0.0002951388888888889
+        }
+      }
+    },
+    {
+      "sequence_id": "seq_004",
+      "job_id": "validation_005",
+      "category": "sensor_quality",
+      "overexposed_any_eye": false,
+      "eyes": {
+        "left": {
+          "fixed_point_visible": [
+            false,
+            false
+          ],
+          "tip_region_visible": [
+            true,
+            true
+          ],
+          "near_white_fraction": 0.00043619791666666666
+        },
+        "right": {
+          "fixed_point_visible": [
+            false,
+            false
+          ],
+          "tip_region_visible": [
+            true,
+            true
+          ],
+          "near_white_fraction": 0.0002951388888888889
+        }
+      }
+    },
+    {
+      "sequence_id": "seq_006",
+      "job_id": "validation_006",
+      "category": "occlusion",
+      "overexposed_any_eye": true,
+      "eyes": {
+        "left": {
+          "fixed_point_visible": [
+            false,
+            false
+          ],
+          "tip_region_visible": [
+            false,
+            false
+          ],
+          "near_white_fraction": 0.073681640625
+        },
+        "right": {
+          "fixed_point_visible": [
+            false,
+            false
+          ],
+          "tip_region_visible": [
+            false,
+            false
+          ],
+          "near_white_fraction": 0.07685655381944445
+        }
+      }
+    },
+    {
+      "sequence_id": "seq_006",
+      "job_id": "validation_007",
+      "category": "occlusion",
+      "overexposed_any_eye": true,
+      "eyes": {
+        "left": {
+          "fixed_point_visible": [
+            false,
+            false
+          ],
+          "tip_region_visible": [
+            false,
+            false
+          ],
+          "near_white_fraction": 0.07369140625
+        },
+        "right": {
+          "fixed_point_visible": [
+            false,
+            false
+          ],
+          "tip_region_visible": [
+            false,
+            false
+          ],
+          "near_white_fraction": 0.0769314236111111
+        }
+      }
+    },
+    {
+      "sequence_id": "seq_008",
+      "job_id": "validation_008",
+      "category": "ecm_motion",
+      "overexposed_any_eye": false,
+      "eyes": {
+        "left": {
+          "fixed_point_visible": [
+            false,
+            false
+          ],
+          "tip_region_visible": [
+            true,
+            true
+          ],
+          "near_white_fraction": 0.0007313368055555556
+        },
+        "right": {
+          "fixed_point_visible": [
+            false,
+            false
+          ],
+          "tip_region_visible": [
+            true,
+            true
+          ],
+          "near_white_fraction": 0.0005230034722222222
+        }
+      }
+    },
+    {
+      "sequence_id": "seq_008",
+      "job_id": "validation_009",
+      "category": "ecm_motion",
+      "overexposed_any_eye": false,
+      "eyes": {
+        "left": {
+          "fixed_point_visible": [
+            false,
+            false
+          ],
+          "tip_region_visible": [
+            true,
+            true
+          ],
+          "near_white_fraction": 0.0007421875
+        },
+        "right": {
+          "fixed_point_visible": [
+            false,
+            false
+          ],
+          "tip_region_visible": [
+            true,
+            true
+          ],
+          "near_white_fraction": 0.0005447048611111111
+        }
+      }
+    },
+    {
+      "sequence_id": "seq_010",
+      "job_id": "validation_010",
+      "category": "stereo_rig",
+      "overexposed_any_eye": false,
+      "eyes": {
+        "left": {
+          "fixed_point_visible": [
+            false,
+            false
+          ],
+          "tip_region_visible": [
+            true,
+            true
+          ],
+          "near_white_fraction": 0.0005186631944444444
+        },
+        "right": {
+          "fixed_point_visible": [
+            false,
+            false
+          ],
+          "tip_region_visible": [
+            true,
+            true
+          ],
+          "near_white_fraction": 0.0003331163194444444
+        }
+      }
+    },
+    {
+      "sequence_id": "seq_010",
+      "job_id": "validation_011",
+      "category": "stereo_rig",
+      "overexposed_any_eye": false,
+      "eyes": {
+        "left": {
+          "fixed_point_visible": [
+            false,
+            false
+          ],
+          "tip_region_visible": [
+            true,
+            true
+          ],
+          "near_white_fraction": 0.0005013020833333333
+        },
+        "right": {
+          "fixed_point_visible": [
+            false,
+            false
+          ],
+          "tip_region_visible": [
+            true,
+            true
+          ],
+          "near_white_fraction": 0.0003537326388888889
+        }
+      }
+    },
+    {
+      "sequence_id": "seq_012",
+      "job_id": "validation_012",
+      "category": "combined_pose_jaw",
+      "overexposed_any_eye": false,
+      "eyes": {
+        "left": {
+          "fixed_point_visible": [
+            false,
+            false
+          ],
+          "tip_region_visible": [
+            true,
+            true
+          ],
+          "near_white_fraction": 0.0005349392361111111
+        },
+        "right": {
+          "fixed_point_visible": [
+            false,
+            false
+          ],
+          "tip_region_visible": [
+            true,
+            true
+          ],
+          "near_white_fraction": 0.0003862847222222222
+        }
+      }
+    },
+    {
+      "sequence_id": "seq_012",
+      "job_id": "validation_013",
+      "category": "combined_pose_jaw",
+      "overexposed_any_eye": false,
+      "eyes": {
+        "left": {
+          "fixed_point_visible": [
+            false,
+            false
+          ],
+          "tip_region_visible": [
+            true,
+            true
+          ],
+          "near_white_fraction": 0.0005512152777777777
+        },
+        "right": {
+          "fixed_point_visible": [
+            false,
+            false
+          ],
+          "tip_region_visible": [
+            true,
+            true
+          ],
+          "near_white_fraction": 0.000380859375
+        }
+      }
+    }
+  ],
+  "overexposed_pair_count": 2
+}
