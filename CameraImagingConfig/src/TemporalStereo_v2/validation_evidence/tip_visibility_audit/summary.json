@@ -1,0 +1,53 @@
+{
+  "source": "32 existing pairs, saved camera/body truth and versioned USD meshes",
+  "new_rgb_renders": 0,
+  "saved_pairs_integrity_verified": 32,
+  "endpoint_observations": 128,
+  "counts": {
+    "visible_fixed_material_point": 2,
+    "instrument_occlusion": 110,
+    "tissue_occlusion": 16
+  },
+  "instrument_occlusion": {
+    "same_jaw": 108,
+    "other_jaw": 2,
+    "gap_range_mm": [
+      0.4115973335404135,
+      1.5525304664927688
+    ],
+    "projected_pixels_inside_visible_instrument_mask": 110,
+    "independent_ray_disagreements": 0
+  },
+  "tip_definition": {
+    "point_on_actual_tip_surface": 128,
+    "surface_normal_away_from_camera": 126,
+    "max_body_local_point_variation_mm": 6.2e-13,
+    "offset_from_distal_mesh_Y_extremum_mm": 0.00165387
+  },
+  "anatomy": {
+    "meshes_checked": 17,
+    "independent_ray_disagreements": 0,
+    "tissue_blocked_observations": 16
+  },
+  "brightness": {
+    "sequence": "seq_006",
+    "jobs": [
+      "validation_014",
+      "validation_015",
+      "validation_016",
+      "validation_017"
+    ],
+    "category": "occlusion",
+    "light_multiplier": 1.0,
+    "base_intensity_setting": 1000000.0,
+    "light_exposure": 0.0,
+    "near_white_definition": "R,G,B each >=250 on 8-bit saved raw RGB",
+    "range_percent": [
+      7.342013888888889,
+      7.706705729166667
+    ],
+    "first_pair_left_percent": 7.36794704861111,
+    "first_pair_right_percent": 7.685980902777778
+  },
+  "conclusion": "Fixed surface-point visibility is not jaw-tip-region visibility. Point definition and limited view coverage explain low visible count; no count-changing ray-test error was found. seq_006 has near-field overexposure at base light intensity, not an increased-light preset."
+}
