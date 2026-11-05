@@ -1,0 +1,93 @@
+{
+  "date": "2026-11-09",
+  "passed": true,
+  "source_sha256": "5a725ef053469c1af6fceba5a26d2e127fb638216e7e0d006872a05ac8428113",
+  "ubuntu_code_directory": "/home/leorobot/PoseProject/CameraImagingConfig/TemporalStereo_v2_distributed_20261109",
+  "unit_tests": {
+    "passed": true,
+    "count": 23,
+    "elapsed_seconds": 9.275,
+    "cases": {
+      "test_dispatch": [
+        "test_exact_disjoint_work_and_split_counts",
+        "test_overlap_missing_unknown_count_and_laptop_overallocation_rejected",
+        "test_machine_binding_and_old_laptop_full_guard",
+        "test_relocation_preserves_identity_but_changed_assets_do_not",
+        "test_frozen_dispatch_changes_and_code_version_rejected",
+        "test_worker_preparation_is_portable_resumable_and_assignment_is_immutable",
+        "test_interrupted_preparation_resumes_without_replanning",
+        "test_only_assigned_jobs_can_render_and_corrupt_pair_can_retry",
+        "test_inventory_missing_duplicate_and_wrong_owner_rejected",
+        "test_shard_cannot_claim_complete_dataset",
+        "test_merge_all_2100_files_without_rewriting_labels_and_detect_corruption",
+        "test_prepare_only_launches_no_capture_and_worker_cannot_use_second_run",
+        "test_same_worker_lock_excludes_parallel_process"
+      ],
+      "test_dataset_policy": [
+        "test_exact_manifest_and_legacy",
+        "test_all_21_clips_and_32_jobs",
+        "test_source_time_and_effects_not_retimed",
+        "test_missing_train_combination_and_wrong_bin_rejected",
+        "test_occlusion_requires_clear_hidden_recovered",
+        "test_short_clip_cannot_claim_a_phase_from_one_boundary_frame",
+        "test_noise_camera_reversal_and_nearcopy_do_not_create_new_paths",
+        "test_joint_curve_hold_preserves_other_joints_and_limit",
+        "test_indexes_weights_and_incomplete_status",
+        "test_exposure_visibility_retained_and_coverage_checked"
+      ]
+    }
+  },
+  "geometry_and_calculation_tests": {
+    "passed": true,
+    "count": 26,
+    "report": "geometry_tests.json"
+  },
+  "asset_runtime_preflight": "preflight.json",
+  "worker_allocation": {
+    "rtx4060": {
+      "role": "laptop",
+      "sequence_ids": [
+        "seq_003",
+        "seq_013",
+        "seq_011"
+      ],
+      "pair_count": 352
+    },
+    "rtx4080super": {
+      "role": "server",
+      "sequence_ids": [
+        "seq_000",
+        "seq_001",
+        "seq_002",
+        "seq_004",
+        "seq_005",
+        "seq_006",
+        "seq_007",
+        "seq_008",
+        "seq_009",
+        "seq_010",
+        "seq_012",
+        "seq_014",
+        "seq_015",
+        "seq_016",
+        "seq_017",
+        "seq_018",
+        "seq_019",
+        "seq_020"
+      ],
+      "pair_count": 1748
+    }
+  },
+  "merge_test": {
+    "fixture_pairs": 2100,
+    "label_files_preserved": true,
+    "real_rgb_rendered": false
+  },
+  "new_rgb_renders": 0,
+  "full_generation_started": false,
+  "limitations": [
+    "Two-machine GPU rendering and measured throughput have not been tested.",
+    "Merge/resume tests use temporary file fixtures, not newly rendered images.",
+    "No production dispatch plan or worker generation has been started."
+  ]
+}

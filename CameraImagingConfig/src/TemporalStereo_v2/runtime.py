@@ -10,7 +10,7 @@ from imaging import project
 def arguments():
     p=argparse.ArgumentParser();p.add_argument('--machine',type=Path,required=True)
     p.add_argument('--settings',type=Path,required=True);p.add_argument('--run',type=Path,required=True)
-    p.add_argument('--mode',choices=['plan','validate','generate'],required=True)
+    p.add_argument('--mode',choices=['plan','validate','generate','shard','merge'],required=True)
     a=p.parse_args();a.machine_data=load_machine(a.machine);a.settings_data=read(a.settings)
     validate_settings(a.settings_data)
     assert_mode(a.mode,a.machine_data)

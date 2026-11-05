@@ -64,6 +64,11 @@ def main():
     require_seal(run/'trajectories/index.json',m['fingerprint'])
     index=read(run/'trajectories/index.json');sequences=[read(run/'trajectories'/f'{sid}.json') for sid in index['sequences']]
     seq_by_id={s['sequence_id']:s for s in sequences};joint_info=read(run/'config/joints.json')
+    from dispatch import run_context,validate_inventory,validate_dispatch,completion_status
+    full=a.mode in ('generate','merge');worker=run_context(run,a.machine_data,c) if a.mode=='shard' else None
+    if worker is not None or full:validate_inventory(inv,index,worker)
+    distributed=read(run/'config/dispatch.json') if (run/'config/dispatch.json').exists() else None
+    if distributed is not None:validate_dispatch(distributed,c)
     balanced=policy.enabled(c);records=[]
     planned_report=policy.audit(sequences,c) if balanced else None
     rows=[];clips={};max_projection=0.;max_stereo=0.;tip_distances=[];key_masks={};mask_change_counts={};full_pose_count=0
@@ -73,6 +78,11 @@ def main():
         r,result,_=validate_record(label,m['fingerprint'],c)
         if r['sequence_id']!=job['sequence_id'] or r['frame_index']!=job['frame_index'] or r['reason']!=job['reason']:
             raise ValueError('Saved receipt does not match planned render job')
+        if distributed is not None:
+            owners=[name for name,spec in distributed['workers'].items() if r['sequence_id'] in spec['sequence_ids']]
+            if len(owners)!=1:raise ValueError('Ambiguous sequence ownership')
+            owner=owners[0];expected_worker={'dispatch_id':distributed['dispatch_id'],'worker_id':owner,**distributed['workers'][owner]}
+            if r.get('render_worker')!=expected_worker:raise ValueError('Frame was not produced by its assigned worker')
         if balanced:policy.validate_saved_state(r,seq_by_id[r['sequence_id']],joint_info['order'])
         records.append(r)
         categories.add(r['category'])
@@ -135,9 +145,9 @@ def main():
     if balanced:
         policy.write_split_indexes(run,sequences,records)
         coverage=policy.rendered_coverage(records)
-        coverage.update(partial_sample=a.mode!='generate',full_dataset_coverage_verified=a.mode=='generate' and coverage['passed'])
+        coverage.update(partial_sample=not full,full_dataset_coverage_verified=full and coverage['passed'])
         write(run/'validation/rendered_split_coverage.json',coverage)
-        if a.mode=='generate' and not coverage['passed']:raise ValueError('Rendered held-out visibility/exposure lacks training coverage')
+        if full and not coverage['passed']:raise ValueError('Rendered held-out visibility/exposure lacks training coverage')
         write(run/'validation/planned_split_coverage.json',planned_report)
     write(run/'validation/visibility_and_exposure.json',{'records':quality_rows,'overexposed_pair_count':sum(r['overexposed_any_eye'] for r in quality_rows)})
     write(run/'validation/overexposed_frames.json',[r for r in quality_rows if r['overexposed_any_eye']])
@@ -164,15 +174,14 @@ def main():
         'visible_tip_checks':len(tip_distances),'maximum_visible_tip_mask_distance_px':max(tip_distances) if tip_distances else None,
         'mask_changed_pixels_by_sequence':mask_change_counts,'jaw_limit_changed_mask_pixels':jaw_change,
         'jaw_limit_comparison_scope':'different independent safe poses' if balanced else 'same wrist pose',
-        'planned_split_coverage':planned_report,'full_dataset_render_coverage_verified':a.mode=='generate',
+        'planned_split_coverage':planned_report,'full_dataset_render_coverage_verified':full,
         'insertion_sample_range_m':[min(insertion),max(insertion)],'insertion_near_lower_limit_count':near_lower,'split_by_sequence':True,
         'limitations':['Geometric contact approximation; no tissue mechanics or contact forces.','Existing ECM optical mount is a preview convention, not a measured official calibration.','No shutter integration or motion blur.','Numerical projection checks do not establish real-world model accuracy.']}
-    expected=len(index['validation_jobs']) if a.mode=='validate' else index['total_pairs']
-    if len(rows)!=expected:raise ValueError('Incomplete output count')
-    if balanced:policy.write_split_indexes(run,sequences,records,acceptance_passed=a.mode=='generate')
+    status=completion_status(a.mode,len(rows),index,worker)
+    if balanced:policy.write_split_indexes(run,sequences,records,acceptance_passed=full)
+    if worker is not None:report.update(worker=worker,shard_complete=True,dataset_complete=False)
     write(run/'validation/report.json',report)
-    write(run/'status.json',{'state':'validated' if a.mode=='validate' else 'complete','validation_complete':True,
-        'dataset_complete':a.mode=='generate','rendered_pairs':len(rows),'planned_pairs':index['total_pairs']})
+    write(run/'status.json',status)
     print('VALIDATION_COMPLETE',json.dumps(report),flush=True)
 
 if __name__=='__main__':main()

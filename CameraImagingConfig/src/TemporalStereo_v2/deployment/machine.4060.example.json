@@ -1,0 +1,10 @@
+{
+  "role": "laptop",
+  "worker_id": "rtx4060",
+  "isaac_root": "~/isaacsim-5.1.0",
+  "asset_root": "../assets",
+  "output_root": "../outputs",
+  "deps_root": "../deps",
+  "expected_isaac_version": "5.1.0",
+  "preview_font": "../fonts/NotoSansCJK-Regular.ttc"
+}

@@ -43,9 +43,11 @@ def load_machine(path):
     return m
 
 def assert_mode(mode,machine):
-    if mode not in ('plan','validate','generate'):raise ValueError('Unknown mode')
+    if mode not in ('plan','validate','generate','shard','merge'):raise ValueError('Unknown mode')
     if mode=='generate' and machine['role']!='server':
         raise ValueError('Full generation is forbidden on a laptop; use validate (maximum 32 render attempts).')
+    if mode=='shard' and machine.get('worker_id') not in ('rtx4060','rtx4080super'):
+        raise ValueError('Sharded generation requires a configured worker_id')
 
 @contextmanager
 def lock(path):
@@ -56,8 +58,26 @@ def lock(path):
         try:yield
         finally:fcntl.flock(f,fcntl.LOCK_UN)
 
-def reserve_render(machine,settings,run_id,job_id):
+def reserve_render(machine,settings,run_id,job_id,worker=None):
     """Laptop scope is cumulative across runs and crashes, not reset by a new run id."""
+    if worker is not None:
+        sid, ident = job_id.split('/')
+        counts = {r['sequence_id']: r['frame_count'] for r in settings['sequence_manifest']}
+        if (sid not in worker['sequence_ids'] or ident != f'{int(ident):06d}'
+                or not 0 <= int(ident) < counts[sid]
+                or machine.get('worker_id') != worker['worker_id'] or machine['role'] != worker['role']):
+            raise ValueError('Attempt to render a job owned by another worker')
+        # The quota bounds unique dataset pairs; a failed/corrupt pair can retry.
+        path = Path(machine['output_root'])/'.worker_claims'/(worker['dispatch_id']+'.'+worker['worker_id']+'.budget.json')
+        with lock(path.with_suffix('.lock')):
+            ledger = read(path) if path.exists() else {'run_id':run_id,'worker':worker,'attempts':[]}
+            if ledger['run_id'] != run_id or ledger['worker'] != worker:
+                raise ValueError('Worker budget belongs to another run or assignment')
+            jobs = {a['job_id'] for a in ledger['attempts']} | {job_id}
+            if len(jobs) > worker['pair_count']:raise RuntimeError('Assigned pair budget exceeded')
+            ledger['attempts'].append({'job_id':job_id,'utc_unix':time.time()})
+            write(path,ledger)
+        return
     if machine['role']!='laptop':return
     limit=min(32,int(settings['validation_render_limit']))
     path=Path(machine['output_root'])/(settings['validation_budget_scope']+'.budget.json')

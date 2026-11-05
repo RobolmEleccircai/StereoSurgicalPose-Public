@@ -1,5 +1,7 @@
 # Balanced temporal dataset: 2,100 stereo pairs
 
+The 4060/4080 Super distributed execution keeps this exact split and all trajectories unchanged. See [distributed generation](DISTRIBUTED_GENERATION.md) for the disjoint 352 / 1,748 assignments and the final merge. Worker outputs remain explicitly incomplete until the combined 2,100-pair acceptance passes.
+
 `settings.balanced21.json` is the current versioned sampling policy (`balanced_2100_v1`). It replaces sequence-number modulo assignment with an explicit manifest. It does not change camera calibration, optical appearance, image quality, physical limits or the 2,100-pair total. The old `settings.json` and old runs remain available for regression.
 
 ## Exact allocation

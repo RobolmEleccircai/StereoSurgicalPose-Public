@@ -1,6 +1,8 @@
 # Temporal stereo capture v2
 
-Single official PSM instrument with an articulated ECM stereo rig. The default `settings.balanced21.json` specifies 21 independent, variable-length sequences: **1,400 train + 350 validation + 350 test = 2,100 stereo pairs**, at 60 Hz and 1280 × 720 per eye. See [DATASET_SPLITS.md](DATASET_SPLITS.md) for exact lengths, coverage gates, original-time clipping and evaluation indexes. The legacy `settings.json` and historical samples remain unchanged. The laptop is a validation machine; it must not generate the complete dataset.
+**4060 + 4080 Super execution:** the new `shard` and `merge` modes assign 352 / 1,748 pairs to disjoint whole sequences, using one frozen plan. See [DISTRIBUTED_GENERATION.md](DISTRIBUTED_GENERATION.md) for commands, machine templates and completion semantics. No rendering is started by this code update; existing image quality and occlusion policy are unchanged.
+
+Single official PSM instrument with an articulated ECM stereo rig. The default `settings.balanced21.json` specifies 21 independent, variable-length sequences: **1,400 train + 350 validation + 350 test = 2,100 stereo pairs**, at 60 Hz and 1280 × 720 per eye. See [DATASET_SPLITS.md](DATASET_SPLITS.md) for exact lengths, coverage gates, original-time clipping and evaluation indexes. The legacy `settings.json` and historical samples remain unchanged. The laptop may validate or generate its explicitly assigned 352-pair shard; it must not generate the complete dataset.
 
 The [balanced validation report](validation_evidence/balanced_2100/README.md) records 36 passing tests, all 21 checked trajectories, all 2,100 planned-state decoding checks, 32 accepted rendered stereo pairs, and an actual resume with zero new capture attempts. Full rendered dataset coverage and target-server performance remain untested.
 
@@ -11,6 +13,7 @@ The [balanced validation report](validation_evidence/balanced_2100/README.md) re
 | Files / directory | Responsibility |
 |---|---|
 | `generate.py` | Entry point for planning, bounded validation, full generation and resume |
+| `dispatch.py` | Frozen common plan, mutually exclusive worker assignments and result merging |
 | `settings.balanced21.json`, `dataset_policy.py` | Current 21-sequence manifest, split counts, source-time clips and indexes |
 | `planner.py`, `paths.py`, `kinematics.py`, `safety.py` | Continuous articulated paths, official model frames and physical checks |
 | `capture.py`, `imaging.py`, `quality_labels.py` | Synchronized images, truth, visibility/exposure labels and committed output files |

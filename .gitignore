@@ -46,3 +46,10 @@ venv/
 !CameraImagingConfig/src/SingleInstrument_2026-11-07/preview/native/scene/*.usda
 
 *.log
+
+# Machine-specific distributed capture configuration and runtime output
+/CameraImagingConfig/src/TemporalStereo_v2/*.local.json
+/CameraImagingConfig/src/TemporalStereo_v2/runs/
+/CameraImagingConfig/src/TemporalStereo_v2/checks/
+/CameraImagingConfig/src/TemporalStereo_v2/dispatch_*/
+/CameraImagingConfig/src/TemporalStereo_v2/.deps/

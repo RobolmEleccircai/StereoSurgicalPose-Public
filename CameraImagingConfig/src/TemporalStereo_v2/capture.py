@@ -6,7 +6,7 @@ import dataset_policy as policy
 
 def main():
     p=argparse.ArgumentParser();p.add_argument('--machine',type=Path,required=True);p.add_argument('--settings',type=Path,required=True)
-    p.add_argument('--run',type=Path,required=True);p.add_argument('--mode',required=True,choices=['validate','generate'])
+    p.add_argument('--run',type=Path,required=True);p.add_argument('--mode',required=True,choices=['validate','generate','shard'])
     a=p.parse_args();m=load_machine(a.machine);c=read(a.settings);assert_mode(a.mode,m)
     validate_settings(c)
     run=a.run;manifest=read(run/'config/manifest.json');index=read(run/'trajectories/index.json');fp=manifest['fingerprint']
@@ -17,7 +17,10 @@ def main():
         if sha(run/'trajectories'/f'{sid}.json')!=h:raise ValueError('Trajectory was changed after inspection')
         require_seal(run/'trajectories'/f'{sid}.json',fp)
     if policy.enabled(c):policy.audit(list(sequences.values()),c)
-    jobs=index['validation_jobs'] if a.mode=='validate' else [{'sequence_id':sid,'frame_index':i,'job_id':f'{i:06d}','reason':'dataset_frame'} for sid in index['sequences'] for i in range(len(sequences[sid]['frames']))]
+    from dispatch import run_context,jobs_for
+    worker=run_context(run,m,c) if a.mode=='shard' else None
+    if worker is None and (run/'config/dispatch.json').exists():raise ValueError('Distributed run requires shard mode')
+    jobs=index['validation_jobs'] if a.mode=='validate' else jobs_for(index,worker)
     if a.mode=='validate' and len(jobs)>min(32,c['validation_render_limit']):raise ValueError('Validation cap exceeded')
     from live_preview import LivePreview,preview_font
     from pose_truth import jaw_definitions,attach_body_truth
@@ -78,6 +81,8 @@ def main():
     for job in jobs:
         seq=sequences[job['sequence_id']];frame=seq['frames'][job['frame_index']];folder=run/'sequences'/seq['sequence_id'];ident=job['job_id'];label=folder/'labels'/f'{ident}.json'
         if frame_valid(label,fp):
+            if worker is not None and read(label).get('render_worker')!=worker:
+                raise ValueError('Existing pair belongs to another worker')
             preview_writer.publish_saved(label)
             completed+=1;continue
         qp=np.array(frame['q_psm']);qe=np.array(frame['q_ecm']);path=Trajectory(seq['path'])
@@ -103,7 +108,7 @@ def main():
         effects=frame['appearance'] if policy.enabled(c) else {'light_multiplier':float(seq['light_start']+(seq['light_end']-seq['light_start'])*smoother(u)),
                  'noise_multiplier':seq['noise_multiplier'],'blur_multiplier':seq['blur_multiplier']}
         UsdLux.LightAPI(stage.GetPrimAtPath(scene.rig+'/EndoscopePointLight')).GetIntensityAttr().Set(c['endoscope_light_intensity']*effects['light_multiplier'])
-        reserve_render(m,c,run.name,seq['sequence_id']+'/'+ident);started=time.monotonic()
+        reserve_render(m,c,run.name,seq['sequence_id']+'/'+ident,worker=worker);started=time.monotonic()
         rep.orchestrator.step(rt_subframes=c['rt_subframes'],pause_timeline=True,delta_time=0.,wait_for_render=True)
         record={'schema_version':4,'fingerprint':fp,'mode':a.mode,'sequence_id':seq['sequence_id'],'job_id':ident,
             'frame_index':frame['frame_index'],'time_s':frame['time_s'],'timestamp_ns':frame['timestamp_ns'],'fps':c['fps'],
@@ -123,6 +128,7 @@ def main():
                 sequence_frame_count=len(seq['frames']),parent_frame_count=seq['parent_frame_count'],
                 trajectory_group_id=seq['trajectory_group_id'],feature_profile_id=seq['feature_profile_id'],
                 condition_bins=seq['condition_bins'],features=seq['features'],sequence_seed=seq['seed'])
+        if worker is not None:record['render_worker']=worker
         images={}
         for eye in ('left','right'):
             uv=rays[eye];raw=anns[eye]['HdrColor'].get_data();hdr=np.asarray(raw['data'] if isinstance(raw,dict) else raw)[...,:3].astype(np.float32)
@@ -166,7 +172,7 @@ def main():
         write(run/'status.json',{'state':'rendering','mode':a.mode,'completed_pairs':completed,'target_pairs':len(jobs),'nominal_fps':c['fps'],
             'seconds_last_pair':times[-1],'complete':False})
         print('PAIR_COMPLETE',completed,'/',len(jobs),seq['sequence_id'],ident,'seconds',round(times[-1],2),flush=True)
-    write(run/'validation/render_inventory.json',{'mode':a.mode,'fingerprint':fp,'jobs':jobs,'pairs':completed,'complete':True})
+    write(run/'validation/render_inventory.json',{'mode':a.mode,'fingerprint':fp,'jobs':jobs,'pairs':completed,'complete':True,'worker':worker})
     app.close()
 
 if __name__=='__main__':main()
