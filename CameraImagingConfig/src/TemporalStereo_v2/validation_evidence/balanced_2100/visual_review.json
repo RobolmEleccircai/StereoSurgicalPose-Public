@@ -1,0 +1,54 @@
+{
+  "scope": "Manual review of selected saved previews; raw images unchanged, no additional rendering",
+  "run_id": "balanced_2100_20261108_acceptance",
+  "reviews": [
+    {
+      "preview": "seq_000_validation_000.jpg",
+      "finding": "Open instrument and three local-axis panels align with the rendered tool; fixed-point self-occlusion and distal-region visibility distinguished."
+    },
+    {
+      "preview": "seq_003_validation_003.jpg",
+      "finding": "Lighting sample has visible distal regions and separate shaft/jaw arrows; not flagged overexposed."
+    },
+    {
+      "preview": "seq_006_validation_006.jpg",
+      "finding": "Contact-slide sample retained. Closest actual jaw mesh gap 0.05153173953427094 mm; distal regions visible; no overexposure flag."
+    },
+    {
+      "preview": "seq_009_validation_009.jpg",
+      "finding": "Pre-occlusion sample: both distal regions visible, fixed points self-occluded. Bright near tissue does not cross the configured all-channel near-white proportion threshold."
+    },
+    {
+      "preview": "seq_010_validation_010.jpg",
+      "finding": "Tissue covers both physical endpoints and distal regions. Dashed arrows and tissue-hidden labels agree. Independent overexposure labels present (approximately 7.31% left / 7.76% right near-white pixels)."
+    },
+    {
+      "preview": "seq_012_validation_012.jpg",
+      "finding": "ECM-motion sample: camera-relative shaft/jaw arrows and local XYZ panels follow the instrument; distal regions visible."
+    },
+    {
+      "preview": "seq_015_validation_015.jpg",
+      "finding": "Stereo-rig sample: small opening, corresponding arrows in each camera view, no overexposure flag."
+    },
+    {
+      "preview": "seq_018_validation_018.jpg",
+      "finding": "Combined-category sample: large opening and articulation are represented by separate jaw arrows/XYZ panels; distal regions visible."
+    },
+    {
+      "preview": "seq_015_validation_028.jpg",
+      "finding": "Closed state: half-angle 0 degrees. Physical tip projections nearly coincide; no artificial separation of endpoints or shared hinge origin."
+    },
+    {
+      "preview": "seq_000_validation_029.jpg",
+      "finding": "Maximum permitted state: half-angle 30 degrees per jaw, 60-degree total opening. Separate jaw arrows and local frames agree with the visible opening."
+    },
+    {
+      "preview": "seq_018_validation_030.jpg",
+      "finding": "Contact-slide keyframe: 0.0495122086 mm nearest actual jaw surface gap, large opening and visible distal regions."
+    },
+    {
+      "preview": "seq_018_validation_031.jpg",
+      "finding": "Withdrawal keyframe: 2.0494397373 mm tissue gap, no geometric-contact label, distal regions visible."
+    }
+  ]
+}

@@ -9,6 +9,7 @@ from runtime import arguments,initialize_run,Scene
 from safety import Safety
 from paths import Trajectory,jaw_positions,smoother,phase,contact_offset
 from io_utils import write,read,sha,canonical_hash,seal,require_seal
+import dataset_policy as policy
 
 CASES=[('pose_motion','return'),('pose_motion','arc'),('lighting','hover'),('lighting','contact'),
        ('sensor_quality','return'),('sensor_quality','slide'),('occlusion','occlusion'),('occlusion','occlusion'),
@@ -21,7 +22,8 @@ class Planner:
         self.active=[i for i,n in enumerate(self.k.names) if 'gripper' not in n]
         self.end=self.k.root+'/psm_tool_yaw_link'
         self.R0=self.k.fk(self.k.base)[self.end][:3,:3]
-        self.duration=(self.c['frames_per_sequence']-1)/self.c['fps']
+        self.parent_count=self.c.get('frames_per_sequence',150)
+        self.duration=(self.parent_count-1)/self.c['fps']
 
     def ik(self,point,R,alpha,seed):
         k=self.k;q=jaw_positions(seed,k,alpha);indices=self.active
@@ -63,6 +65,7 @@ class Planner:
     def free_path(self,rng,spec,alpha):
         q=self.sample_free(rng);base=q.copy();knots=[];times=np.linspace(0,self.duration,5)
         delta=np.array([.0025 if self.k.by_name[n]['linear'] else np.deg2rad(3) for n in self.k.names])
+        if policy.enabled(self.c):delta*=rng.uniform(.7,1.2,len(delta))*rng.choice([-1,1],len(delta))
         for u in np.linspace(0,1,5):
             scale=np.sin(2*np.pi*u) if spec['kind']=='arc' else np.sin(np.pi*u)**2
             qq=base+delta*scale
@@ -70,9 +73,10 @@ class Planner:
             qq=jaw_positions(qq,self.k,np.deg2rad(alpha[0]+(alpha[1]-alpha[0])*smoother(u)))
             knots.append(qq)
         ebase=self.s.ecm.base.copy();ecms=np.repeat(ebase[None,:],5,axis=0)
-        if spec['category']=='ecm_motion':
-            ecms[:,0]+=np.deg2rad(.6)*np.sin(np.linspace(0,np.pi,5))
-            ecms[:,1]+=np.deg2rad(.3)*np.sin(np.linspace(0,np.pi,5))
+        if spec.get('ecm_motion',spec['category']=='ecm_motion'):
+            signs=rng.choice([-1,1],2) if policy.enabled(self.c) else [1,1]
+            ecms[:,0]+=signs[0]*np.deg2rad(.6)*np.sin(np.linspace(0,np.pi,5))
+            ecms[:,1]+=signs[1]*np.deg2rad(.3)*np.sin(np.linspace(0,np.pi,5))
             ecms[:,2]+=np.linspace(.001,.003,5)
         return Trajectory.create(times,knots,ecms),None
 
@@ -116,7 +120,7 @@ class Planner:
             q,offset=self.contact_pose(organ,point,normal,goal,R,angle,seed,offset+goal-previous_goal)
             seed=q;previous_goal=goal;qp.append(q)
             e=camera.copy()
-            if spec['category'] in ('ecm_motion','combined_pose_jaw'):
+            if spec.get('ecm_motion',spec['category'] in ('ecm_motion','combined_pose_jaw')):
                 e[0]+=np.deg2rad(.3)*np.sin(np.pi*u);e[1]+=np.deg2rad(.2)*np.sin(np.pi*u)
             qe.append(e)
         spec['surface']={'prim':organ.name,'center_mm':center.tolist(),'initial_normal':n.tolist(),'slide_length_mm':length if spec['kind']=='slide' else 0.}
@@ -137,10 +141,10 @@ class Planner:
         mid_angle=np.deg2rad(sum(alpha)/2);q=jaw_positions(q,self.k,mid_angle)
         _,_,tips=self.s.points(q);qe=self.camera_aim(tips.mean(0),screen_x=.48)
         if not self.safe.check(q,qe,self.c['free_clearance_mm'])['safe']:raise ValueError('Occlusion seed is not collision-free')
-        cameras=self.s.cameras(qe,spec)
-        def visibility(qp):
-            self.safe.move(qp,qe);_,_,points=self.s.points(qp)
-            return [self.safe.visible(cam[:3,3],point) for cam in cameras.values() for point in points]
+        def visibility(qp,ecm=None):
+            ecm=qe if ecm is None else ecm
+            self.safe.move(qp,ecm);_,_,points=self.s.points(qp)
+            return [self.safe.visible(cam[:3,3],point) for cam in self.s.cameras(ecm,spec).values() for point in points]
         def tissue(v):return bool(v['occluder'] and v['occluder'].startswith(self.c['anatomy_root']+'/'))
         mid=visibility(q);hidden=[i for i,v in enumerate(mid) if tissue(v)]
         if not hidden:raise ValueError('Occlusion seed has no tissue-hidden endpoint')
@@ -149,20 +153,23 @@ class Planner:
             visible=q.copy();visible[indices]+=rng.uniform(-1,1,len(names))*excursion
             first=jaw_positions(visible,self.k,np.deg2rad(alpha[0]));last=jaw_positions(visible,self.k,np.deg2rad(alpha[1]))
             if np.any(first<self.k.lower) or np.any(first>self.k.upper):continue
-            if not self.safe.check(first,qe,self.c['free_clearance_mm'])['safe']:continue
-            if not self.safe.check(last,qe,self.c['free_clearance_mm'])['safe']:continue
-            v0,v1=visibility(first),visibility(last)
+            e0,e1=qe.copy(),qe.copy()
+            if spec.get('ecm_motion',False):
+                e0[:2]-=np.deg2rad([.03,.02]);e1[:2]+=np.deg2rad([.03,.02])
+            if not self.safe.check(first,e0,self.c['free_clearance_mm'])['safe']:continue
+            if not self.safe.check(last,e1,self.c['free_clearance_mm'])['safe']:continue
+            v0,v1=visibility(first,e0),visibility(last,e1)
             targets=[i for i in hidden if not tissue(v0[i]) and not tissue(v1[i])]
             if not targets:continue
             chosen=targets[0];spec['occlusion_target']={'eye':('left','right')[chosen//2],'jaw_index':chosen%2,
                 'transition':'tissue_clear_to_tissue_occluded_to_tissue_clear',
                 'surface_visibility_is_separately_labeled':True}
             spec['occluding_surface']=mid[chosen]['occluder']
-            return Trajectory.create([0,self.duration/2,self.duration],[first,q,last],[qe,qe,qe]),None
+            return Trajectory.create([0,self.duration/2,self.duration],[first,q,last],[e0,qe,e1]),None
         raise ValueError('No collision-free reveal near the occlusion seed')
 
     def inspect(self,path,spec):
-        path.validate_bounds(self.s);count=self.c['frames_per_sequence'];records=[];cache={}
+        path.validate_bounds(self.s);count=self.parent_count;records=[];cache={}
         print('CHECKING_FRAMES',spec.get('sequence_id','candidate'),count,flush=True)
         iscontact=spec['kind'] in ('contact','slide')
         def check(t):
@@ -186,6 +193,11 @@ class Planner:
                 'q_psm':qp.tolist(),'q_ecm':qe.tolist(),'contact':{'geometric_contact':bool(r['organ_distance_mm']<=self.c['contact_max_mm']),
                 'organ_distance_mm':r['organ_distance_mm'],'closest_pair':r['organ_pair'],'model':'near_zero_gap_not_force_simulation'},
                 'jaw_visibility':vis})
+            if policy.enabled(self.c):
+                vp,ve=path.velocity(t)
+                records[-1].update(v_psm=vp.tolist(),v_ecm=ve.tolist(),
+                    jaw_half_angle_deg=float(np.rad2deg(qp[self.k.names.index('psm_tool_gripper2_joint')])),
+                    appearance=policy.effects_at(spec,i,self.c['fps']))
         if spec['kind']=='occlusion':
             target=spec['occlusion_target'];visibility=[r['jaw_visibility'][target['eye']][target['jaw_index']] for r in records]
             hidden=[bool(v['occluder'] and v['occluder'].startswith(self.c['anatomy_root']+'/')) for v in visibility]
@@ -197,6 +209,33 @@ class Planner:
             r=self.safe.sweep(path,i/self.c['fps'],(i+1)/self.c['fps'],check,cache=cache)
             if not r['safe']:raise ValueError('Unsafe interval: '+r.get('reason','unknown'))
         return records,sum(isinstance(k,(float,int)) for k in cache)
+
+    def balanced_sequence(self,row,accepted):
+        self.parent_count=row['parent_frame_count'];self.duration=(self.parent_count-1)/self.c['fps']
+        rng=np.random.default_rng(row['seed']);failures=collections.Counter()
+        training=next((s for s in accepted if s['category']==row['category'] and s['split']=='train'),None)
+        if row['split']!='train' and training is None:raise ValueError('Training coverage must be planned first')
+        for attempt in range(self.c['max_candidates']):
+            spec=policy.sample_conditions(row,rng);alpha=spec['jaw_angles_deg'];kind=spec['kind']
+            try:
+                if kind in ('slide','contact','hover'):path,_=self.contact_path(rng,spec,alpha)
+                elif kind=='occlusion':path,_=self.occlusion_path(rng,spec,alpha)
+                else:path,_=self.free_path(rng,spec,alpha)
+                path=path.with_jaw_curve(self.k,alpha,spec['jaw_hold_start_s'])
+                parent,checked=self.inspect(path,spec)
+                spec['parent_frames']=parent
+                descriptor=policy.trajectory_descriptor(self.s,parent)
+                spec.update(trajectory_descriptor=descriptor,trajectory_group_id=policy.group_id(descriptor),path=path.record)
+                spec['frames']=policy.choose_clip(spec,parent,self.c['fps'],training)
+                policy.check_against(spec,accepted)
+                spec['preflight']={'passed':True,'states_checked':checked,'attempt':attempt+1,'rejections':dict(failures)}
+                print('PLANNED',spec['sequence_id'],spec['split'],spec['category'],'output',len(spec['frames']),
+                      'parent',len(parent),'start',spec['clip_start_frame'],'attempt',attempt+1,flush=True)
+                return spec
+            except ValueError as e:
+                reason=str(e).split(' /')[0];failures[reason]+=1
+                if attempt%10==0:print('REPLAN',row['sequence_id'],attempt,reason[:180],flush=True)
+        raise RuntimeError(f"No covered safe independent trajectory for {row['sequence_id']}: {dict(failures)}")
 
     def sequence(self,sid):
         category,kind=CASES[sid%len(CASES)];rng=np.random.default_rng(self.c['seed']+sid);failures=collections.Counter()
@@ -229,6 +268,7 @@ class Planner:
         raise RuntimeError(f'No valid trajectory for {category}/{kind}: {dict(failures)}')
 
 def select_jobs(sequences,c):
+    if policy.enabled(c):return policy.diagnostic_jobs(sequences)
     jobs=[];selected={}
     small=c.get('validation_selection','standard_32')=='categories_14'
     for seq in sequences:
@@ -283,18 +323,23 @@ def main():
     write(a.run/'config/appearance_source.json',s.appearance);write(a.run/'validation/geometry_inventory.json',safety.audit)
     write(a.run/'config/joints.json',{'psm':s.psm.audit(),'ecm':s.ecm.audit(),'order':{'psm':s.psm.names,'ecm':s.ecm.names}})
     sequences=[]
-    priority=[12,13]+[i for i in range(s.c['sequence_count']) if i not in (12,13)]
+    if policy.enabled(s.c):
+        manifest={int(row['sequence_id'].split('_')[1]):row for row in s.c['sequence_manifest']}
+        priority=[sid for split in policy.SPLITS for sid,row in manifest.items() if row['split']==split]
+    else:priority=[12,13]+[i for i in range(s.c['sequence_count']) if i not in (12,13)]
     for sid in priority:
         p=a.run/'trajectories'/f'seq_{sid:03d}.json'
         if p.exists():
             require_seal(p,fp)
             seq=read(p)
             if seq['fingerprint']!=fp:raise ValueError('Trajectory cache fingerprint mismatch')
-        else:seq=planner.sequence(sid);seq['fingerprint']=fp;write(p,seq);seal(p,fp)
+        else:
+            seq=planner.balanced_sequence(manifest[sid],sequences) if policy.enabled(s.c) else planner.sequence(sid)
+            seq['fingerprint']=fp;write(p,seq);seal(p,fp)
         sequences.append(seq)
     sequences.sort(key=lambda seq:seq['sequence_id'])
     jobs=select_jobs(sequences,s.c)
-    jaw_keyframes(s,safety,sequences,jobs)
+    if not policy.enabled(s.c):jaw_keyframes(s,safety,sequences,jobs)
     # Keyframe overrides receive the same geometry and limits checks before rendering.
     for job in jobs:
         seq=next(sq for sq in sequences if sq['sequence_id']==job['sequence_id']);frame=seq['frames'][job['frame_index']]
@@ -302,8 +347,14 @@ def main():
             qp=np.array(job['q_psm_override'])
             check=safety.check(qp,frame['q_ecm'],s.c['free_clearance_mm'])
             if not check['safe']:raise ValueError('Unsafe jaw endpoint keyframe: '+str(check))
+    if policy.enabled(s.c):
+        write(a.run/'validation/planned_split_coverage.json',policy.audit(sequences,s.c))
+        policy.write_split_indexes(a.run,sequences)
+        write(a.run/'config/dataset_split_policy.json',{'policy':policy.POLICY,'manifest':s.c['sequence_manifest'],
+            'sampling_ranges':s.c['sampling_ranges'],'source':'Explicit dataset sampling design, not official camera calibration'})
     write(a.run/'trajectories/index.json',{'fingerprint':fp,'sequences':[s['sequence_id'] for s in sequences],
         'total_pairs':sum(len(s['frames']) for s in sequences),'validation_jobs':jobs,
+        'sequence_frame_counts':{s['sequence_id']:len(s['frames']) for s in sequences},
         'trajectory_hashes':{s['sequence_id']:sha(a.run/'trajectories'/f"{s['sequence_id']}.json") for s in sequences}})
     seal(a.run/'trajectories/index.json',fp)
     write(a.run/'status.json',{'state':'planned','mode':a.mode,'complete':False,'sequences':len(sequences),'validation_pairs':len(jobs)})

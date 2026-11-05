@@ -1,0 +1,251 @@
+{
+  "passed": true,
+  "sequences": 21,
+  "planned_output_pairs": 2100,
+  "parent_samples": 3500,
+  "checked_states_including_subdivision": 14131,
+  "sequence_checks": [
+    {
+      "sequence_id": "seq_000",
+      "split": "train",
+      "category": "pose_motion",
+      "preflight": {
+        "passed": true,
+        "states_checked": 180,
+        "attempt": 1,
+        "rejections": {}
+      }
+    },
+    {
+      "sequence_id": "seq_001",
+      "split": "validation",
+      "category": "pose_motion",
+      "preflight": {
+        "passed": true,
+        "states_checked": 150,
+        "attempt": 1,
+        "rejections": {}
+      }
+    },
+    {
+      "sequence_id": "seq_002",
+      "split": "test",
+      "category": "pose_motion",
+      "preflight": {
+        "passed": true,
+        "states_checked": 150,
+        "attempt": 1,
+        "rejections": {}
+      }
+    },
+    {
+      "sequence_id": "seq_003",
+      "split": "train",
+      "category": "lighting",
+      "preflight": {
+        "passed": true,
+        "states_checked": 334,
+        "attempt": 1,
+        "rejections": {}
+      }
+    },
+    {
+      "sequence_id": "seq_004",
+      "split": "validation",
+      "category": "lighting",
+      "preflight": {
+        "passed": true,
+        "states_checked": 515,
+        "attempt": 1,
+        "rejections": {}
+      }
+    },
+    {
+      "sequence_id": "seq_005",
+      "split": "test",
+      "category": "lighting",
+      "preflight": {
+        "passed": true,
+        "states_checked": 269,
+        "attempt": 1,
+        "rejections": {}
+      }
+    },
+    {
+      "sequence_id": "seq_006",
+      "split": "train",
+      "category": "sensor_quality",
+      "preflight": {
+        "passed": true,
+        "states_checked": 2189,
+        "attempt": 2,
+        "rejections": {
+          "IK target not reached": 1
+        }
+      }
+    },
+    {
+      "sequence_id": "seq_007",
+      "split": "validation",
+      "category": "sensor_quality",
+      "preflight": {
+        "passed": true,
+        "states_checked": 1299,
+        "attempt": 1,
+        "rejections": {}
+      }
+    },
+    {
+      "sequence_id": "seq_008",
+      "split": "test",
+      "category": "sensor_quality",
+      "preflight": {
+        "passed": true,
+        "states_checked": 1482,
+        "attempt": 2,
+        "rejections": {
+          "IK target not reached": 1
+        }
+      }
+    },
+    {
+      "sequence_id": "seq_009",
+      "split": "train",
+      "category": "occlusion",
+      "preflight": {
+        "passed": true,
+        "states_checked": 287,
+        "attempt": 1,
+        "rejections": {}
+      }
+    },
+    {
+      "sequence_id": "seq_010",
+      "split": "validation",
+      "category": "occlusion",
+      "preflight": {
+        "passed": true,
+        "states_checked": 150,
+        "attempt": 4,
+        "rejections": {
+          "Occlusion seed has no tissue-hidden endpoint": 2,
+          "Occlusion seed is not collision-free": 1
+        }
+      }
+    },
+    {
+      "sequence_id": "seq_011",
+      "split": "test",
+      "category": "occlusion",
+      "preflight": {
+        "passed": true,
+        "states_checked": 150,
+        "attempt": 1,
+        "rejections": {}
+      }
+    },
+    {
+      "sequence_id": "seq_012",
+      "split": "train",
+      "category": "ecm_motion",
+      "preflight": {
+        "passed": true,
+        "states_checked": 180,
+        "attempt": 1,
+        "rejections": {}
+      }
+    },
+    {
+      "sequence_id": "seq_013",
+      "split": "validation",
+      "category": "ecm_motion",
+      "preflight": {
+        "passed": true,
+        "states_checked": 150,
+        "attempt": 1,
+        "rejections": {}
+      }
+    },
+    {
+      "sequence_id": "seq_014",
+      "split": "test",
+      "category": "ecm_motion",
+      "preflight": {
+        "passed": true,
+        "states_checked": 150,
+        "attempt": 1,
+        "rejections": {}
+      }
+    },
+    {
+      "sequence_id": "seq_015",
+      "split": "train",
+      "category": "stereo_rig",
+      "preflight": {
+        "passed": true,
+        "states_checked": 180,
+        "attempt": 1,
+        "rejections": {}
+      }
+    },
+    {
+      "sequence_id": "seq_016",
+      "split": "validation",
+      "category": "stereo_rig",
+      "preflight": {
+        "passed": true,
+        "states_checked": 150,
+        "attempt": 1,
+        "rejections": {}
+      }
+    },
+    {
+      "sequence_id": "seq_017",
+      "split": "test",
+      "category": "stereo_rig",
+      "preflight": {
+        "passed": true,
+        "states_checked": 150,
+        "attempt": 1,
+        "rejections": {}
+      }
+    },
+    {
+      "sequence_id": "seq_018",
+      "split": "train",
+      "category": "combined_pose_jaw",
+      "preflight": {
+        "passed": true,
+        "states_checked": 1685,
+        "attempt": 2,
+        "rejections": {
+          "IK target not reached": 1
+        }
+      }
+    },
+    {
+      "sequence_id": "seq_019",
+      "split": "validation",
+      "category": "combined_pose_jaw",
+      "preflight": {
+        "passed": true,
+        "states_checked": 1889,
+        "attempt": 2,
+        "rejections": {
+          "IK target not reached": 1
+        }
+      }
+    },
+    {
+      "sequence_id": "seq_020",
+      "split": "test",
+      "category": "combined_pose_jaw",
+      "preflight": {
+        "passed": true,
+        "states_checked": 2442,
+        "attempt": 1,
+        "rejections": {}
+      }
+    }
+  ]
+}

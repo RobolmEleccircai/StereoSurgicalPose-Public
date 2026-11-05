@@ -1,0 +1,667 @@
+{
+  "policy": "balanced_2100_v1",
+  "manifest": [
+    {
+      "sequence_id": "seq_000",
+      "category": "pose_motion",
+      "kind": "return",
+      "split": "train",
+      "frame_count": 180,
+      "parent_frame_count": 180,
+      "seed": 20261107,
+      "feature_profile_id": "balanced_2100_v1/pose_motion",
+      "condition_bins": {
+        "light": 1,
+        "noise": 0,
+        "blur": 2,
+        "baseline": 0,
+        "relative_yaw": 2
+      },
+      "features": [
+        "psm_motion",
+        "jaw_motion",
+        "lighting",
+        "noise",
+        "blur",
+        "stereo_variation"
+      ],
+      "jaw_angles_deg": [
+        30.0,
+        24.0
+      ],
+      "jaw_hold_start_s": 0.25
+    },
+    {
+      "sequence_id": "seq_001",
+      "category": "pose_motion",
+      "kind": "return",
+      "split": "validation",
+      "frame_count": 32,
+      "parent_frame_count": 150,
+      "seed": 20261208,
+      "feature_profile_id": "balanced_2100_v1/pose_motion",
+      "condition_bins": {
+        "light": 1,
+        "noise": 0,
+        "blur": 2,
+        "baseline": 0,
+        "relative_yaw": 2
+      },
+      "features": [
+        "psm_motion",
+        "jaw_motion",
+        "lighting",
+        "noise",
+        "blur",
+        "stereo_variation"
+      ],
+      "jaw_angles_deg": [
+        30.0,
+        24.0
+      ],
+      "jaw_hold_start_s": 0.25
+    },
+    {
+      "sequence_id": "seq_002",
+      "category": "pose_motion",
+      "kind": "return",
+      "split": "test",
+      "frame_count": 32,
+      "parent_frame_count": 150,
+      "seed": 20261309,
+      "feature_profile_id": "balanced_2100_v1/pose_motion",
+      "condition_bins": {
+        "light": 1,
+        "noise": 0,
+        "blur": 2,
+        "baseline": 0,
+        "relative_yaw": 2
+      },
+      "features": [
+        "psm_motion",
+        "jaw_motion",
+        "lighting",
+        "noise",
+        "blur",
+        "stereo_variation"
+      ],
+      "jaw_angles_deg": [
+        30.0,
+        24.0
+      ],
+      "jaw_hold_start_s": 0.25
+    },
+    {
+      "sequence_id": "seq_003",
+      "category": "lighting",
+      "kind": "hover",
+      "split": "train",
+      "frame_count": 180,
+      "parent_frame_count": 180,
+      "seed": 20262116,
+      "feature_profile_id": "balanced_2100_v1/lighting",
+      "condition_bins": {
+        "light": 2,
+        "noise": 1,
+        "blur": 0,
+        "baseline": 1,
+        "relative_yaw": 1
+      },
+      "features": [
+        "psm_motion",
+        "jaw_motion",
+        "lighting",
+        "noise",
+        "blur",
+        "stereo_variation"
+      ],
+      "jaw_angles_deg": [
+        4.0,
+        9.0
+      ],
+      "jaw_hold_start_s": 0.0
+    },
+    {
+      "sequence_id": "seq_004",
+      "category": "lighting",
+      "kind": "hover",
+      "split": "validation",
+      "frame_count": 32,
+      "parent_frame_count": 150,
+      "seed": 20262217,
+      "feature_profile_id": "balanced_2100_v1/lighting",
+      "condition_bins": {
+        "light": 2,
+        "noise": 1,
+        "blur": 0,
+        "baseline": 1,
+        "relative_yaw": 1
+      },
+      "features": [
+        "psm_motion",
+        "jaw_motion",
+        "lighting",
+        "noise",
+        "blur",
+        "stereo_variation"
+      ],
+      "jaw_angles_deg": [
+        4.0,
+        9.0
+      ],
+      "jaw_hold_start_s": 0.0
+    },
+    {
+      "sequence_id": "seq_005",
+      "category": "lighting",
+      "kind": "hover",
+      "split": "test",
+      "frame_count": 32,
+      "parent_frame_count": 150,
+      "seed": 20262318,
+      "feature_profile_id": "balanced_2100_v1/lighting",
+      "condition_bins": {
+        "light": 2,
+        "noise": 1,
+        "blur": 0,
+        "baseline": 1,
+        "relative_yaw": 1
+      },
+      "features": [
+        "psm_motion",
+        "jaw_motion",
+        "lighting",
+        "noise",
+        "blur",
+        "stereo_variation"
+      ],
+      "jaw_angles_deg": [
+        4.0,
+        9.0
+      ],
+      "jaw_hold_start_s": 0.0
+    },
+    {
+      "sequence_id": "seq_006",
+      "category": "sensor_quality",
+      "kind": "slide",
+      "split": "train",
+      "frame_count": 180,
+      "parent_frame_count": 180,
+      "seed": 20263125,
+      "feature_profile_id": "balanced_2100_v1/sensor_quality",
+      "condition_bins": {
+        "light": 0,
+        "noise": 2,
+        "blur": 1,
+        "baseline": 2,
+        "relative_yaw": 0
+      },
+      "features": [
+        "psm_motion",
+        "jaw_motion",
+        "lighting",
+        "noise",
+        "blur",
+        "stereo_variation"
+      ],
+      "jaw_angles_deg": [
+        11.0,
+        17.0
+      ],
+      "jaw_hold_start_s": 0.0
+    },
+    {
+      "sequence_id": "seq_007",
+      "category": "sensor_quality",
+      "kind": "slide",
+      "split": "validation",
+      "frame_count": 32,
+      "parent_frame_count": 150,
+      "seed": 20263226,
+      "feature_profile_id": "balanced_2100_v1/sensor_quality",
+      "condition_bins": {
+        "light": 0,
+        "noise": 2,
+        "blur": 1,
+        "baseline": 2,
+        "relative_yaw": 0
+      },
+      "features": [
+        "psm_motion",
+        "jaw_motion",
+        "lighting",
+        "noise",
+        "blur",
+        "stereo_variation"
+      ],
+      "jaw_angles_deg": [
+        11.0,
+        17.0
+      ],
+      "jaw_hold_start_s": 0.0
+    },
+    {
+      "sequence_id": "seq_008",
+      "category": "sensor_quality",
+      "kind": "slide",
+      "split": "test",
+      "frame_count": 32,
+      "parent_frame_count": 150,
+      "seed": 20263327,
+      "feature_profile_id": "balanced_2100_v1/sensor_quality",
+      "condition_bins": {
+        "light": 0,
+        "noise": 2,
+        "blur": 1,
+        "baseline": 2,
+        "relative_yaw": 0
+      },
+      "features": [
+        "psm_motion",
+        "jaw_motion",
+        "lighting",
+        "noise",
+        "blur",
+        "stereo_variation"
+      ],
+      "jaw_angles_deg": [
+        11.0,
+        17.0
+      ],
+      "jaw_hold_start_s": 0.0
+    },
+    {
+      "sequence_id": "seq_009",
+      "category": "occlusion",
+      "kind": "occlusion",
+      "split": "train",
+      "frame_count": 240,
+      "parent_frame_count": 240,
+      "seed": 20264134,
+      "feature_profile_id": "balanced_2100_v1/occlusion",
+      "condition_bins": {
+        "light": 1,
+        "noise": 0,
+        "blur": 1,
+        "baseline": 1,
+        "relative_yaw": 1
+      },
+      "features": [
+        "psm_motion",
+        "jaw_motion",
+        "lighting",
+        "noise",
+        "blur",
+        "stereo_variation",
+        "ecm_motion"
+      ],
+      "jaw_angles_deg": [
+        12.0,
+        16.0
+      ],
+      "jaw_hold_start_s": 0.0
+    },
+    {
+      "sequence_id": "seq_010",
+      "category": "occlusion",
+      "kind": "occlusion",
+      "split": "validation",
+      "frame_count": 140,
+      "parent_frame_count": 150,
+      "seed": 20264235,
+      "feature_profile_id": "balanced_2100_v1/occlusion",
+      "condition_bins": {
+        "light": 1,
+        "noise": 0,
+        "blur": 1,
+        "baseline": 1,
+        "relative_yaw": 1
+      },
+      "features": [
+        "psm_motion",
+        "jaw_motion",
+        "lighting",
+        "noise",
+        "blur",
+        "stereo_variation",
+        "ecm_motion"
+      ],
+      "jaw_angles_deg": [
+        12.0,
+        16.0
+      ],
+      "jaw_hold_start_s": 0.0
+    },
+    {
+      "sequence_id": "seq_011",
+      "category": "occlusion",
+      "kind": "occlusion",
+      "split": "test",
+      "frame_count": 140,
+      "parent_frame_count": 150,
+      "seed": 20264336,
+      "feature_profile_id": "balanced_2100_v1/occlusion",
+      "condition_bins": {
+        "light": 1,
+        "noise": 0,
+        "blur": 1,
+        "baseline": 1,
+        "relative_yaw": 1
+      },
+      "features": [
+        "psm_motion",
+        "jaw_motion",
+        "lighting",
+        "noise",
+        "blur",
+        "stereo_variation",
+        "ecm_motion"
+      ],
+      "jaw_angles_deg": [
+        12.0,
+        16.0
+      ],
+      "jaw_hold_start_s": 0.0
+    },
+    {
+      "sequence_id": "seq_012",
+      "category": "ecm_motion",
+      "kind": "arc",
+      "split": "train",
+      "frame_count": 180,
+      "parent_frame_count": 180,
+      "seed": 20265143,
+      "feature_profile_id": "balanced_2100_v1/ecm_motion",
+      "condition_bins": {
+        "light": 0,
+        "noise": 2,
+        "blur": 2,
+        "baseline": 0,
+        "relative_yaw": 2
+      },
+      "features": [
+        "psm_motion",
+        "jaw_motion",
+        "lighting",
+        "noise",
+        "blur",
+        "stereo_variation",
+        "ecm_motion"
+      ],
+      "jaw_angles_deg": [
+        19.0,
+        13.0
+      ],
+      "jaw_hold_start_s": 0.0
+    },
+    {
+      "sequence_id": "seq_013",
+      "category": "ecm_motion",
+      "kind": "arc",
+      "split": "validation",
+      "frame_count": 32,
+      "parent_frame_count": 150,
+      "seed": 20265244,
+      "feature_profile_id": "balanced_2100_v1/ecm_motion",
+      "condition_bins": {
+        "light": 0,
+        "noise": 2,
+        "blur": 2,
+        "baseline": 0,
+        "relative_yaw": 2
+      },
+      "features": [
+        "psm_motion",
+        "jaw_motion",
+        "lighting",
+        "noise",
+        "blur",
+        "stereo_variation",
+        "ecm_motion"
+      ],
+      "jaw_angles_deg": [
+        19.0,
+        13.0
+      ],
+      "jaw_hold_start_s": 0.0
+    },
+    {
+      "sequence_id": "seq_014",
+      "category": "ecm_motion",
+      "kind": "arc",
+      "split": "test",
+      "frame_count": 32,
+      "parent_frame_count": 150,
+      "seed": 20265345,
+      "feature_profile_id": "balanced_2100_v1/ecm_motion",
+      "condition_bins": {
+        "light": 0,
+        "noise": 2,
+        "blur": 2,
+        "baseline": 0,
+        "relative_yaw": 2
+      },
+      "features": [
+        "psm_motion",
+        "jaw_motion",
+        "lighting",
+        "noise",
+        "blur",
+        "stereo_variation",
+        "ecm_motion"
+      ],
+      "jaw_angles_deg": [
+        19.0,
+        13.0
+      ],
+      "jaw_hold_start_s": 0.0
+    },
+    {
+      "sequence_id": "seq_015",
+      "category": "stereo_rig",
+      "kind": "return",
+      "split": "train",
+      "frame_count": 180,
+      "parent_frame_count": 180,
+      "seed": 20266152,
+      "feature_profile_id": "balanced_2100_v1/stereo_rig",
+      "condition_bins": {
+        "light": 1,
+        "noise": 1,
+        "blur": 1,
+        "baseline": 2,
+        "relative_yaw": 0
+      },
+      "features": [
+        "psm_motion",
+        "jaw_motion",
+        "lighting",
+        "noise",
+        "blur",
+        "stereo_variation"
+      ],
+      "jaw_angles_deg": [
+        0.0,
+        6.0
+      ],
+      "jaw_hold_start_s": 0.25
+    },
+    {
+      "sequence_id": "seq_016",
+      "category": "stereo_rig",
+      "kind": "return",
+      "split": "validation",
+      "frame_count": 32,
+      "parent_frame_count": 150,
+      "seed": 20266253,
+      "feature_profile_id": "balanced_2100_v1/stereo_rig",
+      "condition_bins": {
+        "light": 1,
+        "noise": 1,
+        "blur": 1,
+        "baseline": 2,
+        "relative_yaw": 0
+      },
+      "features": [
+        "psm_motion",
+        "jaw_motion",
+        "lighting",
+        "noise",
+        "blur",
+        "stereo_variation"
+      ],
+      "jaw_angles_deg": [
+        0.0,
+        6.0
+      ],
+      "jaw_hold_start_s": 0.25
+    },
+    {
+      "sequence_id": "seq_017",
+      "category": "stereo_rig",
+      "kind": "return",
+      "split": "test",
+      "frame_count": 32,
+      "parent_frame_count": 150,
+      "seed": 20266354,
+      "feature_profile_id": "balanced_2100_v1/stereo_rig",
+      "condition_bins": {
+        "light": 1,
+        "noise": 1,
+        "blur": 1,
+        "baseline": 2,
+        "relative_yaw": 0
+      },
+      "features": [
+        "psm_motion",
+        "jaw_motion",
+        "lighting",
+        "noise",
+        "blur",
+        "stereo_variation"
+      ],
+      "jaw_angles_deg": [
+        0.0,
+        6.0
+      ],
+      "jaw_hold_start_s": 0.25
+    },
+    {
+      "sequence_id": "seq_018",
+      "category": "combined_pose_jaw",
+      "kind": "slide",
+      "split": "train",
+      "frame_count": 260,
+      "parent_frame_count": 260,
+      "seed": 20267161,
+      "feature_profile_id": "balanced_2100_v1/combined_pose_jaw",
+      "condition_bins": {
+        "light": 2,
+        "noise": 1,
+        "blur": 0,
+        "baseline": 1,
+        "relative_yaw": 1
+      },
+      "features": [
+        "psm_motion",
+        "jaw_motion",
+        "lighting",
+        "noise",
+        "blur",
+        "stereo_variation",
+        "ecm_motion"
+      ],
+      "jaw_angles_deg": [
+        22.0,
+        28.0
+      ],
+      "jaw_hold_start_s": 0.0
+    },
+    {
+      "sequence_id": "seq_019",
+      "category": "combined_pose_jaw",
+      "kind": "slide",
+      "split": "validation",
+      "frame_count": 50,
+      "parent_frame_count": 150,
+      "seed": 20267262,
+      "feature_profile_id": "balanced_2100_v1/combined_pose_jaw",
+      "condition_bins": {
+        "light": 2,
+        "noise": 1,
+        "blur": 0,
+        "baseline": 1,
+        "relative_yaw": 1
+      },
+      "features": [
+        "psm_motion",
+        "jaw_motion",
+        "lighting",
+        "noise",
+        "blur",
+        "stereo_variation",
+        "ecm_motion"
+      ],
+      "jaw_angles_deg": [
+        22.0,
+        28.0
+      ],
+      "jaw_hold_start_s": 0.0
+    },
+    {
+      "sequence_id": "seq_020",
+      "category": "combined_pose_jaw",
+      "kind": "slide",
+      "split": "test",
+      "frame_count": 50,
+      "parent_frame_count": 150,
+      "seed": 20267363,
+      "feature_profile_id": "balanced_2100_v1/combined_pose_jaw",
+      "condition_bins": {
+        "light": 2,
+        "noise": 1,
+        "blur": 0,
+        "baseline": 1,
+        "relative_yaw": 1
+      },
+      "features": [
+        "psm_motion",
+        "jaw_motion",
+        "lighting",
+        "noise",
+        "blur",
+        "stereo_variation",
+        "ecm_motion"
+      ],
+      "jaw_angles_deg": [
+        22.0,
+        28.0
+      ],
+      "jaw_hold_start_s": 0.0
+    }
+  ],
+  "sampling_ranges": {
+    "light": [
+      0.7,
+      1.3
+    ],
+    "noise": [
+      0.5,
+      1.5
+    ],
+    "blur": [
+      0.75,
+      1.25
+    ],
+    "baseline": [
+      0.95,
+      1.05
+    ],
+    "relative_yaw": [
+      -0.5,
+      0.5
+    ]
+  },
+  "source": "Explicit dataset sampling design, not official camera calibration"
+}

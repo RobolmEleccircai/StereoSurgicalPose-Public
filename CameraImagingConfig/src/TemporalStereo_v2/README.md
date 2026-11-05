@@ -1,6 +1,8 @@
 # Temporal stereo capture v2
 
-Single official PSM instrument with an articulated ECM stereo rig. The default dataset is 14 sequences × 150 synchronized pairs at 60 Hz, 1280 × 720 per eye. The laptop is a validation machine; it must not generate the complete dataset.
+Single official PSM instrument with an articulated ECM stereo rig. The default `settings.balanced21.json` specifies 21 independent, variable-length sequences: **1,400 train + 350 validation + 350 test = 2,100 stereo pairs**, at 60 Hz and 1280 × 720 per eye. See [DATASET_SPLITS.md](DATASET_SPLITS.md) for exact lengths, coverage gates, original-time clipping and evaluation indexes. The legacy `settings.json` and historical samples remain unchanged. The laptop is a validation machine; it must not generate the complete dataset.
+
+The [balanced validation report](validation_evidence/balanced_2100/README.md) records 36 passing tests, all 21 checked trajectories, all 2,100 planned-state decoding checks, 32 accepted rendered stereo pairs, and an actual resume with zero new capture attempts. Full rendered dataset coverage and target-server performance remain untested.
 
 ## Modes and setup
 
@@ -27,7 +29,7 @@ python3 generate.py --mode plan --machine machine.local.json --run-id geometry_c
 python3 generate.py --machine machine.local.json --run-id validation_v2
 ```
 
-`generate` is rejected when the machine role is `laptop`. Validation's budget is stored outside individual run directories and persists across crashes and new run IDs. Do not change the budget scope to bypass the user-approved cap. Four consecutive frames from each of seven categories plus four jaw/contact keyframes form the 32-pair validation selection. Both jaw-limit keyframes are rendered first, using one safe wrist view. The open keyframe supplies one directly visible physical endpoint per eye; the closed keyframe retains its actual self-occlusion labels. Those keyframes are explicitly marked; they must not be concatenated into a continuous training video.
+`generate` is rejected when the machine role is `laptop`. Validation's budget is stored outside individual run directories and persists across crashes and new run IDs. Do not change the budget scope to bypass the user-approved cap. The balanced policy selects one pair from each of 21 sequences, seven adjacent pairs (one per category), and four actual planned states: closed, 30° half-opening, contact and withdrawal. These 32 samples are diagnostics, not a completed training dataset. Jaw key states come from independent safe trajectories, so their mask difference is not a controlled opening-only experiment. Visibility remains the actual geometric visibility; no fixed endpoint is forced visible.
 
 ## Server transfer
 
@@ -74,11 +76,11 @@ Frame intervals are checked using conservative articulated point-motion bounds a
 
 ## Image formation and labels
 
-The [model input/output and kinematic decoding specification](MODEL_INPUT_OUTPUT.md) defines the proposed 17-value network output, its existing training-label sources, and the fixed USD geometry required to derive d, H1/H2, J1/J2, T and complete jaw frames. A separate no-render check reconstructed all 14 new stereo pairs without giving the decoder camera extrinsics or saved jaw poses. This is a numerical decoding check, not a trained-network accuracy claim.
+The [model input/output and kinematic decoding specification](MODEL_INPUT_OUTPUT.md) defines the proposed 17-value network output, its existing training-label sources, and the fixed USD geometry required to derive d, H1/H2, J1/J2, T and complete jaw frames. A separate no-render regression reconstructed the 14 historical quality-label stereo pairs without giving the decoder camera extrinsics or saved jaw poses. Current balanced-run evidence is recorded separately in [balanced validation](validation_evidence/balanced_2100/README.md). These are numerical decoding checks, not trained-network accuracy claims.
 
 Each output includes RGB PNGs, visible tool masks, per-eye C/d/T (18 main numbers), both physical jaw endpoints, K/D, joint positions and velocities, timestamps, contact state and physical endpoint visibility. C is the internal roll-link origin; d follows the shaft +Z axis; T is the midpoint of the two actual jaw endpoints. C and T are not assigned fictitious surface-visibility labels. Direction alone does not specify axial roll or a complete 6D rotation.
 
-New captures use label schema 4, retaining the schema-3 `body_pose_truth` (full PSM body transforms, authored jaw anchors, source scene hash) and `eyes.left/right.local_frames.shaft/jaw1/jaw2.T_optical_from_local_mm`. These are 4×4 transforms with physical origins C/H1/H2. Their rotation columns are the part's local +X/+Y/+Z directions expressed in the corresponding camera's optical coordinates. They are obtained from the same frozen joint state used for RGB, checked against authored USD transforms, and independently checked between eyes. They are not inferred from silhouette pixels or from d alone. Earlier samples remain unchanged; their saved joint truth and asset version permit offline recovery.
+Balanced captures use label schema 5 (legacy captures retain schema 4), retaining the schema-3 `body_pose_truth` (full PSM body transforms, authored jaw anchors, source scene hash) and `eyes.left/right.local_frames.shaft/jaw1/jaw2.T_optical_from_local_mm`. These are 4×4 transforms with physical origins C/H1/H2. Their rotation columns are the part's local +X/+Y/+Z directions expressed in the corresponding camera's optical coordinates. They are obtained from the same frozen joint state used for RGB, checked against authored USD transforms, and independently checked between eyes. They are not inferred from silhouette pixels or from d alone. Earlier samples remain unchanged; their saved joint truth and asset version permit offline recovery.
 
 ### Separate fixed-point, distal-region and exposure labels
 
@@ -104,7 +106,7 @@ python3 tools/annotate_saved_quality.py --machine machine.local.json \
 
 The 32-pair regression retained **2/128 visible fixed points**, found **112/128 visible distal regions**, and separately flagged the four seq_006 overexposed pairs. All 224 original data files remained unchanged. The 26 no-render tests include actual surface sampling, exposure thresholds, full pose truth, safety and the finite render-authorization extension.
 
-For an explicitly authorized small new capture, `validation_selection: "categories_14"` selects **seven categories × two adjacent frames**, while `validation_render_limit: 14` caps that invocation. The normal selection remains 32 pairs with additional isolated jaw/contact keyframes. The small profile does not claim to rerun those isolated keyframes; all planned trajectories and normal safety/temporal checks still apply. Full `generate` remains forbidden on laptops.
+The historical `validation_selection: "categories_14"` profile selects **seven categories × two adjacent frames**, with a 14-pair invocation cap. It is retained for legacy regression. The current balanced policy requires `balanced_32`: 21 sequence samples, seven adjacent samples and four jaw/contact key states, all read directly from the checked paths without isolated pose overrides. Full `generate` remains forbidden on laptops.
 
 The laptop budget ledger is never reset. A later explicit user request for additional renders is recorded as an `additional_authorizations` entry bound to one run ID and a finite attempt count; attempts retain their authorization ID. The November 8 quality-label validation uses 14 additional attempts after the original 32. The extension cannot be reused by another run or replenish itself after a crash. No code path automatically grants more attempts.
 
@@ -122,15 +124,15 @@ Source calibration and effective capture settings are separate. The inherited EC
 
 ## Outputs and acceptance
 
-Each run contains `config/`, `trajectories/`, `sequences/`, `previews/` and `validation/`. A pair is committed only after both images, masks and camera truth exist and a separate label-hash receipt has been written. Every trajectory and the job index also has a sealed hash record. Resume verifies all those files. Train/validation/test split is by complete sequence (10/2/2 for the default 14 sequences).
+Each run contains `config/`, `trajectories/`, `sequences/`, `previews/` and `validation/`. A pair is committed only after both images, masks and camera truth exist and a separate label-hash receipt has been written. Every trajectory and the job index also has a sealed hash record. Resume verifies all those files. Train/validation/test use seven independent motion groups each, with 1,400/350/350 frames; the three full planned indexes explicitly mark whether each pair has been rendered and verified.
 
 `validation/report.json` checks source preservation, output hashes, image sizes, independent distorted projection arithmetic (<1e-6 px), stereo-coordinate consistency, visible endpoint alignment with masks (≤2 px), tissue-occlusion consistency against the visible mask, frame continuity, joint speeds and MP4 frame count/rate. Projection arithmetic is not an image-estimation accuracy measurement. A successful laptop run is `validated` with `dataset_complete: false`; only a fully verified server run can have `dataset_complete: true`.
 
-Occlusion search seeds and bounded excursions are explicit scene-specific sampling design values in `settings.json`. They are revalidated against the current meshes and joint limits; they are not manufacturer parameters. A fixed endpoint may remain self-occluded by its own jaw even when its tip region is clear of tissue. The per-point surface visibility field preserves that distinction.
+Occlusion search seeds and bounded excursions are explicit scene-specific sampling design values in the effective settings. They are revalidated against the current meshes and joint limits; they are not manufacturer parameters. A fixed endpoint may remain self-occluded by its own jaw even when its tip region is clear of tissue. The per-point surface visibility field preserves that distinction.
 
 Native USD camera attributes and endoscope light intensity are included in effective settings. Apertures are derived and recorded in `config/render_map.json`. The uncalibrated light-intensity setting is not a measured lumen/candela claim.
 
-The [completed laptop validation report](validation_evidence/README.md) records 20 passing tests, all 14 checked trajectories, exactly 32 rendered pairs, and an actual resume with zero new render attempts. It includes source/effective camera settings, fingerprints, joint coverage and rendered examples. No full dataset was generated. Near-field tissue saturation in the occlusion sample remains an explicitly documented appearance finding.
+The [historical laptop validation report](validation_evidence/README.md) records the original 20 passing tests, 14 checked trajectories, 32 rendered pairs, and a resume with zero new render attempts. It includes source/effective camera settings, fingerprints, joint coverage and rendered examples. It is not evidence that the new 21-trajectory policy passed; use the separate [balanced-run report](validation_evidence/balanced_2100/README.md). No full dataset was generated. Near-field tissue saturation in the old occlusion sample remains an explicitly documented appearance finding.
 
 ## Offline named annotations
 

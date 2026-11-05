@@ -90,7 +90,8 @@ def main():
             'unresolved': audit['unresolved'], 'anatomy_meshes': len(safety.static),
             'moving_meshes': len(safety.moving), 'contact_surfaces': len(safety.contact_surfaces),
             'font_sha256': sha(font), 'output_free_bytes': shutil.disk_usage(output).free,
-            'expected_sequences': c['sequence_count'], 'expected_pairs': c['sequence_count']*c['frames_per_sequence'],
+            'expected_sequences': c['sequence_count'],
+            'expected_pairs': sum(s['frame_count'] for s in c['sequence_manifest']) if 'sequence_manifest' in c else c['sequence_count']*c['frames_per_sequence'],
             'next_step': 'Check renderer/GPU compatibility on the actual server before starting the dataset job.'}
         write(a.output, report); print(json.dumps(report, ensure_ascii=False, indent=2))
     except BaseException as error:

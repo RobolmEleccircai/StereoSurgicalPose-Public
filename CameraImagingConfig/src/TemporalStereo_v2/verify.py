@@ -6,6 +6,7 @@ import cv2
 from PIL import Image
 from runtime import arguments
 from io_utils import read,write,sha,frame_valid,require_seal,annotation_code_hash
+import dataset_policy as policy
 
 def project_independent(points,K,D):
     p=np.asarray(points,float);x,y=(p[:,:2]/p[:,2:3]).T;k1,k2,p1,p2,k3=D;r=x*x+y*y
@@ -61,11 +62,19 @@ def validate_record(label,fp,c):
 def main():
     a=arguments();c=a.settings_data;run=a.run;m=read(run/'config/manifest.json');inv=read(run/'validation/render_inventory.json')
     require_seal(run/'trajectories/index.json',m['fingerprint'])
+    index=read(run/'trajectories/index.json');sequences=[read(run/'trajectories'/f'{sid}.json') for sid in index['sequences']]
+    seq_by_id={s['sequence_id']:s for s in sequences};joint_info=read(run/'config/joints.json')
+    balanced=policy.enabled(c);records=[]
+    planned_report=policy.audit(sequences,c) if balanced else None
     rows=[];clips={};max_projection=0.;max_stereo=0.;tip_distances=[];key_masks={};mask_change_counts={};full_pose_count=0
     quality_rows=[];categories=set()
     for job in inv['jobs']:
         label=run/'sequences'/job['sequence_id']/'labels'/f"{job['job_id']}.json"
         r,result,_=validate_record(label,m['fingerprint'],c)
+        if r['sequence_id']!=job['sequence_id'] or r['frame_index']!=job['frame_index'] or r['reason']!=job['reason']:
+            raise ValueError('Saved receipt does not match planned render job')
+        if balanced:policy.validate_saved_state(r,seq_by_id[r['sequence_id']],joint_info['order'])
+        records.append(r)
         categories.add(r['category'])
         if r.get('schema_version',2)>=4:
             quality_rows.append({'sequence_id':r['sequence_id'],'job_id':r['job_id'],'category':r['category'],
@@ -85,8 +94,8 @@ def main():
         tip_distances.extend(result['visible_tip_mask_distance_px'])
         if r['reason'] in ('closed_jaw','maximum_opening'):
             key_masks[r['reason']]={eye:np.asarray(Image.open(label.parent/e['mask'])) for eye,e in r['eyes'].items()}
-        rows.append({'sequence_id':r['sequence_id'],'frame_index':r['frame_index'],'time_s':r['time_s'],'label':str(label.relative_to(run)),'split':r['split'],'reason':r['reason']})
-        if r['reason'] in ('continuous_category_clip','dataset_frame'):clips.setdefault(r['sequence_id'],[]).append(label)
+        rows.append({'sequence_id':r['sequence_id'],'frame_index':r['frame_index'],'time_s':r['time_s'],'label':str(label.relative_to(run)),'split':r['split'],'category':r['category'],'reason':r['reason']})
+        if r['reason'] in ('continuous_category_clip','dataset_frame','balanced_sequence_sample','balanced_adjacent_sample'):clips.setdefault(r['sequence_id'],[]).append(label)
     for sid,labels in clips.items():
         labels.sort(key=lambda p:read(p)['frame_index']);video_path=run/'previews'/f'{sid}_stereo_60fps.mp4'
         writer=cv2.VideoWriter(str(video_path),cv2.VideoWriter_fourcc(*'mp4v'),c['fps'],(c['width']*2,c['height']))
@@ -112,21 +121,32 @@ def main():
     jaw_change=None
     small=c.get('validation_selection','standard_32')=='categories_14'
     if a.mode=='validate' and not small:
-        if not tip_distances:raise ValueError('No visible physical endpoint was available for the image-alignment check')
+        if not tip_distances and not balanced:raise ValueError('No visible physical endpoint was available for the image-alignment check')
         if set(key_masks)!={'closed_jaw','maximum_opening'}:raise ValueError('Missing jaw limit keyframes')
         jaw_change={eye:int(np.count_nonzero(key_masks['closed_jaw'][eye]!=key_masks['maximum_opening'][eye])) for eye in ('left','right')}
         if min(jaw_change.values())<100:raise ValueError('Jaw pose change did not update both rendered masks')
     if a.mode=='validate' and small and (len(rows)!=14 or len(categories)!=7 or any(len(v)!=2 for v in clips.values())):
         raise ValueError('Small validation must retain all seven two-frame category clips')
+    if a.mode=='validate' and balanced:
+        if len(rows)!=32 or len(clips)!=21 or sum(len(v)==2 for v in clips.values())!=7:
+            raise ValueError('Balanced validation needs 21 sequences, seven adjacent pairs and four key states')
+        if not any(v['region_visible'] for r in records for e in r['eyes'].values() for v in e['jaw_tip_region_visibility']):
+            raise ValueError('No visible distal surface for mask alignment verification')
+    if balanced:
+        policy.write_split_indexes(run,sequences,records)
+        coverage=policy.rendered_coverage(records)
+        coverage.update(partial_sample=a.mode!='generate',full_dataset_coverage_verified=a.mode=='generate' and coverage['passed'])
+        write(run/'validation/rendered_split_coverage.json',coverage)
+        if a.mode=='generate' and not coverage['passed']:raise ValueError('Rendered held-out visibility/exposure lacks training coverage')
+        write(run/'validation/planned_split_coverage.json',planned_report)
     write(run/'validation/visibility_and_exposure.json',{'records':quality_rows,'overexposed_pair_count':sum(r['overexposed_any_eye'] for r in quality_rows)})
     write(run/'validation/overexposed_frames.json',[r for r in quality_rows if r['overexposed_any_eye']])
     (run/'index.jsonl').write_text(''.join(json.dumps(r)+'\n' for r in rows))
     # Verify source assets remain byte-identical after the full pipeline.
     for entry in m['dependencies']['files']:
         if sha(entry['path'])!=entry['sha256']:raise ValueError('A source asset changed during capture')
-    index=read(run/'trajectories/index.json');sequences=[read(run/'trajectories'/f'{sid}.json') for sid in index['sequences']]
     insertion=[]
-    joint_info=read(run/'config/joints.json');joints=joint_info['psm']
+    joints=joint_info['psm']
     insertion_name=next(n for n,j in joints.items() if j['linear'])
     insertion_index=joint_info['order']['psm'].index(insertion_name)
     for seq in sequences:
@@ -143,10 +163,13 @@ def main():
         'maximum_projection_error_px':max_projection,'maximum_stereo_consistency_error_mm':max_stereo,
         'visible_tip_checks':len(tip_distances),'maximum_visible_tip_mask_distance_px':max(tip_distances) if tip_distances else None,
         'mask_changed_pixels_by_sequence':mask_change_counts,'jaw_limit_changed_mask_pixels':jaw_change,
+        'jaw_limit_comparison_scope':'different independent safe poses' if balanced else 'same wrist pose',
+        'planned_split_coverage':planned_report,'full_dataset_render_coverage_verified':a.mode=='generate',
         'insertion_sample_range_m':[min(insertion),max(insertion)],'insertion_near_lower_limit_count':near_lower,'split_by_sequence':True,
         'limitations':['Geometric contact approximation; no tissue mechanics or contact forces.','Existing ECM optical mount is a preview convention, not a measured official calibration.','No shutter integration or motion blur.','Numerical projection checks do not establish real-world model accuracy.']}
     expected=len(index['validation_jobs']) if a.mode=='validate' else index['total_pairs']
     if len(rows)!=expected:raise ValueError('Incomplete output count')
+    if balanced:policy.write_split_indexes(run,sequences,records,acceptance_passed=a.mode=='generate')
     write(run/'validation/report.json',report)
     write(run/'status.json',{'state':'validated' if a.mode=='validate' else 'complete','validation_complete':True,
         'dataset_complete':a.mode=='generate','rendered_pairs':len(rows),'planned_pairs':index['total_pairs']})

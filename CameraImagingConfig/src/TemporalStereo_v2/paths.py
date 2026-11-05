@@ -36,11 +36,19 @@ class Trajectory:
     def at(self,t):return tuple(self.polys[g](t) for g in ('psm','ecm'))
     def velocity(self,t):return tuple(self.polys[g].derivative()(t) for g in ('psm','ecm'))
 
-    def with_jaw_curve(self,model,angles_deg):
+    def with_jaw_curve(self,model,angles_deg,hold_start_s=0.):
         """Exact C2 opening curve, including zero-angle hard-stop endpoints."""
         import copy
-        record=copy.deepcopy(self.record);duration=self.times[-1]-self.times[0]
-        u=(self.times-self.times[0])/duration;start,end=np.deg2rad(angles_deg);delta=end-start
+        record=copy.deepcopy(self.record);duration=self.times[-1]-self.times[0]-hold_start_s
+        if duration<=0 or hold_start_s<0:raise ValueError('Invalid jaw hold duration')
+        times=self.times
+        if hold_start_s:
+            times=np.unique(np.r_[times,self.times[0]+hold_start_s])
+            record['knot_times_s']=times.tolist()
+            for group in ('psm','ecm'):
+                for field,order in (('q',0),('v',1),('a',2)):
+                    record[field+'_'+group+'_knots']=self.polys[group].derivative(order)(times).tolist()
+        u=np.clip((times-self.times[0]-hold_start_s)/duration,0.,1.);start,end=np.deg2rad(angles_deg);delta=end-start
         values=[start+delta*smoother(u),delta*30*u*u*(1-u)**2/duration,
                 delta*(60*u-180*u*u+120*u*u*u)/duration**2]
         for field,values_at_knots in zip(('q','v','a'),values):

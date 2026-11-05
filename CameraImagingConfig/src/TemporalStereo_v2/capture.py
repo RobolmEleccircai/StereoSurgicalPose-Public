@@ -2,6 +2,7 @@
 from pathlib import Path
 import argparse,time,os,json
 from io_utils import read,write,sha,source_hash,load_machine,assert_mode,reserve_render,frame_valid,commit_label,require_seal,validate_settings
+import dataset_policy as policy
 
 def main():
     p=argparse.ArgumentParser();p.add_argument('--machine',type=Path,required=True);p.add_argument('--settings',type=Path,required=True)
@@ -15,7 +16,8 @@ def main():
     for sid,h in index['trajectory_hashes'].items():
         if sha(run/'trajectories'/f'{sid}.json')!=h:raise ValueError('Trajectory was changed after inspection')
         require_seal(run/'trajectories'/f'{sid}.json',fp)
-    jobs=index['validation_jobs'] if a.mode=='validate' else [{'sequence_id':sid,'frame_index':i,'job_id':f'{i:06d}','reason':'dataset_frame'} for sid in index['sequences'] for i in range(c['frames_per_sequence'])]
+    if policy.enabled(c):policy.audit(list(sequences.values()),c)
+    jobs=index['validation_jobs'] if a.mode=='validate' else [{'sequence_id':sid,'frame_index':i,'job_id':f'{i:06d}','reason':'dataset_frame'} for sid in index['sequences'] for i in range(len(sequences[sid]['frames']))]
     if a.mode=='validate' and len(jobs)>min(32,c['validation_render_limit']):raise ValueError('Validation cap exceeded')
     from live_preview import LivePreview,preview_font
     from pose_truth import jaw_definitions,attach_body_truth
@@ -78,7 +80,14 @@ def main():
         if frame_valid(label,fp):
             preview_writer.publish_saved(label)
             completed+=1;continue
-        qp=np.array(frame['q_psm']);qe=np.array(frame['q_ecm']);path=Trajectory(seq['path']);vp,ve=path.velocity(frame['time_s'])
+        qp=np.array(frame['q_psm']);qe=np.array(frame['q_ecm']);path=Trajectory(seq['path'])
+        source_time=frame.get('source_time_s',frame['time_s'])
+        vp,ve=path.velocity(source_time)
+        if policy.enabled(c):
+            if not all(np.allclose(actual,expected,atol=1e-12,rtol=0) for actual,expected in
+                       zip((qp,qe,vp,ve),(*path.at(source_time),frame['v_psm'],frame['v_ecm']))):
+                raise ValueError('Saved clip state/velocity differs from parent trajectory')
+            vp,ve=np.array(frame['v_psm']),np.array(frame['v_ecm'])
         if 'q_psm_override' in job:qp=np.array(job['q_psm_override']);vp*=0;ve*=0
         scene.apply(qp,qe,seq,vp,ve);check=safety.check(qp,qe)
         if not check['safe']:raise ValueError('Unsafe render state: '+str(check))
@@ -90,8 +99,8 @@ def main():
         for eye in ('left','right'):
             observed=rigid_mm(usd_world(stage,scene.rig+'/'+eye.capitalize()))@AXES
             if not np.allclose(observed,cams[eye],atol=1e-6):raise ValueError('Camera pose and labels disagree')
-        u=frame['frame_index']/(c['frames_per_sequence']-1)
-        effects={'light_multiplier':float(seq['light_start']+(seq['light_end']-seq['light_start'])*smoother(u)),
+        u=frame['frame_index']/(len(seq['frames'])-1)
+        effects=frame['appearance'] if policy.enabled(c) else {'light_multiplier':float(seq['light_start']+(seq['light_end']-seq['light_start'])*smoother(u)),
                  'noise_multiplier':seq['noise_multiplier'],'blur_multiplier':seq['blur_multiplier']}
         UsdLux.LightAPI(stage.GetPrimAtPath(scene.rig+'/EndoscopePointLight')).GetIntensityAttr().Set(c['endoscope_light_intensity']*effects['light_multiplier'])
         reserve_render(m,c,run.name,seq['sequence_id']+'/'+ident);started=time.monotonic()
@@ -107,12 +116,19 @@ def main():
             'joint_velocities':{'psm':scene.psm.positions(vp),'ecm':scene.ecm.positions(ve)},
             'contact':{'geometric_contact':check['organ_distance_mm']<=c['contact_max_mm'],'distance_mm':check['organ_distance_mm'],
                 'closest_pair':check['organ_pair'],'model':'near_zero_gap_not_force_simulation'},'appearance':effects,'eyes':{}}
+        if policy.enabled(c):
+            record.update(schema_version=5,dataset_policy=c['dataset_policy'],
+                source_frame_index=frame['source_frame_index'],source_time_s=source_time,
+                clip_start_frame=seq['clip_start_frame'],clip_start_time_s=seq['clip_start_time_s'],
+                sequence_frame_count=len(seq['frames']),parent_frame_count=seq['parent_frame_count'],
+                trajectory_group_id=seq['trajectory_group_id'],feature_profile_id=seq['feature_profile_id'],
+                condition_bins=seq['condition_bins'],features=seq['features'],sequence_seed=seq['seed'])
         images={}
         for eye in ('left','right'):
             uv=rays[eye];raw=anns[eye]['HdrColor'].get_data();hdr=np.asarray(raw['data'] if isinstance(raw,dict) else raw)[...,:3].astype(np.float32)
             if hdr.shape!=(meta['height'],meta['width'],3) or not np.isfinite(hdr).all():raise ValueError('Invalid HDR render')
             linear=cv2.remap(hdr,uv[:,:,0],uv[:,:,1],cv2.INTER_LINEAR)
-            rgb=image_effects(linear,eye,scene.profile,scene.appearance,effects,seq['seed']*1000+frame['frame_index']*2+int(eye=='right'),c)
+            rgb=image_effects(linear,eye,scene.profile,scene.appearance,effects,seq['seed']*1000+frame.get('source_frame_index',frame['frame_index'])*2+int(eye=='right'),c)
             seg=anns[eye]['semantic_segmentation'].get_data();data=np.asarray(seg['data'])
             if data.ndim==3:data=data.view(np.uint32).reshape(data.shape[:2])
             ids=[int(k) for k,v in seg['info']['idToLabels'].items() if 'surgical_instrument' in v.get('class','')]

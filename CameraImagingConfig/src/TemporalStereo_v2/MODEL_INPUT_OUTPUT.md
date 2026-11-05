@@ -217,6 +217,18 @@ u=f_xx_d+c_x,\qquad v=f_yy_d+c_y.
 
 ## 8. 代码与复核入口
 
+本次平衡划分不改变上述 17 维输出合同。训练/验证/测试分别为 1,400/350/350 对，按独立轨迹分组；时序输入只能在同一序列内取连续帧，共同窗口上限为 32 帧。具体索引、七类等权评估和来源时间见 [DATASET_SPLITS.md](DATASET_SPLITS.md)。
+
+新增的已有数据复核独立保存在 [解码计算报告](validation_evidence/balanced_2100/existing_calculations/decoder_report.json) 和 [绘图/视频接口报告](validation_evidence/balanced_2100/existing_calculations/display_report.json)。这次重新执行了计算及绘图检查，未重渲染旧图片；新划分的样本检查另行保存，不与旧数据的结果混记。
+
+另已对新版全部 2,100 个已规划状态（4,200 个相机视图）检查同一计算模块，包含每片钳口 0°、30° 边界。由 17 个数值和固定 USD 模型重算 C、d、H1/H2、J1/J2、T、杆体及钳口旋转，与完整 USD 运动链对照：最大位置差 `1.8215313257e-6 mm`，最大投影差 `1.7535644588e-5 px`，左右坐标一致性差 `5.7903528317e-13 mm`。[全部规划状态计算报告](validation_evidence/balanced_2100/all_planned_decoder_report.json)
+
+对应入口为 `tools/verify_planned_decoding.py`，参数为 `--machine`、`--settings`、`--run`、`--instrument-model` 和 `--output`。其中固定器械模型使用 `tools/verify_model_io.py` 导出的 `instrument_model.json`；输出报告放在源 run 之外。此入口不启动渲染器，也不生成图片。相机外参仅用于最后独立核对左右计算结果，没有传入解码函数。这一结果证明计算代码在当前规划范围内数值一致，不代表图像可见性或训练模型精度。
+
+新版 32 对实际采集样本也已全部复核：最大位置差 `1.6611531119e-6 mm`，箭头/坐标轴投影差 `1.5716527741e-5 px`，32 张已确认预览逐像素一致，视频接口与九项错误输入拒绝检查通过。[新样本计算报告](validation_evidence/balanced_2100/new_calculations/report.json) · [绘图报告](validation_evidence/balanced_2100/new_calculations/display_report.json)。
+
+这批可迁移场景对应的固定模型为 [instrument_model.json](validation_evidence/balanced_2100/new_calculations/instrument_model.json)，对应 [17 维目标示例](validation_evidence/balanced_2100/new_calculations/targets_17.json)。后续接入这些样本时使用这一版本；它保留场景哈希，不能与另一版资产的固定变换混用。
+
 - [独立解码函数](pose_display/decoding.py)和[投影函数](pose_display/projection.py)：NumPy/SciPy 实现，不依赖 Isaac Sim、图像标签或相机外参。旧 `tools/kinematic_decoder.py` 保留兼容入口。
 - [预测视频与统一绘图接口](pose_display/README.md)：接收 17 个预测值，计算杆体/双钳口箭头和 XYZ 面板，与批量采集预览共用绘图逻辑；含已有数据回放和无效预测处理。
 - [模型导出及对照验证脚本](tools/verify_model_io.py)：使用 USD 运行库读模型，不启动渲染器。

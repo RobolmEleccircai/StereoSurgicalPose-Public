@@ -110,11 +110,13 @@ def require_seal(path,fingerprint):
 
 def validate_settings(c):
     if (c['width'],c['height'],c['fps'])!=(1280,720,60):raise ValueError('This profile requires 1280x720 at 60 Hz')
-    if c['sequence_count']<14 or c['frames_per_sequence']<8:raise ValueError('At least 14 sequences and 8 frames are required for category coverage')
+    from dataset_policy import enabled,validate_policy
+    if enabled(c):validate_policy(c)
+    elif c['sequence_count']<14 or c['frames_per_sequence']<8:raise ValueError('At least 14 sequences and 8 frames are required for category coverage')
     if c['renderer']!='PathTracing' or c['rt_subframes']<4 or c['samples_per_pixel_per_frame']<64:raise ValueError('Approved path-tracing quality cannot be reduced')
     if not 0<c['contact_target_mm']<c['contact_max_mm'] or c['free_clearance_mm']<2:raise ValueError('Invalid tissue-clearance configuration')
     if c['jaw_speed_rad_s']>.2 or c['jaw_half_angle_deg']!=[0.,30.]:raise ValueError('Jaw limits exceed the agreed physical range')
-    if c.get('validation_selection','standard_32') not in ('standard_32','categories_14'):raise ValueError('Unknown validation selection')
+    if c.get('validation_selection','standard_32') not in ('standard_32','categories_14','balanced_32'):raise ValueError('Unknown validation selection')
     from quality_labels import DEFAULT_REGION,DEFAULT_EXPOSURE
     region=dict(DEFAULT_REGION,**c.get('tip_region',{}));exposure=dict(DEFAULT_EXPOSURE,**c.get('overexposure',{}))
     if not 0<region['distal_length_mm']<=3 or not 16<=region['surface_samples']<=1024:raise ValueError('Invalid distal region design')

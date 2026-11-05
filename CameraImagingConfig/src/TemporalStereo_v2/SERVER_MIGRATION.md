@@ -1,15 +1,15 @@
 # 服务器迁移与启动说明
 
-当前代码和场景可以迁移。笔记本已完成全部 14 段、2,100 个状态的轨迹规划与安全检查，以及少量渲染验证；尚未在目标服务器验证 GPU/驱动和实际渲染，也未执行 2,100 对全量生成。本交付不自动启动任何生成任务。
+当前默认配置为 21 条独立轨迹：训练 1,400、验证 350、测试 350 对，总计仍为 2,100 对。具体分配、短片段时间与覆盖要求见 [DATASET_SPLITS.md](DATASET_SPLITS.md)。笔记本只检查全部路径并验证最多 32 对；本交付不启动服务器全量任务，服务器运行能力仍需在目标机器验证。旧的 14 段配置、样本和迁移包保留。
 
 ## 1. 迁移包与目录
 
-Ubuntu 上的交付目录：`/home/leorobot/PoseProject/CameraImagingConfig/server_transfer_20261108/`。旁边的同名 `.tar.gz` 与 `.tar.gz.sha256` 用于整体迁移。代码也保存在私有 Git 仓库；**只克隆 Git 不包含约 633 MiB 的场景资产**。
+Ubuntu 上的交付目录：`/home/leorobot/PoseProject/CameraImagingConfig/server_transfer_balanced_20261108/`。旁边的同名 `.tar.gz` 与 `.tar.gz.sha256` 用于整体迁移。代码也保存在私有 Git 仓库；**只克隆 Git 不包含约 633 MiB 的场景资产**。
 
 解压后保持以下结构，可以放在任意有读写权限的服务器目录：
 
 ```text
-server_transfer_20261108/
+server_transfer_balanced_20261108/
 ├── code/                  # 整个 TemporalStereo_v2：生成、碰撞检查、标签、绘图、验收
 │   ├── generate.py
 │   ├── planner.py / capture.py / verify.py
@@ -68,17 +68,17 @@ Isaac Sim 5.1.0 的二进制安装包由服务器单独安装；本项目通过 
 
 ```bash
 rsync -avP \
-  /home/leorobot/PoseProject/CameraImagingConfig/server_transfer_20261108.tar.gz \
-  /home/leorobot/PoseProject/CameraImagingConfig/server_transfer_20261108.tar.gz.sha256 \
+  /home/leorobot/PoseProject/CameraImagingConfig/server_transfer_balanced_20261108.tar.gz \
+  /home/leorobot/PoseProject/CameraImagingConfig/server_transfer_balanced_20261108.tar.gz.sha256 \
   SERVER:~/
 ```
 
 在服务器接收目录运行：
 
 ```bash
-sha256sum -c server_transfer_20261108.tar.gz.sha256
-tar -xzf server_transfer_20261108.tar.gz
-cd server_transfer_20261108
+sha256sum -c server_transfer_balanced_20261108.tar.gz.sha256
+tar -xzf server_transfer_balanced_20261108.tar.gz
+cd server_transfer_balanced_20261108
 sha256sum -c MANIFEST.sha256
 mkdir -p deps outputs checks
 cp config/machine.server.example.json config/machine.server.local.json
@@ -138,7 +138,7 @@ python3 code/generate.py --mode plan \
   --settings assets/settings.json --run-id dataset_2100
 ```
 
-`plan` 会规划全部路径、检查碰撞和帧间安全，然后停止，不输出训练图片。它可能耗时较长。未来全量入口本身也会执行规划，因此并非必须手动重复运行一次 `plan`。
+`plan` 会规划全部路径、检查碰撞和帧间安全，然后停止，不输出训练图片。它可能耗时较长。规划首先验收全部 1,400/350/350 分配、训练覆盖和跨集合近似重复。未来全量入口本身也会执行规划，因此并非必须手动重复运行一次 `plan`。
 
 实际服务器首次启用路径追踪之前，还需验证 NVIDIA/Vulkan/RTX 能工作。可以使用官方兼容性工具，或在明确开始服务器渲染验证时运行 `--mode validate --run-id server_render_check`（最多 32 对）；**这属于会生成少量图像的单独命令，本次没有执行**。资产离线齐备不保证 Isaac 扩展在一台全新机器上完全不访问网络，首次运行应按其安装要求准备依赖及缓存。
 
@@ -152,7 +152,7 @@ python3 code/generate.py --mode generate \
   --settings assets/settings.json --run-id dataset_2100
 ```
 
-一个命令依次规划、采集、验收全部 14 段 × 150 帧＝**2,100 对、4,200 张原始 RGB PNG**。每目 1280×720，同步 60 Hz 时间戳；60 Hz 是采样时间轴，不承诺路径追踪每秒渲染 60 帧。七类路径、允许范围内的连续开合、接触/滑动/遮挡统一生成，不用按钳口状态手工分开执行。
+一个命令依次规划、采集、验收七类、每类训练/验证/测试各一条独立轨迹，共 21 条不同长度的片段＝**2,100 对、4,200 张原始 RGB PNG**。每目 1280×720，同步 60 Hz 时间戳；60 Hz 是采样时间轴，不承诺路径追踪每秒渲染 60 帧。七类路径、允许范围内的连续开合、接触/滑动/遮挡统一生成，不用按钳口状态手工分开执行。
 
 必须显式传 `--settings assets/settings.json`。`code/settings.json` 保留原工程资产路径，不能在交付目录中直接省略该参数。现有包保持 PathTracing、64 spp × 4 subframes、最低线性亮度 0.035、整体系数 0.75，保留当前内参、畸变、固定点/尖端区域可见性、过曝标记及完整部件姿态标签。
 
@@ -166,6 +166,7 @@ outputs/dataset_2100/
 ├── trajectories/       # 全路径、关节和安全检查
 ├── sequences/seq_xxx/  # images、masks、labels、camera_truth
 ├── previews/           # 每帧箭头/XYZ 标注图、最新完成帧网页、60 fps 双目视频
+├── indices/            # train / validation / test 索引、七类等权权重及实际完成状态
 ├── validation/         # 验收、覆盖、过曝与可见性记录
 └── status.json
 ```
@@ -176,6 +177,7 @@ outputs/dataset_2100/
 
 ## 8. 当前已做与未做
 
-- 已做：原资产包哈希核对；此前全部轨迹规划/安全检查；32 对原验证和 14 对新质量标签验证；14 对共享绘图/17 维解码回归；本次在新目录中的迁移包无渲染检查。
+- 历史回归：原资产包哈希核对、旧版轨迹检查、32 对原验证和 14 对质量标签验证。新平衡划分的独立证据位于 `code/validation_evidence/balanced_2100/`；以其中实际报告为准，不把旧报告当作新划分已通过的证明。
+- 本次新划分：36 项测试、21 条完整路径、全部 2,100 个规划状态的计算复核、32 对实际采集验收均通过；重复运行新增渲染次数为 0。固定尖端直接可见为 0/128，尖端区域可见为 124/128，过曝样本为两对。少量图片的特征分布覆盖报告明确标为部分采样，完整图像分布仍需全量生成后验收。
 - 未做：目标服务器 GPU/驱动/显存实测；目标服务器渲染验证；全量生成、完整耗时测量及最终 2,100 对验收。
 - 此次服务器迁移不增加组织形变/受力模拟，不训练位姿模型；接触仍为现有无穿透表面接近/滑动定义。

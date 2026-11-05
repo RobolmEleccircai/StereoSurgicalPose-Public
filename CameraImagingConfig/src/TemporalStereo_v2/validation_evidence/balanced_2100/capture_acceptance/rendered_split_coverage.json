@@ -1,0 +1,249 @@
+{
+  "passed": false,
+  "missing_training_coverage": [
+    {
+      "split": "validation",
+      "category": "lighting",
+      "phase": "hover",
+      "missing_training_conditions": [
+        [
+          "fixed",
+          "instrument"
+        ],
+        [
+          "overexposed",
+          false
+        ],
+        [
+          "region_visible",
+          true
+        ]
+      ]
+    },
+    {
+      "split": "test",
+      "category": "lighting",
+      "phase": "hover",
+      "missing_training_conditions": [
+        [
+          "fixed",
+          "instrument"
+        ],
+        [
+          "overexposed",
+          false
+        ],
+        [
+          "region_visible",
+          true
+        ]
+      ]
+    },
+    {
+      "split": "validation",
+      "category": "sensor_quality",
+      "phase": "approach",
+      "missing_training_conditions": [
+        [
+          "fixed",
+          "instrument"
+        ],
+        [
+          "overexposed",
+          false
+        ],
+        [
+          "region_visible",
+          true
+        ]
+      ]
+    },
+    {
+      "split": "test",
+      "category": "sensor_quality",
+      "phase": "approach",
+      "missing_training_conditions": [
+        [
+          "fixed",
+          "instrument"
+        ],
+        [
+          "overexposed",
+          false
+        ],
+        [
+          "region_visible",
+          true
+        ]
+      ]
+    },
+    {
+      "split": "validation",
+      "category": "occlusion",
+      "phase": "occlusion_transition",
+      "missing_training_conditions": [
+        [
+          "fixed",
+          "tissue"
+        ],
+        [
+          "overexposed",
+          true
+        ],
+        [
+          "region_visible",
+          false
+        ]
+      ]
+    },
+    {
+      "split": "test",
+      "category": "occlusion",
+      "phase": "occlusion_transition",
+      "missing_training_conditions": [
+        [
+          "overexposed",
+          true
+        ]
+      ]
+    }
+  ],
+  "by_split_and_category": {
+    "train": {
+      "pose_motion": {
+        "pairs": 3,
+        "overexposed_pairs": 0,
+        "fixed:instrument": 12,
+        "region_visible:True": 12
+      },
+      "lighting": {
+        "pairs": 1,
+        "overexposed_pairs": 0,
+        "fixed:instrument": 4,
+        "region_visible:True": 4
+      },
+      "sensor_quality": {
+        "pairs": 1,
+        "overexposed_pairs": 0,
+        "fixed:instrument": 4,
+        "region_visible:True": 4
+      },
+      "occlusion": {
+        "pairs": 2,
+        "overexposed_pairs": 0,
+        "fixed:instrument": 8,
+        "region_visible:True": 8
+      },
+      "ecm_motion": {
+        "pairs": 1,
+        "overexposed_pairs": 0,
+        "fixed:instrument": 4,
+        "region_visible:True": 4
+      },
+      "stereo_rig": {
+        "pairs": 2,
+        "overexposed_pairs": 0,
+        "fixed:instrument": 8,
+        "region_visible:True": 8
+      },
+      "combined_pose_jaw": {
+        "pairs": 4,
+        "overexposed_pairs": 0,
+        "fixed:instrument": 16,
+        "region_visible:True": 16
+      }
+    },
+    "validation": {
+      "pose_motion": {
+        "pairs": 1,
+        "overexposed_pairs": 0,
+        "fixed:instrument": 4,
+        "region_visible:True": 4
+      },
+      "lighting": {
+        "pairs": 2,
+        "overexposed_pairs": 0,
+        "fixed:instrument": 8,
+        "region_visible:True": 8
+      },
+      "sensor_quality": {
+        "pairs": 1,
+        "overexposed_pairs": 0,
+        "fixed:instrument": 4,
+        "region_visible:True": 4
+      },
+      "occlusion": {
+        "pairs": 1,
+        "overexposed_pairs": 1,
+        "fixed:tissue": 4,
+        "region_visible:False": 4
+      },
+      "ecm_motion": {
+        "pairs": 2,
+        "overexposed_pairs": 0,
+        "fixed:instrument": 8,
+        "region_visible:True": 8
+      },
+      "stereo_rig": {
+        "pairs": 1,
+        "overexposed_pairs": 0,
+        "fixed:instrument": 4,
+        "region_visible:True": 4
+      },
+      "combined_pose_jaw": {
+        "pairs": 1,
+        "overexposed_pairs": 0,
+        "fixed:instrument": 4,
+        "region_visible:True": 4
+      }
+    },
+    "test": {
+      "pose_motion": {
+        "pairs": 1,
+        "overexposed_pairs": 0,
+        "fixed:instrument": 4,
+        "region_visible:True": 4
+      },
+      "lighting": {
+        "pairs": 1,
+        "overexposed_pairs": 0,
+        "fixed:instrument": 4,
+        "region_visible:True": 4
+      },
+      "sensor_quality": {
+        "pairs": 2,
+        "overexposed_pairs": 0,
+        "fixed:instrument": 8,
+        "region_visible:True": 8
+      },
+      "occlusion": {
+        "pairs": 1,
+        "overexposed_pairs": 1,
+        "fixed:instrument": 4,
+        "region_visible:True": 4
+      },
+      "ecm_motion": {
+        "pairs": 1,
+        "overexposed_pairs": 0,
+        "fixed:instrument": 4,
+        "region_visible:True": 4
+      },
+      "stereo_rig": {
+        "pairs": 2,
+        "overexposed_pairs": 0,
+        "fixed:instrument": 8,
+        "region_visible:True": 8
+      },
+      "combined_pose_jaw": {
+        "pairs": 1,
+        "overexposed_pairs": 0,
+        "fixed:instrument": 4,
+        "region_visible:True": 4
+      }
+    }
+  },
+  "overexposed_and_occluded_samples": "retained",
+  "scope": "saved RGB and visibility labels",
+  "partial_sample": true,
+  "full_dataset_coverage_verified": false
+}

@@ -8,7 +8,7 @@ def main():
     p=argparse.ArgumentParser(description=__doc__)
     p.add_argument('--mode',choices=['plan','validate','generate'],default='validate')
     p.add_argument('--machine',type=Path,required=True)
-    p.add_argument('--settings',type=Path,default=HERE/'settings.json')
+    p.add_argument('--settings',type=Path,default=HERE/'settings.balanced21.json')
     p.add_argument('--run-id',default='validation_v2')
     p.add_argument('--tests-only',action='store_true')
     p.add_argument('--pack-assets',type=Path,help='Export assets into a NEW directory; does not render')

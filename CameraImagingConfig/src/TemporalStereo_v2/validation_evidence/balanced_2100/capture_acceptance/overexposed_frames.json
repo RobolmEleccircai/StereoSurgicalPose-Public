@@ -1,0 +1,62 @@
+[
+  {
+    "sequence_id": "seq_010",
+    "job_id": "validation_010",
+    "category": "occlusion",
+    "overexposed_any_eye": true,
+    "eyes": {
+      "left": {
+        "fixed_point_visible": [
+          false,
+          false
+        ],
+        "tip_region_visible": [
+          false,
+          false
+        ],
+        "near_white_fraction": 0.07306749131944444
+      },
+      "right": {
+        "fixed_point_visible": [
+          false,
+          false
+        ],
+        "tip_region_visible": [
+          false,
+          false
+        ],
+        "near_white_fraction": 0.0776171875
+      }
+    }
+  },
+  {
+    "sequence_id": "seq_011",
+    "job_id": "validation_011",
+    "category": "occlusion",
+    "overexposed_any_eye": true,
+    "eyes": {
+      "left": {
+        "fixed_point_visible": [
+          false,
+          false
+        ],
+        "tip_region_visible": [
+          true,
+          true
+        ],
+        "near_white_fraction": 0.009793836805555555
+      },
+      "right": {
+        "fixed_point_visible": [
+          false,
+          false
+        ],
+        "tip_region_visible": [
+          true,
+          true
+        ],
+        "near_white_fraction": 0.010970052083333333
+      }
+    }
+  }
+]
