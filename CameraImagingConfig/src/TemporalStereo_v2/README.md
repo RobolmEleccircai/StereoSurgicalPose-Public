@@ -31,6 +31,8 @@ python3 generate.py --machine machine.local.json --run-id validation_v2
 
 ## Server transfer
 
+See [SERVER_MIGRATION.md](SERVER_MIGRATION.md) for the prepared transfer layout, exact runtime/dependency versions, offline FCL installation, no-render preflight, configuration template and full-generation command. The server preflight does not start SimulationApp or dataset generation.
+
 Create a new portable asset bundle; original files are never rewritten:
 
 ```bash

@@ -1,0 +1,31 @@
+{
+  "passed": true,
+  "scope": "relocated assets, CPU/native dependencies, geometry, font and MP4; no GPU rendering",
+  "new_rgb_renders": 0,
+  "full_generation_started": false,
+  "server_render_validation_pending": true,
+  "machine_role": "laptop",
+  "isaac_version": "5.1.0-rc.19+release.26219.9c81211b.gl",
+  "versions": {
+    "numpy": "1.26.0",
+    "scipy": "1.15.3",
+    "trimesh": "4.5.1",
+    "Pillow": "11.3.0",
+    "python-fcl": "0.7.0.11"
+  },
+  "opencv": "4.11.0",
+  "source_sha256": "c8dae04951c12d0f9a63190cd1d874b9904193f10384177415d14b0fe9a1eb34",
+  "settings_sha256": "d5593b4f77069dbc3eec4c8ed582645bf6ac35e298e5e20daee567ff75970b34",
+  "gpu_inventory": "NVIDIA GeForce RTX 4060 Laptop GPU, 580.95.05, 8188 MiB",
+  "bundle_files_checked": 76,
+  "active_dependency_files": 78,
+  "unresolved": [],
+  "anatomy_meshes": 17,
+  "moving_meshes": 12,
+  "contact_surfaces": 15,
+  "font_sha256": "b76b0433203017ca80401b2ee0dd69350349871c4b19d504c34dbdd80541690a",
+  "output_free_bytes": 607672283136,
+  "expected_sequences": 14,
+  "expected_pairs": 2100,
+  "next_step": "Check renderer/GPU compatibility on the actual server before starting the dataset job."
+}

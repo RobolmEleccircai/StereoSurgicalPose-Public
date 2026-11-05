@@ -1,0 +1,15 @@
+{
+  "isaac_sim": "5.1.0",
+  "tested_isaac_build": "5.1.0-rc.19+release.26219.9c81211b.gl",
+  "platform": "Linux x86_64",
+  "python_major_minor": [3, 11],
+  "packages": {
+    "numpy": "1.26.0",
+    "scipy": "1.15.3",
+    "trimesh": "4.5.1",
+    "Pillow": "11.3.0",
+    "python-fcl": "0.7.0.11"
+  },
+  "opencv_module_version": "4.11.0",
+  "installation": "Use the Isaac Sim standalone runtime; install only python-fcl into the isolated deps directory. Do not pip-upgrade the simulator's numerical or rendering packages."
+}
