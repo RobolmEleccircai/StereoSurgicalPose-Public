@@ -3,7 +3,7 @@ from pathlib import Path
 import os
 import shutil
 from PIL import Image, ImageFont
-from io_utils import read, write, sha
+from io_utils import read, write, sha, annotation_code_hash
 from pose_truth import validate_body_truth
 from tools.reannotate import vector_panel
 
@@ -26,7 +26,7 @@ class LivePreview:
         self.output = Path(output); self.output.mkdir(parents=True, exist_ok=True)
         self.font = Path(font)
         ImageFont.truetype(str(font), 25)
-        self.code_sha256 = sha(Path(__file__).parent/'tools/reannotate.py')
+        self.code_sha256 = annotation_code_hash()
         self.font_sha256 = sha(self.font)
         self._page()
 

@@ -112,7 +112,8 @@ def main():
         raise ValueError('Source dataset was modified')
     report = {'passed': True, 'pairs': len(records), 'eyes': 2*len(records), 'output_values_per_pair': 17,
               'output_layout': OUTPUT_LAYOUT, 'fixed_model_sha256': sha(a.output/'instrument_model.json'),
-              'decoder_sha256': sha(Path(__file__).with_name('kinematic_decoder.py')),
+              'decoder_sha256': sha(ROOT/'pose_display/decoding.py'),
+              'projection_sha256': sha(ROOT/'pose_display/projection.py'),
               'input_to_decoder': '17 values plus fixed USD-derived instrument constants',
               'additional_projection_inputs': 'per-eye K and D only',
               'camera_extrinsics_or_baseline_used_by_decoder': False,

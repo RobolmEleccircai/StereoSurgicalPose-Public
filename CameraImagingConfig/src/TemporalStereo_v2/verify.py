@@ -5,7 +5,7 @@ import numpy as np
 import cv2
 from PIL import Image
 from runtime import arguments
-from io_utils import read,write,sha,frame_valid,require_seal
+from io_utils import read,write,sha,frame_valid,require_seal,annotation_code_hash
 
 def project_independent(points,K,D):
     p=np.asarray(points,float);x,y=(p[:,:2]/p[:,2:3]).T;k1,k2,p1,p2,k3=D;r=x*x+y*y
@@ -79,7 +79,7 @@ def main():
             info=read(preview)
             if info['source_label_sha256']!=sha(label) or sha(preview.parent/info['image'])!=info['image_sha256']:
                 raise ValueError('Missing or stale full-pose preview')
-            if info['annotation_code_sha256']!=sha(Path(__file__).parent/'tools/reannotate.py'):
+            if info['annotation_code_sha256']!=annotation_code_hash():
                 raise ValueError('Preview annotation code changed')
         max_projection=max(max_projection,result['projection_error_px']);max_stereo=max(max_stereo,result['stereo_position_error_mm'])
         tip_distances.extend(result['visible_tip_mask_distance_px'])

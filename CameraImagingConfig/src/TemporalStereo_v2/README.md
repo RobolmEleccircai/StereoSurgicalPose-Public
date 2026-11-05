@@ -4,6 +4,8 @@ Single official PSM instrument with an articulated ECM stereo rig. The default d
 
 ## Modes and setup
 
+For reusable pose decoding, the approved arrows/XYZ overlays, and a video prediction callback, see [pose_display/README.md](pose_display/README.md). Saved-data replay and video display run without starting Isaac Sim. Batch previews and prediction overlays share the same renderer; existing capture outputs remain unchanged.
+
 Copy `machine.example.json` to an ignored `machine.local.json` and set the installation, asset, dependency and output directories. Paths may be absolute, home-relative, or relative to the machine file. No username is embedded in the implementation. Use Isaac Sim **5.1.0**; the launcher discovers its USD extension and checks its version.
 
 Install the extra collision binding into an isolated directory using Isaac Sim Python:

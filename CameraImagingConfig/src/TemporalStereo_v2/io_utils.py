@@ -24,7 +24,11 @@ def canonical_hash(value):
     return hashlib.sha256(json.dumps(value,sort_keys=True,allow_nan=False,separators=(',',':')).encode()).hexdigest()
 
 def source_hash():
-    files=list(HERE.glob('*.py'))+[HERE/'tools/reannotate.py']
+    files=list(HERE.glob('*.py'))+[HERE/'tools/reannotate.py']+list((HERE/'pose_display').glob('*.py'))
+    return canonical_hash({str(p.relative_to(HERE)):sha(p) for p in sorted(files)})
+
+def annotation_code_hash():
+    files=[HERE/'tools/reannotate.py']+list((HERE/'pose_display').glob('*.py'))
     return canonical_hash({str(p.relative_to(HERE)):sha(p) for p in sorted(files)})
 
 def load_machine(path):

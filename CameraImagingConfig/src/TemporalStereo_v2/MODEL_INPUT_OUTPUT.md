@@ -217,7 +217,8 @@ u=f_xx_d+c_x,\qquad v=f_yy_d+c_y.
 
 ## 8. 代码与复核入口
 
-- [独立解码与投影函数](tools/kinematic_decoder.py)：NumPy/SciPy 实现，不依赖 Isaac Sim、图像标签或相机外参。
+- [独立解码函数](pose_display/decoding.py)和[投影函数](pose_display/projection.py)：NumPy/SciPy 实现，不依赖 Isaac Sim、图像标签或相机外参。旧 `tools/kinematic_decoder.py` 保留兼容入口。
+- [预测视频与统一绘图接口](pose_display/README.md)：接收 17 个预测值，计算杆体/双钳口箭头和 XYZ 面板，与批量采集预览共用绘图逻辑；含已有数据回放和无效预测处理。
 - [模型导出及对照验证脚本](tools/verify_model_io.py)：使用 USD 运行库读模型，不启动渲染器。
 - [固定模型参数](validation_evidence/model_io_decoding/instrument_model.json)
 - [17 维训练目标示例](validation_evidence/model_io_decoding/targets_17.json)
