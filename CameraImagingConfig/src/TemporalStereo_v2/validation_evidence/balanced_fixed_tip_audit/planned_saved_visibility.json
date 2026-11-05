@@ -1,0 +1,173 @@
+{
+  "scope": "Existing planned geometry labels; no new image rendering",
+  "counts": {
+    "instrument": 7634,
+    "tissue": 766
+  },
+  "splits": {
+    "train": {
+      "instrument": 5429,
+      "tissue": 171
+    },
+    "validation": {
+      "instrument": 932,
+      "tissue": 468
+    },
+    "test": {
+      "instrument": 1273,
+      "tissue": 127
+    }
+  },
+  "sequences": [
+    {
+      "sequence_id": "seq_000",
+      "split": "train",
+      "counts": {
+        "instrument": 720
+      }
+    },
+    {
+      "sequence_id": "seq_001",
+      "split": "validation",
+      "counts": {
+        "instrument": 128
+      }
+    },
+    {
+      "sequence_id": "seq_002",
+      "split": "test",
+      "counts": {
+        "instrument": 128
+      }
+    },
+    {
+      "sequence_id": "seq_003",
+      "split": "train",
+      "counts": {
+        "instrument": 720
+      }
+    },
+    {
+      "sequence_id": "seq_004",
+      "split": "validation",
+      "counts": {
+        "instrument": 128
+      }
+    },
+    {
+      "sequence_id": "seq_005",
+      "split": "test",
+      "counts": {
+        "instrument": 128
+      }
+    },
+    {
+      "sequence_id": "seq_006",
+      "split": "train",
+      "counts": {
+        "instrument": 720
+      }
+    },
+    {
+      "sequence_id": "seq_007",
+      "split": "validation",
+      "counts": {
+        "instrument": 128
+      }
+    },
+    {
+      "sequence_id": "seq_008",
+      "split": "test",
+      "counts": {
+        "instrument": 128
+      }
+    },
+    {
+      "sequence_id": "seq_009",
+      "split": "train",
+      "counts": {
+        "instrument": 789,
+        "tissue": 171
+      }
+    },
+    {
+      "sequence_id": "seq_010",
+      "split": "validation",
+      "counts": {
+        "tissue": 468,
+        "instrument": 92
+      }
+    },
+    {
+      "sequence_id": "seq_011",
+      "split": "test",
+      "counts": {
+        "instrument": 433,
+        "tissue": 127
+      }
+    },
+    {
+      "sequence_id": "seq_012",
+      "split": "train",
+      "counts": {
+        "instrument": 720
+      }
+    },
+    {
+      "sequence_id": "seq_013",
+      "split": "validation",
+      "counts": {
+        "instrument": 128
+      }
+    },
+    {
+      "sequence_id": "seq_014",
+      "split": "test",
+      "counts": {
+        "instrument": 128
+      }
+    },
+    {
+      "sequence_id": "seq_015",
+      "split": "train",
+      "counts": {
+        "instrument": 720
+      }
+    },
+    {
+      "sequence_id": "seq_016",
+      "split": "validation",
+      "counts": {
+        "instrument": 128
+      }
+    },
+    {
+      "sequence_id": "seq_017",
+      "split": "test",
+      "counts": {
+        "instrument": 128
+      }
+    },
+    {
+      "sequence_id": "seq_018",
+      "split": "train",
+      "counts": {
+        "instrument": 1040
+      }
+    },
+    {
+      "sequence_id": "seq_019",
+      "split": "validation",
+      "counts": {
+        "instrument": 200
+      }
+    },
+    {
+      "sequence_id": "seq_020",
+      "split": "test",
+      "counts": {
+        "instrument": 200
+      }
+    }
+  ]
+}

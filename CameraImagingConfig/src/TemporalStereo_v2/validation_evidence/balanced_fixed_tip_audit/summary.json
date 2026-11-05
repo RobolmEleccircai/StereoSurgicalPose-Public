@@ -1,0 +1,31 @@
+{
+  "existing_pairs": 32,
+  "endpoint_observations": 128,
+  "new_rgb_renders": 0,
+  "synthetic_ray_checks_passed": 5,
+  "previous_visible_reference_checks": 2,
+  "source_files_unchanged": 224,
+  "source_scene_sha256": "103131ce17df7e2dd218ed5389d62ea16313c5441b30bef4c36a4aefb691b126",
+  "mesh_count": 26,
+  "anatomy_mesh_count": 17,
+  "instrument_mesh_count": 9,
+  "counts": {
+    "same_jaw": 118,
+    "tissue": 4,
+    "other_instrument": 6
+  },
+  "visibility_disagreements": 0,
+  "blocker_name_disagreements": 0,
+  "back_facing_observations": 128,
+  "front_facing_observations": 0,
+  "fixed_local_max_difference_mm": 1.6934717735353722e-06,
+  "directly_visible_region_count": 124,
+  "point_surface_hit_confirmations": 128,
+  "tool_gap_range_mm": [
+    0.2654992694852041,
+    1.4024057015729028
+  ],
+  "audit_code_sha256": "829f005b841d8a7aecaca65120c6d1cf7a520c6f705282277460b6bfc9eeef1c",
+  "method": "Independent two-sided NumPy ray-triangle intersections; raw USD visual meshes and saved body/camera transforms; no production visibility function called",
+  "planned_normal_scope": "Surface orientation only, not full visibility or rendered-image verification"
+}

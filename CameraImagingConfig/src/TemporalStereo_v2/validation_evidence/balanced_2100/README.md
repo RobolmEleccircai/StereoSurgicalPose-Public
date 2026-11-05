@@ -46,6 +46,10 @@ These checks demonstrate numerical decoding and display consistency with truth i
 
 The stereo consistency check uses known camera transforms **after** each eye is decoded. These transforms do not enter the decoder. This check covers the planned kinematic range; actual rendered image/mask alignment is checked separately by the bounded capture acceptance.
 
+## Subsequent fixed-tip coverage finding (2026-11-09)
+
+The [independent visibility audit](../balanced_fixed_tip_audit/README.md) found that all 8,400 planned fixed-tip observations lack direct visibility, not just the selected 128 observations. The selected 128 classifications were reproduced independently. The balanced path/acceptance logic does not require positive fixed-tip visibility coverage; it checks visible distal regions instead. The checks below remain valid within their stated scope, but this missing coverage must be addressed before claiming that directly visible fixed endpoints are represented. No production trajectories or images were changed by the audit.
+
 ## Bounded rendering acceptance
 
 Run: `balanced_2100_20261108_acceptance`. The authorized selection is 21 sequence samples, seven adjacent samples and four key states, exactly 32 stereo pairs. Full rendered distribution coverage, training performance and target-server rendering are separate checks; this laptop run cannot establish them.

@@ -1,0 +1,58 @@
+{
+  "1": {
+    "body": "/SurgicalTools/PSM_Right/Robot/psm_tool_gripper1_link",
+    "mesh": "/SurgicalTools/PSM_Right/Robot/psm_tool_gripper1_link/visuals_xform/gripper_right",
+    "local_point_mm": [
+      0.2856546185934832,
+      9.65034605239152,
+      -0.010669412061588446
+    ],
+    "distance_to_surface_mm": 1.752258537213833e-13,
+    "nonfinite_degenerate_nearest_triangles": 29,
+    "behind_distal_Y_extremum_mm": 0.0016538682153282025,
+    "incident_face_indices": [
+      20045,
+      20046
+    ],
+    "local_face_normals": [
+      [
+        0.012156847579038552,
+        0.9990494528078635,
+        0.04186169969373397
+      ],
+      [
+        0.003852668061354803,
+        0.9999925784468648,
+        1.2718303825721695e-12
+      ]
+    ]
+  },
+  "2": {
+    "body": "/SurgicalTools/PSM_Right/Robot/psm_tool_gripper2_link",
+    "mesh": "/SurgicalTools/PSM_Right/Robot/psm_tool_gripper2_link/visuals_xform/gripper_left",
+    "local_point_mm": [
+      -0.2856546186784783,
+      9.650346052391061,
+      -0.014330587919772597
+    ],
+    "distance_to_surface_mm": 2.2078373954699869e-13,
+    "nonfinite_degenerate_nearest_triangles": 31,
+    "behind_distal_Y_extremum_mm": 0.0016538682156834739,
+    "incident_face_indices": [
+      20045,
+      20046
+    ],
+    "local_face_normals": [
+      [
+        -0.012156847227580021,
+        0.9990494529484131,
+        -0.04186169644151645
+      ],
+      [
+        -0.0038526680610525116,
+        0.999992578446866,
+        2.1087814341806368e-13
+      ]
+    ]
+  }
+}

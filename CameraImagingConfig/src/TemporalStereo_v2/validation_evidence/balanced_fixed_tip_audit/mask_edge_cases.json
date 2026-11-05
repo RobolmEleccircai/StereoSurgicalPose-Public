@@ -1,0 +1,16 @@
+[
+  {
+    "sequence_id": "seq_000",
+    "job_id": "validation_000",
+    "eye": "right",
+    "jaw": 1,
+    "continuous_pixel_distance_to_mask_px": 1.0401139637194898
+  },
+  {
+    "sequence_id": "seq_000",
+    "job_id": "validation_021",
+    "eye": "right",
+    "jaw": 1,
+    "continuous_pixel_distance_to_mask_px": 0.7085754534390514
+  }
+]
