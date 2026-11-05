@@ -1,13 +1,19 @@
 # Runtime and backup notes
 
-This backup records the code that produced the three included stereo examples on 2026-11-07. Source files retain their original bytes and absolute runtime paths; cloning alone does not install Isaac Sim or download the external scene assets.
+## Current temporal generator
+
+Use [TemporalStereo_v2](../CameraImagingConfig/src/TemporalStereo_v2/README.md) for the current 2,100-pair, 720p, 60 Hz dataset. Its [server guide](../CameraImagingConfig/src/TemporalStereo_v2/SERVER_MIGRATION.md) lists the portable code/assets, pinned dependencies, machine configuration and launch commands. Its [dataset policy](../CameraImagingConfig/src/TemporalStereo_v2/DATASET_SPLITS.md) defines the 1,400/350/350 split. Occlusion is recorded and retained; it is not an extra image-rejection condition.
+
+## Historical 2026-11-07 snapshot
+
+The remaining sections document the code that produced the three included static stereo examples on 2026-11-07. These historical source files retain their original bytes and absolute runtime paths; cloning alone does not install Isaac Sim or download external scene assets. The fixed 1080p and three-placement limitations below apply only to that preserved snapshot.
 
 ## Existing Ubuntu runtime
 
 - Runtime root: `/home/leorobot/PoseProject/CameraImagingConfig/`.
 - Simulator: `/home/leorobot/isaacsim-5.1.0/`, Isaac Sim 5.1.0; Isaac Lab v2.3.2 is also installed.
-- Current capture: `ShaftTipStereo_2026-11-07/capture.py`.
-- Current post-processing: `ShaftTipStereo_2026-11-07/postprocess.sh` and `package_dataset.py`.
+- Historical capture: `ShaftTipStereo_2026-11-07/capture.py`.
+- Historical post-processing: `ShaftTipStereo_2026-11-07/postprocess.sh` and `package_dataset.py`.
 - CPU post-processing Python: `/home/leorobot/anaconda3/envs/grasp5_pixel_gpu/bin/python` with NumPy, SciPy, Pillow and OpenCV.
 - Source scene: `/home/leorobot/sufia-bc/scenes/OR_scene_CTLiver-Prostate-Bladder/organs_psm_ecm.usda`, plus its referenced organ textures and ORBIT-Surgical robot assets.
 - Required local map cache: `CameraRefinement_2026-11-06/raw_pixel_to_ideal_maps.npz`, with its accompanying `map_config.json`.
@@ -27,7 +33,7 @@ With the original runtime and dependencies present, the capture script accepts:
 
 The output directory must not already exist. This is the script interface, not a claim that arbitrary new output directories work with the unchanged downstream packaging scripts. Those currently target the original `ShaftTipStereo_2026-11-07/render/native`, `render`, `final` and `dataset` paths. `postprocess.sh` takes the running capture PID, waits for completion, then runs sensor effects, DarkBorder_v9 and dataset packaging. Existing successful outputs should be preserved before a future rerun or path refactor.
 
-The current script contains three explicit instrument placements. It creates both eye render products from a frozen stage and saves per-eye truth. Resolution is fixed at 1920 × 1080, with a 2240 × 1472 intermediate render. The relative camera pose is fixed by the reference profile. Neither the 720p discussion nor multiple camera-rig configurations has been implemented here.
+This historical script contains three explicit instrument placements. It creates both eye render products from a frozen stage and saves per-eye truth. Resolution is fixed at 1920 × 1080, with a 2240 × 1472 intermediate render. Its relative camera pose is fixed by the reference profile. The current v2 generator separately implements 720p temporal capture and per-sequence stereo configurations.
 
 ## Verification without rendering
 

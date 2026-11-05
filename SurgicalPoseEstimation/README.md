@@ -1,8 +1,18 @@
 # SurgicalPoseEstimation
 
-Per-camera ground truth and projected overlays for the current single-instrument scene. No trained model is included yet.
+Per-camera ground truth and projected overlays for the single-instrument scene. No trained model is included yet.
 
-## Output contract
+## Current model and dataset interface
+
+The current temporal dataset and reusable calculation/display code live in `CameraImagingConfig/src/TemporalStereo_v2/`:
+
+- [Model inputs, 17 prediction values and fixed-model decoding](../CameraImagingConfig/src/TemporalStereo_v2/MODEL_INPUT_OUTPUT.md).
+- [Shared pose arrows, instrument XYZ frames and video prediction interface](../CameraImagingConfig/src/TemporalStereo_v2/pose_display/README.md).
+- [2,100-pair temporal dataset and split indexes](../CameraImagingConfig/src/TemporalStereo_v2/DATASET_SPLITS.md).
+
+Current labels retain C, d, H1/H2, J1/J2, T and complete part frames in each eye's optical coordinates. Occluded landmarks retain their numerical 3D truth and visibility labels. T is an auxiliary midpoint, not a replacement for the two articulated jaw endpoints. The 17-value prediction contract includes full shaft rotation and articulation; the older C/d/T-only representation below does not.
+
+## Historical static-example contract — 2026-11-07
 
 Each image pair contains these three vectors for **each** camera:
 
@@ -12,7 +22,7 @@ Each image pair contains these three vectors for **each** camera:
 | d | `shaft_direction_unit` | Normalized roll-link +Z, proximal to distal | unit vector |
 | T | `tip_position_mm` | Midpoint of the two closed-jaw distal mesh-end centers | mm |
 
-All three are required targets: **9 scalars per eye, 18 per stereo pair**. Optical axes are X right, Y down, Z forward. C and T are positions; d is a direction. This axis-and-tip representation does not independently specify shaft roll as a general full 6-DoF rotation would.
+These three historical labels comprise **9 scalars per eye, 18 per stereo pair**. Optical axes are X right, Y down, Z forward. C and T are positions; d is a direction. This axis-and-tip representation does not independently specify shaft roll as a general full 6-DoF rotation would.
 
 The tip uses actual mesh endpoints, not the nominal robot control-tip frame. For each jaw, average its unique maximum-local-Y vertices and apply its mesh transform; T is the midpoint of the two resulting centers. See the [machine-readable landmark definitions](examples/shaft_tip_stereo/config/landmark_definitions.json).
 

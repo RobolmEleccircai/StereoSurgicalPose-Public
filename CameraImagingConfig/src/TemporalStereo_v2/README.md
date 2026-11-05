@@ -4,6 +4,21 @@ Single official PSM instrument with an articulated ECM stereo rig. The default `
 
 The [balanced validation report](validation_evidence/balanced_2100/README.md) records 36 passing tests, all 21 checked trajectories, all 2,100 planned-state decoding checks, 32 accepted rendered stereo pairs, and an actual resume with zero new capture attempts. Full rendered dataset coverage and target-server performance remain untested.
 
+**Occlusion is intended data.** Self-occluded and tissue-occluded points retain their images, full numerical 3D truth and visibility flags. The balanced generator does not require a minimum count of directly visible fixed endpoints. The [visibility audit](validation_evidence/balanced_fixed_tip_audit/README.md) explains the saved labels; it does not add an image filter or require different trajectories.
+
+## Code map
+
+| Files / directory | Responsibility |
+|---|---|
+| `generate.py` | Entry point for planning, bounded validation, full generation and resume |
+| `settings.balanced21.json`, `dataset_policy.py` | Current 21-sequence manifest, split counts, source-time clips and indexes |
+| `planner.py`, `paths.py`, `kinematics.py`, `safety.py` | Continuous articulated paths, official model frames and physical checks |
+| `capture.py`, `imaging.py`, `quality_labels.py` | Synchronized images, truth, visibility/exposure labels and committed output files |
+| `verify.py`, `io_utils.py` | Output consistency, run fingerprints and completion records |
+| `pose_display/` | Shared prediction decoding, projection, arrows/XYZ overlays and video interface |
+| `tools/` | Asset/deployment utilities and offline audits/reannotation; the fixed-tip audit does not alter generation policy |
+| `tests/`, `test_suite.py`, `validation_evidence/` | Policy tests, real-asset checks and versioned evidence |
+
 ## Modes and setup
 
 For reusable pose decoding, the approved arrows/XYZ overlays, and a video prediction callback, see [pose_display/README.md](pose_display/README.md). Saved-data replay and video display run without starting Isaac Sim. Batch previews and prediction overlays share the same renderer; existing capture outputs remain unchanged.
@@ -58,13 +73,13 @@ Trajectories use official USD joint frames, bounded inverse kinematics and C2 qu
 
 | Category | Paths |
 |---|---|
-| Pose | Smooth return and arc motions |
-| Lighting | Approach/hover/withdraw and surface contact |
-| Sensor quality | Free motion and surface sliding |
-| Occlusion | Tissue-clear → tissue-occluded → tissue-clear jaw-tip regions; actual surface/self-occlusion is labeled separately |
-| ECM motion | Moving ECM with free motion and sliding |
-| Stereo rig | Different fixed relationships between sequences |
-| Combined | Contact/sliding and occlusion with articulation and appearance variation |
+| Pose | Smooth free-space return with position, orientation and opening changes |
+| Lighting | Approach/hover/withdraw with varying illumination |
+| Sensor quality | Approach/contact/slide/withdraw with noise and blur variation |
+| Occlusion | Tissue-clear → tissue-occluded → tissue-clear with small ECM motion; fixed-point and region visibility are labeled separately |
+| ECM motion | Moving ECM observing a free-space PSM arc |
+| Stereo rig | Free-space return under different fixed relationships between sequences |
+| Combined | Contact/sliding/withdrawal with articulation, ECM motion and appearance variation |
 
 Contact paths use approximately 20% approach, 20% hold, 40% slide and 20% withdrawal. The approach is 2 mm and the slide is 2–4 mm. Sliding follows a closed, consistently oriented anatomical mesh. These distances, category choices and perturbation ranges are dataset design settings, not manufacturer specifications.
 

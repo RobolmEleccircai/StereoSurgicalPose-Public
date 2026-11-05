@@ -54,6 +54,8 @@ For every output frame:
 
 All existing RGB, masks, C, d, H1/H2, J1/J2, T, full part orientations, physical joint states and K/D are retained. Camera transforms/baseline remain separate evaluation truth. Schema 5 adds split/group/profile identifiers, source time and original clip metadata. Fixed-point visibility, distal-region visibility and overexposure labels remain independent and do not filter images out.
 
+Self-occlusion and tissue occlusion are deliberate states in this dataset. There is no additional minimum-direct-visibility requirement for J1/J2. A zero fixed-point-visible count does not invalidate the 3D labels or require regeneration; the images, truth and occlusion labels are kept. The existing training-coverage checks compare the states actually required by the approved splits rather than adding a new visible-endpoint quota.
+
 `indices/train.jsonl`, `validation.jsonl` and `test.jsonl` describe every expected full-dataset frame. During planning or a 32-pair diagnostic run they have `rendered_and_verified: false`; `indices/manifest.json` reports verified counts and cannot claim the dataset is complete. Only actual `dataset_frame` receipts populate these indexes as verified. `index.jsonl` in the run root lists the files actually produced by that run, including explicitly identified diagnostic samples.
 
 Each full-dataset row includes `category_equal_weight = 1/(7 × frames_in_that_category_and_split)`. Multiply per-frame errors by these weights and sum to obtain the seven-category equally weighted mean. Also report each category separately, so the 140-frame occlusion clips do not dominate the aggregate.
