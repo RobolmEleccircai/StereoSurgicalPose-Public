@@ -14,7 +14,7 @@ def main():
     p.add_argument('--tests-only',action='store_true')
     p.add_argument('--pack-assets',type=Path,help='Export assets into a NEW directory; does not render')
     p.add_argument('--dispatch',type=Path,help='Frozen shared plan directory, required for shard mode')
-    p.add_argument('--worker',choices=['rtx4060','rtx4080super'])
+    p.add_argument('--worker',choices=['rtx4060','rtx4080super','rtx5090'])
     p.add_argument('--prepare-only',action='store_true',help='Initialize assigned run and audit local assets without rendering')
     p.add_argument('--shard-runs',type=Path,nargs='+',help='Two finished worker runs, required for merge mode')
     a=p.parse_args();m=load_machine(a.machine);assert_mode(a.mode,m)

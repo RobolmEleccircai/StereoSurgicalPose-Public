@@ -34,7 +34,7 @@ def validate_assignments(workers, settings):
     expected = {r['sequence_id']: r['frame_count'] for r in settings['sequence_manifest']}
     if len(expected) != 21 or sum(expected.values()) != 2100:
         raise ValueError('Distributed release requires the approved 21 sequences / 2100 pairs')
-    if set(workers) != {'rtx4060', 'rtx4080super'}:
+    if set(workers) not in ({'rtx4060', 'rtx4080super'}, {'rtx4080super', 'rtx5090'}):
         raise ValueError('Unexpected workers')
     seen = set()
     for name, worker in workers.items():
@@ -129,6 +129,23 @@ def validate_dispatch(d, settings):
     if d['code_sha256'] != source_hash() or d['settings'] != settings:
         raise ValueError('Dispatch code/configuration changed; cannot mix releases')
     validate_assignments(d['workers'], settings)
+    if d.get('schema_version') == 2:
+        origin = d['plan_origin']
+        for digest, manifest in d['origin_manifests'].items():
+            if canonical_hash(manifest) != digest or manifest['fingerprint'] != d['fingerprint']:
+                raise ValueError('Original renderer provenance changed')
+        if origin['fingerprint'] != d['fingerprint'] or not origin['dispatch_id']:
+            raise ValueError('Redistribution changed frozen plan identity')
+        counts = {r['sequence_id']: r['frame_count'] for r in settings['sequence_manifest']}
+        for key, item in d['imported_frames'].items():
+            sid, ident = key.split('/')
+            if sid not in counts or ident != f'{int(ident):06d}' or not 0 <= int(ident) < counts[sid]:
+                raise ValueError('Invalid imported frame')
+            if len(item['label_sha256']) != 64 or item['source_manifest_sha256'] not in d['origin_manifests']:
+                raise ValueError('Imported frame has no immutable provenance')
+            source_manifest=d['origin_manifests'][item['source_manifest_sha256']]
+            if item['render_worker']['dispatch_id'] != source_manifest.get('dispatch_id',origin['dispatch_id']):
+                raise ValueError('Imported frame belongs to another source dispatch')
 
 
 def load_dispatch(folder, settings):
@@ -166,6 +183,20 @@ def run_context(run, machine, settings):
     if work != worker_context(d, work['worker_id'], machine):
         raise ValueError('Worker assignment changed')
     return work
+
+
+def validate_frame_owner(label, context, dispatch):
+    """Keep prior receipts byte-identical; a transfer changes scheduling, not origin."""
+    record = read(label)
+    if record['sequence_id'] not in context['sequence_ids']:
+        raise ValueError('Frame is outside the assigned sequences')
+    key = record['sequence_id'] + '/' + record['job_id']
+    imported = dispatch.get('imported_frames', {}).get(key)
+    if imported is not None:
+        if sha(label) != imported['label_sha256'] or record.get('render_worker') != imported['render_worker']:
+            raise ValueError('Transferred frame changed or lost original renderer identity')
+    elif record.get('render_worker') != context:
+        raise ValueError('Frame renderer ownership differs from assignment')
 
 
 def install_plan(folder, run, machine, settings, d):
@@ -277,8 +308,7 @@ def inspect_shards(inputs, settings):
                 raise ValueError('Unassigned or missing frame files')
             for label in labels.glob('*.json'):
                 if not frame_valid(label, d['fingerprint']): raise ValueError('Corrupt worker frame: '+str(label))
-                if read(label).get('render_worker') != context:
-                    raise ValueError('Frame renderer ownership differs from assignment')
+                validate_frame_owner(label, context, d)
         result.append((run, context))
     if owners != common['workers'].keys(): raise ValueError('Missing worker')
     for name in RENDER_CONFIG_FILES:
@@ -298,12 +328,17 @@ def merge(inputs, run, machine, settings):
         shutil.copy2(sources[0][0]/'config'/name, run/'config'/name)
     (run/'previews').mkdir(exist_ok=True)
     for source, context in sources:
+        for definition in (source/'config/definition_versions').glob('*.json'):
+            if definition.stem != sha(definition):raise ValueError('Corrupt archived definition')
+            copy_atomic(definition,run/'config/definition_versions'/definition.name)
         name = context['worker_id']
         write(run/'config/workers'/f'{name}.json', read(source/'config/manifest.json'))
         for sid in context['sequence_ids']:
             shutil.copytree(source/'sequences'/sid, run/'sequences'/sid)
             for p in (source/'previews').glob(sid+'_*'):
                 if p.is_file(): shutil.copy2(p, run/'previews'/p.name)
+    for digest, original in d.get('origin_manifests', {}).items():
+        write(run/'config/original_workers'/f'{digest}.json', original)
     index = read(run/'trajectories/index.json'); jobs = jobs_for(index)
     write(run/'validation/render_inventory.json', {'mode': 'merge', 'fingerprint': d['fingerprint'],
           'jobs': jobs, 'pairs': len(jobs), 'complete': True, 'dispatch_id': d['dispatch_id']})

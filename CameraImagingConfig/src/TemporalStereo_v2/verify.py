@@ -64,7 +64,7 @@ def main():
     require_seal(run/'trajectories/index.json',m['fingerprint'])
     index=read(run/'trajectories/index.json');sequences=[read(run/'trajectories'/f'{sid}.json') for sid in index['sequences']]
     seq_by_id={s['sequence_id']:s for s in sequences};joint_info=read(run/'config/joints.json')
-    from dispatch import run_context,validate_inventory,validate_dispatch,completion_status
+    from dispatch import run_context,validate_inventory,validate_dispatch,completion_status,validate_frame_owner
     full=a.mode in ('generate','merge');worker=run_context(run,a.machine_data,c) if a.mode=='shard' else None
     if worker is not None or full:validate_inventory(inv,index,worker)
     distributed=read(run/'config/dispatch.json') if (run/'config/dispatch.json').exists() else None
@@ -82,7 +82,7 @@ def main():
             owners=[name for name,spec in distributed['workers'].items() if r['sequence_id'] in spec['sequence_ids']]
             if len(owners)!=1:raise ValueError('Ambiguous sequence ownership')
             owner=owners[0];expected_worker={'dispatch_id':distributed['dispatch_id'],'worker_id':owner,**distributed['workers'][owner]}
-            if r.get('render_worker')!=expected_worker:raise ValueError('Frame was not produced by its assigned worker')
+            validate_frame_owner(label,expected_worker,distributed)
         if balanced:policy.validate_saved_state(r,seq_by_id[r['sequence_id']],joint_info['order'])
         records.append(r)
         categories.add(r['category'])

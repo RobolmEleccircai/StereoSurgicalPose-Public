@@ -6,6 +6,7 @@ unchanged. This adapter has its own recorded SHA-256, separate from plan identit
 import argparse
 import hashlib
 import sys
+import traceback
 from pathlib import Path
 
 p = argparse.ArgumentParser()
@@ -38,6 +39,10 @@ sys.argv = [str(a.code / 'capture.py'), *capture_args]
 try:
     import capture
     capture.main()
+except BaseException:
+    # Kit shutdown may abort on pending tasks; print the original error first.
+    traceback.print_exc()
+    raise
 finally:
     for app in instances:
         if not app.adapter_closed:

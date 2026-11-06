@@ -17,8 +17,9 @@ def main():
         if sha(run/'trajectories'/f'{sid}.json')!=h:raise ValueError('Trajectory was changed after inspection')
         require_seal(run/'trajectories'/f'{sid}.json',fp)
     if policy.enabled(c):policy.audit(list(sequences.values()),c)
-    from dispatch import run_context,jobs_for
+    from dispatch import run_context,jobs_for,validate_frame_owner
     worker=run_context(run,m,c) if a.mode=='shard' else None
+    dispatch=read(run/'config/dispatch.json') if worker is not None else None
     if worker is None and (run/'config/dispatch.json').exists():raise ValueError('Distributed run requires shard mode')
     jobs=index['validation_jobs'] if a.mode=='validate' else jobs_for(index,worker)
     if a.mode=='validate' and len(jobs)>min(32,c['validation_render_limit']):raise ValueError('Validation cap exceeded')
@@ -61,7 +62,13 @@ def main():
         if str(prim.GetPath()).startswith(c['psm_root']+'/') and prim.IsA(UsdGeom.Mesh):add_update_semantics(prim,'surgical_instrument')
     safety=Safety(scene);rays,meta=maps(scene.profile,c['native_camera']['focalLength']);write(run/'config/render_map.json',meta)
     regions=TipRegions(safety,c.get('tip_region'))
-    region_path=run/'config/tip_regions.json';write(region_path,regions.definitions())
+    region_path=run/'config/tip_regions.json'
+    if region_path.exists():
+        import shutil
+        archived=run/'config/definition_versions'/f'{sha(region_path)}.json'
+        archived.parent.mkdir(parents=True,exist_ok=True);shutil.copy2(region_path,archived)
+    write(region_path,regions.definitions())
+    write(run/'config/definition_versions'/f'{sha(region_path)}.json',regions.definitions())
     anns={};cameras={}
     for eye in ('left','right'):
         cam=Camera(prim_path=scene.rig+'/'+eye.capitalize(),resolution=(meta['width'],meta['height']),name='temporal_v2_'+eye)
@@ -81,10 +88,11 @@ def main():
     for job in jobs:
         seq=sequences[job['sequence_id']];frame=seq['frames'][job['frame_index']];folder=run/'sequences'/seq['sequence_id'];ident=job['job_id'];label=folder/'labels'/f'{ident}.json'
         if frame_valid(label,fp):
-            if worker is not None and read(label).get('render_worker')!=worker:
-                raise ValueError('Existing pair belongs to another worker')
+            if worker is not None:validate_frame_owner(label,worker,dispatch)
             preview_writer.publish_saved(label)
             completed+=1;continue
+        if dispatch is not None and seq['sequence_id']+'/'+ident in dispatch.get('imported_frames',{}):
+            raise ValueError('Transferred frame is missing or corrupt; restore its verified source copy')
         qp=np.array(frame['q_psm']);qe=np.array(frame['q_ecm']);path=Trajectory(seq['path'])
         source_time=frame.get('source_time_s',frame['time_s'])
         vp,ve=path.velocity(source_time)

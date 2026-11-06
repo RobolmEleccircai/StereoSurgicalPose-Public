@@ -46,7 +46,7 @@ def assert_mode(mode,machine):
     if mode not in ('plan','validate','generate','shard','merge'):raise ValueError('Unknown mode')
     if mode=='generate' and machine['role']!='server':
         raise ValueError('Full generation is forbidden on a laptop; use validate (maximum 32 render attempts).')
-    if mode=='shard' and machine.get('worker_id') not in ('rtx4060','rtx4080super'):
+    if mode=='shard' and machine.get('worker_id') not in ('rtx4060','rtx4080super','rtx5090'):
         raise ValueError('Sharded generation requires a configured worker_id')
 
 @contextmanager
@@ -96,6 +96,16 @@ def reserve_render(machine,settings,run_id,job_id,worker=None):
         ledger['attempts'].append(attempt)
         write(path,ledger)
 
+def resolve_tip_definition(label_path, record):
+    """Resolve shared metadata by its exact content hash across runtime versions."""
+    label_path=Path(label_path)
+    digest=record['tip_region_definition_sha256']
+    direct=label_path.parent/record['tip_region_definition']
+    archive=label_path.parents[3]/'config/definition_versions'/f'{digest}.json'
+    for candidate in (direct,archive):
+        if candidate.is_file() and sha(candidate)==digest:return candidate
+    raise ValueError('Missing or corrupt exact tip-region definition: '+digest)
+
 def frame_valid(label_path,expected_fingerprint):
     """A label is the final commit marker; every referenced file must match."""
     p=Path(label_path)
@@ -111,8 +121,7 @@ def frame_valid(label_path,expected_fingerprint):
                 if not target.is_file() or sha(target)!=e[key+'_sha256']:return False
         truth=p.parent/d['camera_truth']
         if d.get('schema_version',2)>=4:
-            definition=p.parent/d['tip_region_definition']
-            if not definition.is_file() or sha(definition)!=d['tip_region_definition_sha256']:return False
+            resolve_tip_definition(p,d)
         return truth.is_file() and sha(truth)==d['camera_truth_sha256']
     except (OSError,ValueError,KeyError,TypeError):return False
 
