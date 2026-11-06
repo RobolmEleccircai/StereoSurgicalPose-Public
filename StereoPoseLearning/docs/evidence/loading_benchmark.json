@@ -1,0 +1,16 @@
+[
+  {
+    "workers": 0,
+    "first_batch_seconds": 1.448738324106671,
+    "steady_mean_batch_seconds": 0.49918617855291814,
+    "same_tensors": true,
+    "pinned": true
+  },
+  {
+    "workers": 4,
+    "first_batch_seconds": 0.6312122630188242,
+    "steady_mean_batch_seconds": 0.16347969874041154,
+    "same_tensors": true,
+    "pinned": true
+  }
+]

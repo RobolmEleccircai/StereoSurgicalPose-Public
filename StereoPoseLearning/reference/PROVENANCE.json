@@ -1,0 +1,18 @@
+{
+  "source": "CameraImagingConfig/src/TemporalStereo_v2/pose_display",
+  "purpose": "Unmodified approved kinematics and overlay reference snapshot",
+  "sha256": {
+    "pose_display/recorded.py": "006be3db5fb7fe41c66ad30b45b843a26621f4bf407249ccbd6f9b5ac53ed78a",
+    "pose_display/renderer.py": "6765c3198856d29572284b8b10773e148f0f114fa59d71b6b135c6efc3784c6c",
+    "pose_display/__init__.py": "c0f4f4046ef67a047ac39f6a3cd309264152d5748a571861d9de8f6b388236ba",
+    "pose_display/decoding.py": "2ef6421bc01e8ea98e6def0d1d45c2d69676048d80cf6dca3829d027188a9249",
+    "pose_display/README.md": "6c9b6ed12ba152dd0580f19507ee9d7d71b72097b4173ca057f4cb8d95ec305c",
+    "pose_display/replay.py": "f68efa21f23f971eade4cd5aaabad908cf223b3cb82e0ea07d7e9634a2ef0efb",
+    "pose_display/pipeline.py": "c624edfac80028bac3683dcd8dce0ac460b20570fd0a13eef6be1c7c18637ec6",
+    "pose_display/geometry.py": "df31bdee561fe4161c76e5b9daf79aafffdf039ef0d41ac49e2b3902a38c9b4c",
+    "pose_display/text_cache.py": "bd56c1eefe7711655f6e52296497d452ec3bd0ff5e1cddd728b4af97320ac7a1",
+    "pose_display/projection.py": "9f554364b253a914002e0f1cf5e73e99e3efd4937a199533884b4727c95652ef",
+    "pose_display/video.py": "9dc78fabd300f5f1bd15d01580026770d6edb677d254a2ca6d87a70e7aeb74bf",
+    "pose_display/adapters.py": "e231245c23935a90593381b1942d0c7963f36a1c2520b2d323d02aab8dbe3717"
+  }
+}

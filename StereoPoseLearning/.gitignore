@@ -1,0 +1,15 @@
+.venv/
+__pycache__/
+.pytest_cache/
+*.pyc
+*.pt
+*.pth
+*.safetensors
+weights/
+data/
+runs/
+configs/*.local.json
+*.mp4
+.python-path
+*.log
+operations/
