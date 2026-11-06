@@ -138,7 +138,12 @@ class StereoPredictor:
             if discontinuous:
                 self.reset()
             inputs = self._preprocess(frame, cameras)
-            prediction, hidden = self.model(*inputs, hidden=self.hidden)
+            kwargs = {}
+            if self.training_config['model'].get('foreground_parts', False):
+                raw = np.stack([np.asarray(getattr(frame, eye+'_rgb')).transpose(2,0,1)
+                                for eye in ('left','right')])
+                kwargs['hires_images'] = torch.as_tensor(raw.copy(), dtype=torch.uint8, device=self.device)[None,None]
+            prediction, hidden = self.model(*inputs, hidden=self.hidden, **kwargs)
             value = self.model.export_values(prediction)[0, 0].detach().cpu().numpy()
             if value.shape != (17,) or not np.isfinite(value).all():
                 raise ValueError("Model produced nonfinite or malformed values17")

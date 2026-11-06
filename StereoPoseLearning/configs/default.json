@@ -1,37 +1,130 @@
 {
-  "schema_version": "stereo_pose_learning_v1",
-  "image_size": [360, 640],
+  "schema_version": "stereo_pose_unified_c_v1",
+  "image_size": [
+    360,
+    640
+  ],
   "window": 8,
   "model": {
     "backbone": "convnextv2_nano.fcmae_ft_in22k_in1k",
     "pretrained": true,
     "feature_dim": 128,
-    "token_grid": [6, 10],
+    "token_grid": [
+      6,
+      10
+    ],
     "fusion_layers": 2,
     "attention_heads": 4,
     "hidden_dim": 256,
-    "depth_scale_mm": 100.0
+    "depth_scale_mm": 100.0,
+    "channels_last": false,
+    "feature_guidance": true,
+    "roi_patch_size": 8,
+    "roi_radius_px": 24.0,
+    "landmark_power": 4.0,
+    "foreground_context_floor": 0.0,
+    "roi_pool_size": 4,
+    "roi_local_encoder": true,
+    "foreground_parts": true,
+    "part_crop_size": 160,
+    "part_mask_cutoff": 0.2,
+    "part_mask_dilation_px": 1,
+    "part_crop_chunk_size": 8,
+    "wrist_roi_min_half_px": 24.0,
+    "wrist_roi_max_half_px": 128.0,
+    "wrist_roi_margin_px": 10.0,
+    "jaw_roi_min_half_px": 20.0,
+    "jaw_roi_max_half_px": 96.0,
+    "jaw_roi_margin_px": 10.0,
+    "part_roi_jitter_center_px": 1.0,
+    "part_roi_jitter_scale_fraction": 0.03,
+    "c_translation_head": "landmark_ray_depth_v1"
   },
   "training": {
     "seed": 20261109,
-    "epochs": 100,
-    "batch_size": 1,
-    "accumulate": 4,
-    "backbone_lr": 0.00001,
+    "epochs": null,
+    "batch_size": 4,
+    "accumulate": 6,
+    "backbone_lr": 1e-05,
     "head_lr": 0.0001,
     "weight_decay": 0.01,
-    "warmup_epochs": 5,
-    "patience": 15,
+    "warmup_epochs": 3,
+    "patience": null,
     "clip_grad_norm": 1.0,
     "amp": true,
     "workers": 4,
     "pin_memory": true,
     "prefetch_factor": 2,
     "persistent_workers": true,
-    "async_transfer": true
+    "async_transfer": true,
+    "shared_frame_cache": true,
+    "cpu_threads": 4,
+    "fused_optimizer": true,
+    "keep_epoch_checkpoints": 0,
+    "selection_metric": "joint_mae_deg",
+    "trajectory_balanced": true,
+    "category_balanced": true,
+    "lr_schedule_epochs": 100,
+    "min_lr_factor": 0.01,
+    "save_metric_best_checkpoints": false
   },
-  "loss_weights": {"position": 1.0, "rotation": 1.0, "joints": 1.0, "geometry": 1.0, "part_rotation": 0.25, "projection": 0.2, "depth": 0.1, "mask": 0.1, "heatmap": 1.0},
-  "loss_scales": {"position_scale_mm": 10.0, "projection_scale_px": 20.0},
-  "expected_pairs": {"train": 1400, "validation": 350, "test": 350},
-  "notes": "Engineering initial settings, not official camera or paper hyperparameters. Preserve existing split including extrapolation; no full training started."
+  "loss_weights": {
+    "position": 1.0,
+    "rotation": 1.0,
+    "joints": 0.1,
+    "geometry": 1.0,
+    "part_rotation": 0.25,
+    "projection": 0.2,
+    "depth": 0.1,
+    "mask": 0.1,
+    "heatmap": 1.0,
+    "landmark_consistency": 0.0,
+    "local_heatmap": 1.0,
+    "landmark_uv": 1.0
+  },
+  "loss_scales": {
+    "position_scale_mm": 10.0,
+    "projection_scale_px": 20.0,
+    "joint_scale_deg": [
+      10.0,
+      10.0,
+      5.0
+    ],
+    "decouple_geometry": true
+  },
+  "expected_pairs": {
+    "train": 1820,
+    "validation": 350,
+    "test": 350
+  },
+  "augmentation": {
+    "probability": 0.8,
+    "brightness": [
+      0.8,
+      1.2
+    ],
+    "contrast": [
+      0.85,
+      1.15
+    ],
+    "channel_gain": [
+      0.95,
+      1.05
+    ],
+    "gamma": [
+      0.9,
+      1.1
+    ],
+    "noise_probability": 0.3,
+    "noise_std": [
+      0.0,
+      0.01
+    ],
+    "blur_probability": 0.2,
+    "blur_sigma": [
+      0.5,
+      1.0
+    ]
+  },
+  "notes": "Public training template. Verify immutable source assignments before training; no historical checkpoint or accuracy result is supplied."
 }

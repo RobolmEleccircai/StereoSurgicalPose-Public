@@ -1,7 +1,7 @@
 """Read immutable TemporalStereo labels without leaking truth into model inputs.
 
-Only ``images``, ``K`` and ``D`` are network inputs. All other tensors returned
-by this module are supervision targets. The reader never opens camera_truth.
+Only ``images``, optional raw ``hires_images``, ``K`` and ``D`` are network inputs.
+All other tensors returned by this module are supervision targets. The reader never opens camera_truth.
 Occlusion and overexposure are retained; keypoint heatmaps are *amodal* targets.
 """
 from __future__ import annotations
@@ -22,6 +22,7 @@ EYES = ("left", "right")
 POINT_NAMES = ("C", "H1", "H2", "J1", "J2", "T")
 HEATMAP_NAMES = POINT_NAMES[:5]
 SPLITS = ("train", "validation", "test")
+_SHARED_CACHE = {}
 ISOLATED_VALIDATION_REASONS = {"closed_jaw", "maximum_opening", "contact_keyframe", "withdraw_keyframe"}
 TENSOR_KEYS = (
     "images", "K", "D", "C", "R", "joints", "points", "R_jaws",
@@ -97,7 +98,7 @@ def _image_metadata(path: Path, expected_hash: str | None, verify_hashes: bool) 
 
 def _planned_sequences(root: Path) -> dict[str, dict]:
     result = {}
-    for path in sorted((root / "trajectories").glob("seq_*.json")):
+    for path in sorted((root / "trajectories").glob("*.json")):
         plan = _read_json(path)
         if "split" not in plan or "frame_count" not in plan:
             continue
@@ -108,7 +109,7 @@ def _planned_sequences(root: Path) -> dict[str, dict]:
 
 
 def build_manifest(run_roots: Iterable[str | Path], output: str | Path,
-                   *, verify_hashes: bool = True) -> dict:
+                   *, verify_hashes: bool = True, selected_labels=None) -> dict:
     """Index actual committed RGB+mask+label pairs, never unrendered plan rows.
 
     Matching duplicate source frames are explicitly deduplicated by immutable
@@ -119,6 +120,8 @@ def build_manifest(run_roots: Iterable[str | Path], output: str | Path,
     roots = [Path(p).expanduser().resolve() for p in run_roots]
     if not roots:
         raise ValueError("At least one run root is required")
+    selected = None if selected_labels is None else {str(Path(p).resolve()) for p in selected_labels}
+    selected_groups = None if selected is None else {_read_json(Path(p))["trajectory_group_id"] for p in selected}
     records, deduplicated = [], []
     seen, groups, plans = {}, {}, {}
     source_hashes = set()
@@ -126,6 +129,7 @@ def build_manifest(run_roots: Iterable[str | Path], output: str | Path,
         if not root.is_dir():
             raise FileNotFoundError(root)
         for key, plan in _planned_sequences(root).items():
+            if selected_groups is not None and key not in selected_groups:continue
             if key in plans and plans[key] != plan:
                 raise ValueError(f"Conflicting trajectory plan {key}")
             plans[key] = plan
@@ -133,9 +137,13 @@ def build_manifest(run_roots: Iterable[str | Path], output: str | Path,
         if not label_paths:
             raise ValueError(f"No generated frame labels under {root}/sequences/*/labels")
         for path in label_paths:
+            if selected is not None and str(path.resolve()) not in selected:continue
             label = _read_json(path)
             if "eyes" not in label or "joint_positions" not in label:
                 continue  # Non-frame receipts/summary files are not image data.
+            if verify_hashes and selected is not None:
+                receipt=_read_json(path.parent/".commits"/path.name)
+                if receipt!={"fingerprint":label["fingerprint"],"sha256":_hash_file(path)}:raise ValueError("Incomplete frame receipt")
             split = label["split"]
             if split not in SPLITS:
                 raise ValueError(f"Unknown split {split!r} in {path}")
@@ -212,6 +220,7 @@ def build_manifest(run_roots: Iterable[str | Path], output: str | Path,
                 continue
             seen[identity] = record
             records.append(record)
+    if selected is not None and {r["label_path"] for r in records}!=selected:raise ValueError("Selected index contains unavailable labels")
     if not records:
         raise ValueError("No actual stereo pairs found")
     if len(source_hashes) != 1:
@@ -346,7 +355,8 @@ class StereoDataset(Dataset):
     """
     def __init__(self, manifest: str | Path | dict, split: str, window: int = 8,
                  image_size: tuple[int, int] = (360, 640), heatmap_stride: int = 4,
-                 heatmap_sigma: float = 1.5, *, verify_labels: bool = True):
+                 heatmap_sigma: float = 1.5, *, verify_labels: bool = True,
+                 include_hires: bool = False):
         if split not in SPLITS:
             raise ValueError(f"Invalid split {split!r}")
         if not 1 <= window <= 32:
@@ -362,6 +372,8 @@ class StereoDataset(Dataset):
         self.image_size = tuple(map(int, image_size))
         self.heatmap_stride, self.heatmap_sigma = int(heatmap_stride), float(heatmap_sigma)
         self.verify_labels = verify_labels
+        self.include_hires = bool(include_hires)
+        self.tensor_keys = TENSOR_KEYS + (("hires_images",) if self.include_hires else ())
         self.records = self.frame_records(split)
         self.windows = []
         start = 0
@@ -372,6 +384,8 @@ class StereoDataset(Dataset):
                 self.windows.append(tuple(range(end - self.window + 1, end + 1)))
         self._label_cache = {}
         self._verified_images = set()
+        self._shared_cache = None
+        self._record_lookup={r["label_path"]:i for i,r in enumerate(self.records)}
 
     def __len__(self) -> int:
         return len(self.windows)
@@ -381,7 +395,25 @@ class StereoDataset(Dataset):
         return sorted([r for r in self.manifest["records"] if r["split"] == chosen],
                       key=lambda r: (r["sequence_id"], r["temporal_group_id"], r["frame_index"], r["timestamp_ns"]))
 
+    def preload_shared(self):
+        key=(self.manifest['manifest_sha256'],self.split,self.image_size,self.heatmap_stride,self.heatmap_sigma,self.include_hires)
+        if key not in _SHARED_CACHE:
+            values={};metadata=[]
+            for i,record in enumerate(self.records):
+                frame=self.load_frame(record)
+                if not values:
+                    values={k:torch.empty((len(self.records),*frame[k].shape),dtype=frame[k].dtype).share_memory_() for k in self.tensor_keys}
+                for k in self.tensor_keys:values[k][i].copy_(frame[k])
+                metadata.append(frame['metadata'])
+                if (i+1)%200==0 or i+1==len(self.records):print(f'SHARED_CACHE {self.split} {i+1}/{len(self.records)}',flush=True)
+            _SHARED_CACHE[key]=(values,metadata)
+        self._shared_cache=_SHARED_CACHE[key]
+        return self
+
     def load_frame(self, record: dict) -> dict[str, Any]:
+        if self._shared_cache is not None:
+            values,metadata=self._shared_cache;i=self._record_lookup[record['label_path']]
+            return {**{k:v[i] for k,v in values.items()},'metadata':metadata[i]}
         path = Path(record["label_path"])
         # Cache decoded labels only; RGB arrays remain bounded by the loader batch.
         if str(path) not in self._label_cache:
@@ -392,6 +424,7 @@ class StereoDataset(Dataset):
         truth = _pose_truth(label)
         height, width = self.image_size
         images, masks, cameras, distortions, heatmaps, valid_maps = [], [], [], [], [], []
+        hires_images = []
         mean = np.asarray([0.485, 0.456, 0.406], dtype=np.float32)[:, None, None]
         std = np.asarray([0.229, 0.224, 0.225], dtype=np.float32)[:, None, None]
         for i, eye in enumerate(EYES):
@@ -404,7 +437,10 @@ class StereoDataset(Dataset):
                         self._verified_images.add(str(image_path))
             with Image.open(record["image_paths"][eye]) as im:
                 source_size = (im.height, im.width)
-                rgb = np.asarray(im.convert("RGB").resize((width, height), Image.Resampling.BILINEAR), dtype=np.float32) / 255
+                rgb_image = im.convert("RGB")
+                if self.include_hires:
+                    hires_images.append(np.asarray(rgb_image, dtype=np.uint8).transpose(2, 0, 1).copy())
+                rgb = np.asarray(rgb_image.resize((width, height), Image.Resampling.BILINEAR), dtype=np.float32) / 255
             with Image.open(record["mask_paths"][eye]) as im:
                 mask = np.asarray(im.convert("L").resize((width // self.heatmap_stride, height // self.heatmap_stride), Image.Resampling.NEAREST))
             images.append((rgb.transpose(2, 0, 1) - mean) / std)
@@ -421,6 +457,10 @@ class StereoDataset(Dataset):
                   "masks": np.stack(masks), "heatmaps": np.stack(heatmaps),
                   "heatmap_valid": np.stack(valid_maps), "image_size": np.asarray(self.image_size)}
         result = {key: torch.as_tensor(np.array(value, copy=True), dtype=torch.float32) for key, value in arrays.items()}
+        if self.include_hires:
+            if hires_images[0].shape != hires_images[1].shape:
+                raise ValueError("Raw left/right dimensions must match for hires_images")
+            result["hires_images"] = torch.from_numpy(np.stack(hires_images))
         result["metadata"] = {key: record[key] for key in (
             "sequence_id", "trajectory_group_id", "temporal_group_id", "split", "category", "phase", "frame_index",
             "source_frame_index", "timestamp_ns", "source_time_s", "label_path", "job_id", "isolated_diagnostic",
@@ -432,13 +472,19 @@ class StereoDataset(Dataset):
 
     def __getitem__(self, index: int) -> dict[str, Any]:
         frames = [self.load_frame(self.records[i]) for i in self.windows[index]]
-        result = {key: torch.stack([frame[key] for frame in frames]) for key in TENSOR_KEYS}
+        result = {key: torch.stack([frame[key] for frame in frames]) for key in self.tensor_keys}
         result["metadata"] = [frame["metadata"] for frame in frames]
         return result
 
 
 def collate_samples(samples: list[dict]) -> dict[str, Any]:
     """Stack tensors into [B,T,...], preserving metadata as [B][T] records."""
-    result = {key: torch.stack([sample[key] for sample in samples]) for key in TENSOR_KEYS}
+    if not samples:
+        raise ValueError("Cannot collate an empty sample list")
+    include_hires = "hires_images" in samples[0]
+    if any(("hires_images" in sample) != include_hires for sample in samples):
+        raise ValueError("Cannot mix samples with and without hires_images")
+    tensor_keys = TENSOR_KEYS + (("hires_images",) if include_hires else ())
+    result = {key: torch.stack([sample[key] for sample in samples]) for key in tensor_keys}
     result["metadata"] = [sample["metadata"] for sample in samples]
     return result

@@ -21,6 +21,8 @@ def main():
         p.add_argument("--output", required=True)
         p.add_argument("--device", default="cuda")
         p.add_argument("--resume")
+        p.add_argument("--append-train-manifest", help="Original manifest; verify only new training records were added")
+        p.add_argument("--extend-training", action="store_true", help="Extend epochs in a fresh directory, preserving optimizer state and initial resumed learning rate")
         p.add_argument("--loader-upgrade", action="store_true", help="Allow audited data-loading-only changes when resuming")
     for command in ("validate", "test"):
         p = subs.add_parser(command)
@@ -35,7 +37,7 @@ def main():
         print({k: result[k] for k in ("split_counts", "complete", "warnings")})
     elif args.mode in ("train", "smoke", "trial"):
         train(read_json(args.config), read_json(args.instrument_model), read_json(args.manifest), args.output,
-              torch.device(args.device), args.resume, args.mode == "smoke", args.mode == "trial", args.loader_upgrade)
+              torch.device(args.device), args.resume, args.mode == "smoke", args.mode == "trial", args.loader_upgrade, args.extend_training, args.append_train_manifest)
     else:
         device = torch.device(args.device)
         model, saved = load_model(args.checkpoint, device, args.allow_diagnostic)
