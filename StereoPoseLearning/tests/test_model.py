@@ -18,16 +18,17 @@ class ModelContractTest(unittest.TestCase):
         images = torch.randn(1, 3, 2, 3, 64, 96)
         K = torch.tensor([[90., 0., 47.5], [0., 90., 31.5], [0., 0., 1.]]).expand(1, 3, 2, 3, 3)
         D = torch.zeros(1, 3, 2, 5)
+        raw = torch.randint(0, 256, (1, 3, 2, 3, 128, 192), dtype=torch.uint8)
         with torch.no_grad():
-            pred, _ = model(images, K, D)
+            pred, _ = model(images, K, D, hires_images=raw)
             values = model.export_values(pred)
             stream, state = [], None
             for t in range(3):
-                p, state = model(images[:, t:t+1], K[:, t:t+1], D[:, t:t+1], state)
+                p, state = model(images[:, t:t+1], K[:, t:t+1], D[:, t:t+1], state, raw[:, t:t+1])
                 stream.append(model.export_values(p))
             torch.testing.assert_close(values, torch.cat(stream, 1), atol=3e-5, rtol=1e-5)
             future_changed = images.clone(); future_changed[:, 2] *= -1
-            changed, _ = model(future_changed, K, D)
+            changed, _ = model(future_changed, K, D, hires_images=raw)
             torch.testing.assert_close(values[:, :2], model.export_values(changed)[:, :2], atol=1e-6, rtol=1e-6)
             self.assertGreater(float((values[:, 2] - model.export_values(changed)[:, 2]).abs().max()), 1e-7)
         self.assertEqual(tuple(values.shape), (1, 3, 17))
