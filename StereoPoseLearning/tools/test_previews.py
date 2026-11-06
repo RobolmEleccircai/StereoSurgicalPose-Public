@@ -1,5 +1,5 @@
 """Draw saved test predictions without substituting label poses or rerendering."""
-import argparse,json,sys
+import argparse,json,sys,hashlib
 from pathlib import Path
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]))
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]/'reference'))
@@ -9,9 +9,19 @@ import torch
 from pose_display.pipeline import StereoFrame,PosePrediction,StereoOverlay
 
 def main():
- p=argparse.ArgumentParser();p.add_argument('--manifest',required=True);p.add_argument('--report',required=True);p.add_argument('--checkpoint',required=True);p.add_argument('--output',required=True);a=p.parse_args()
+ p=argparse.ArgumentParser();p.add_argument('--manifest',required=True);p.add_argument('--report',required=True);p.add_argument('--checkpoint',required=True);p.add_argument('--output',required=True);p.add_argument('--font',default=None);a=p.parse_args()
+ bundled=Path(__file__).resolve().parents[2]/'fonts/NotoSansCJK-Regular.ttc'
+ font=a.font or (str(bundled) if bundled.is_file() else None)
  manifest=json.loads(Path(a.manifest).read_text());report=json.loads(Path(a.report).read_text())
- saved=torch.load(a.checkpoint,map_location='cpu',weights_only=True)
+ with Path(a.checkpoint).open('rb') as handle:
+  checkpoint_hash=hashlib.file_digest(handle,'sha256').hexdigest();handle.seek(0)
+  saved=torch.load(handle,map_location='cpu',weights_only=True)
+ if report.get('checkpoint_sha256',checkpoint_hash)!=checkpoint_hash:
+  raise ValueError('Checkpoint differs from the evaluated report')
+ if report.get('checkpoint_epoch',saved['epoch']+1)!=saved['epoch']+1:
+  raise ValueError('Checkpoint epoch differs from the evaluated report')
+ if report.get('manifest_sha256',manifest['manifest_sha256'])!=manifest['manifest_sha256']:
+  raise ValueError('Manifest differs from the evaluated report')
  records={(r['sequence_id'],r['frame_index']):r for r in manifest['records'] if r['split']=='test'}
  rows=report['frames_detail'];out=Path(a.output);out.mkdir(parents=True,exist_ok=True);index=[]
  for seq in sorted({r['sequence_id'] for r in rows}):
@@ -25,7 +35,7 @@ def main():
    fid=f"{seq}/{row['frame_index']:06d}"
    frame=StereoFrame(fid,row['timestamp_ns'],*images)
    pred=PosePrediction(fid,row['timestamp_ns'],row['prediction_values17'],source='prediction',visibility=None,visibility_source='unknown')
-   overlay=StereoOverlay(saved['instrument_model'],cameras)
+   overlay=StereoOverlay(saved['instrument_model'],cameras,font=font)
    canvas,metadata=overlay.render(frame,pred)
    name=f"{seq}_{row['frame_index']:06d}"
    Image.fromarray(canvas).save(out/(name+'.jpg'),quality=95)
