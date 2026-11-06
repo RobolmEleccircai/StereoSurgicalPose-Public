@@ -1,0 +1,121 @@
+{
+  "schema_version": "stereo_pose_foreground_parts_v1",
+  "image_size": [
+    360,
+    640
+  ],
+  "window": 8,
+  "model": {
+    "backbone": "convnextv2_nano.fcmae_ft_in22k_in1k",
+    "pretrained": true,
+    "feature_dim": 128,
+    "token_grid": [
+      6,
+      10
+    ],
+    "fusion_layers": 2,
+    "attention_heads": 4,
+    "hidden_dim": 256,
+    "depth_scale_mm": 100.0,
+    "channels_last": false,
+    "feature_guidance": true,
+    "roi_patch_size": 8,
+    "roi_radius_px": 24.0,
+    "landmark_power": 4.0,
+    "foreground_context_floor": 0.0,
+    "roi_pool_size": 4,
+    "roi_local_encoder": true,
+    "foreground_parts": true,
+    "part_crop_size": 160,
+    "part_mask_cutoff": 0.2,
+    "part_mask_dilation_px": 1,
+    "part_crop_chunk_size": 8,
+    "wrist_roi_min_half_px": 24.0,
+    "wrist_roi_max_half_px": 128.0,
+    "wrist_roi_margin_px": 10.0,
+    "jaw_roi_min_half_px": 20.0,
+    "jaw_roi_max_half_px": 96.0,
+    "jaw_roi_margin_px": 10.0
+  },
+  "training": {
+    "seed": 20261109,
+    "epochs": 100,
+    "batch_size": 4,
+    "accumulate": 2,
+    "backbone_lr": 1e-05,
+    "head_lr": 0.0001,
+    "weight_decay": 0.01,
+    "warmup_epochs": 3,
+    "patience": 25,
+    "clip_grad_norm": 1.0,
+    "amp": true,
+    "workers": 4,
+    "pin_memory": true,
+    "prefetch_factor": 2,
+    "persistent_workers": true,
+    "async_transfer": true,
+    "shared_frame_cache": true,
+    "cpu_threads": 4,
+    "fused_optimizer": true,
+    "keep_epoch_checkpoints": 2,
+    "selection_metric": "joint_mae_deg",
+    "trajectory_balanced": true
+  },
+  "loss_weights": {
+    "position": 1.0,
+    "rotation": 1.0,
+    "joints": 0.1,
+    "geometry": 1.0,
+    "part_rotation": 0.25,
+    "projection": 0.2,
+    "depth": 0.1,
+    "mask": 0.1,
+    "heatmap": 1.0,
+    "landmark_consistency": 0.1,
+    "local_heatmap": 1.0
+  },
+  "loss_scales": {
+    "position_scale_mm": 10.0,
+    "projection_scale_px": 20.0,
+    "joint_scale_deg": [
+      10.0,
+      10.0,
+      5.0
+    ],
+    "decouple_geometry": false
+  },
+  "expected_pairs": {
+    "train": 1400,
+    "validation": 350,
+    "test": 350
+  },
+  "augmentation": {
+    "probability": 0.8,
+    "brightness": [
+      0.8,
+      1.2
+    ],
+    "contrast": [
+      0.85,
+      1.15
+    ],
+    "channel_gain": [
+      0.95,
+      1.05
+    ],
+    "gamma": [
+      0.9,
+      1.1
+    ],
+    "noise_probability": 0.3,
+    "noise_std": [
+      0.0,
+      0.01
+    ],
+    "blur_probability": 0.2,
+    "blur_sigma": [
+      0.5,
+      1.0
+    ]
+  }
+}
