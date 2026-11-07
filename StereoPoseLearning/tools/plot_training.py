@@ -13,12 +13,54 @@ def read_rows(path):
   except json.JSONDecodeError:pass
  return rows
 
-def plot(run,logs,through_epoch=None):
+def plot_loss(run,rows):
+ """Separate linear scales show epoch changes without altering recorded losses."""
+ plots=run/'plots';plots.mkdir(exist_ok=True)
+ epochs=[r['epoch']+1 for r in rows]
+ fig,axs=plt.subplots(2,1,figsize=(10,7),sharex=True,layout='constrained')
+ for ax,key,title,color in zip(axs,('training_loss','validation_loss'),
+                              ('Training loss','Validation loss'),('tab:blue','tab:orange')):
+  values=[r.get(key,float('nan')) for r in rows]
+  ax.plot(epochs,values,'o-',color=color,linewidth=1.7,markersize=5)
+  finite=[(e,v) for e,v in zip(epochs,values) if isinstance(v,(int,float)) and math.isfinite(v)]
+  if finite:
+   low=min(v for _,v in finite);high=max(v for _,v in finite)
+   span=max(high-low,abs((high+low)/2)*.01,1e-10)
+   ax.set_ylim(max(0,low-.15*span),high+.15*span)
+   ax.set_title(f'{title} | latest {finite[-1][1]:.6f} | best {low:.6f}',loc='left')
+  else:
+   ax.set_title(title,loc='left');ax.text(.5,.5,'Not recorded',transform=ax.transAxes,ha='center')
+  ax.set_ylabel('Weighted total loss')
+  ax.ticklabel_format(axis='y',style='plain',useOffset=False)
+  ax.grid(alpha=.25)
+ axs[-1].set_xlabel('Epoch')
+ if len(epochs)<=20:axs[-1].set_xticks(epochs)
+ else:
+  from matplotlib.ticker import MaxNLocator
+  axs[-1].xaxis.set_major_locator(MaxNLocator(nbins=12,integer=True))
+ fig.suptitle('Training and validation loss — independent zoomed y-axes')
+ notes=['Linear scales; compare changes within each panel.']
+ baseline_file=run/'baseline_validation_loss.json'
+ baseline=json.loads(baseline_file.read_text()) if baseline_file.exists() else {}
+ value=baseline.get('validation_loss');epoch=baseline.get('source_epoch')
+ if baseline.get('new_objective') is True and isinstance(epoch,int) and isinstance(value,(int,float)) and math.isfinite(value):
+  notes.append(f'Frozen epoch {epoch} validation reference: {value:.6f} (reference only, excluded from zoom limits).')
+ missing=[str(r['epoch']+1) for r in rows if 'validation_loss' not in r]
+ if missing:notes.append('Validation loss unavailable for epochs: '+', '.join(missing))
+ fig.supxlabel('\n'.join(notes),fontsize=9)
+ temporary=plots/'loss_zoom.tmp.png';fig.savefig(temporary,dpi=150)
+ temporary.replace(plots/'training_curves.png');plt.close(fig)
+ (plots/'metrics.json').write_text(json.dumps(rows,indent=2)+'\n')
+ if baseline:(plots/'baseline_validation_loss.json').write_text(json.dumps(baseline,indent=2)+'\n')
+
+def plot(run,logs,through_epoch=None,loss_only=False):
  rows=read_rows(run/'history.jsonl')
  if through_epoch is not None:rows=[r for r in rows if r['epoch']+1<=through_epoch]
  if not rows:return
  supplements={r['epoch']:r for r in read_rows(run/'validation_loss.jsonl')}
  rows=[dict(r, **{k:v for k,v in supplements.get(r['epoch'],{}).items() if k.startswith('validation_loss')}) for r in rows]
+ if loss_only:
+  plot_loss(run,rows);return
  fig,axs=plt.subplots(2,2,figsize=(12,8),layout='constrained')
  epochs=[r['epoch']+1 for r in rows]
  axs[0,0].plot(epochs,[r['training_loss'] for r in rows],'o-');axs[0,0].set(title='Mean training loss per epoch',xlabel='Epoch',ylabel='Weighted loss',yscale='log')
@@ -40,34 +82,7 @@ def plot(run,logs,through_epoch=None):
  plots=run/'plots';plots.mkdir(exist_ok=True)
  temporary=plots/'training_curves.tmp.png';fig.savefig(temporary,dpi=150)
  temporary.replace(plots/'diagnostics.png');plt.close(fig)
- fig,ax=plt.subplots(figsize=(9,5),layout='constrained')
- ax.plot(epochs,[r['training_loss'] for r in rows],'o-',label='Training loss')
- validation=[r.get('validation_loss',float('nan')) for r in rows]
- ax.plot(epochs,validation,'s-',label='Validation loss')
- baseline_file=run/'baseline_validation_loss.json'
- baseline_loss=json.loads(baseline_file.read_text()) if baseline_file.exists() else {}
- baseline_epoch=baseline_loss.get('source_epoch')
- baseline_value=baseline_loss.get('validation_loss')
- ticks=list(epochs)
- if (baseline_loss.get('new_objective') is True
-     and isinstance(baseline_epoch,int) and baseline_epoch<=max(epochs)
-     and isinstance(baseline_value,(int,float)) and math.isfinite(baseline_value)):
-  # A rescored frozen checkpoint is a validation reference, not a fabricated
-  # training epoch. Never splice losses measured under the old objective.
-  ax.plot([baseline_epoch,max(epochs)],[baseline_value,baseline_value],':',color='tab:orange',
-          label=f'Epoch {baseline_epoch} rescored with current loss')
-  ax.scatter([baseline_epoch],[baseline_value],marker='D',facecolors='none',
-             edgecolors='tab:orange',zorder=4)
-  ticks=sorted(set(ticks+[baseline_epoch]))
- ax.set(title='Training and validation total loss per epoch',xlabel='Epoch',ylabel='Weighted total loss')
- ax.set_xticks(ticks);ax.grid(alpha=.25);ax.legend()
- missing=[str(r['epoch']+1) for r in rows if 'validation_loss' not in r]
- if missing:fig.supxlabel('Validation loss unavailable for epochs: '+', '.join(missing),fontsize=9)
- temporary=plots/'loss.tmp.png';fig.savefig(temporary,dpi=150)
- temporary.replace(plots/'training_curves.png');plt.close(fig)
- (plots/'metrics.json').write_text(json.dumps(rows,indent=2)+'\n')
- if baseline_loss:
-  (plots/'baseline_validation_loss.json').write_text(json.dumps(baseline_loss,indent=2)+'\n')
+ plot_loss(run,rows)
  weighted=sorted({k for r in rows for k in r.get('training_metrics',{}) if k.startswith('weighted_loss/')})
  if weighted:
   fig,ax=plt.subplots(figsize=(10,5),layout='constrained')
@@ -96,9 +111,17 @@ def plot(run,logs,through_epoch=None):
 
 
 def main():
- p=argparse.ArgumentParser();p.add_argument('--run',type=Path,required=True);p.add_argument('--log',type=Path,action='append',default=[]);p.add_argument('--watch-pid',type=int);a=p.parse_args()
+ p=argparse.ArgumentParser();p.add_argument('--run',type=Path,required=True);p.add_argument('--log',type=Path,action='append',default=[]);p.add_argument('--watch-pid',type=int);p.add_argument('--loss-only',action='store_true');a=p.parse_args()
+ def signature():
+  paths=[a.run/'history.jsonl',a.run/'validation_loss.jsonl',a.run/'baseline_validation_loss.json',a.run/'plots/training_curves.png']
+  return tuple(x.stat().st_mtime_ns if x.exists() else None for x in paths)
+ previous=None
  while True:
-  plot(a.run,a.log)
+  # Also notice a running trainer replacing the chart using its already-imported
+  # old plotting function. This watcher changes images only, not training state.
+  current=signature()
+  if not a.loss_only or current!=previous:
+   plot(a.run,a.log,loss_only=a.loss_only);previous=signature()
   if not a.watch_pid:break
   try:os.kill(a.watch_pid,0)
   except ProcessLookupError:break
