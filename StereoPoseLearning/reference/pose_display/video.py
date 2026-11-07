@@ -5,6 +5,7 @@ import json
 from pathlib import Path
 import time
 import cv2
+import numpy as np
 from .pipeline import StereoFrame, StereoOverlay
 
 
@@ -15,6 +16,7 @@ def main():
     p.add_argument('--predictor', required=True, help='Python module:factory; factory(config) returns predict(frame, calibration)')
     p.add_argument('--predictor-config', type=Path)
     p.add_argument('--font'); p.add_argument('--show', action='store_true')
+    p.add_argument('--backend', choices=('cpp', 'python'), default='cpp')
     p.add_argument('--geometry-log', action='store_true', help='Save all projected polyline samples; larger per-frame logs')
     p.add_argument('--start-time-ns', type=int, default=0)
     a = p.parse_args(); a.output.mkdir(parents=True, exist_ok=True)
@@ -24,18 +26,24 @@ def main():
     config['_config_dir'] = str(a.predictor_config.resolve().parent if a.predictor_config else Path.cwd())
     module, factory = a.predictor.rsplit(':', 1)
     predict = getattr(importlib.import_module(module), factory)(config)
-    overlay = StereoOverlay(model, calibration, a.font, compact=True)
+    if a.backend == 'cpp':
+        from .cpp_backend import CppStereoOverlay
+        overlay = CppStereoOverlay(model, calibration, a.font, geometry_log=a.geometry_log)
+        canvas_buffer = np.empty((overlay.height+50, overlay.width*2, 3), np.uint8)
+    else:
+        overlay = StereoOverlay(model, calibration, a.font, compact=True)
     for name, value in [('instrument_model', model), ('calibration', calibration)]:
         (a.output/(name+'.json')).write_text(json.dumps(value, indent=2)+'\n')
     captures = [cv2.VideoCapture(str(path)) for path in (a.left, a.right)]
     writer = None; count = 0; failures = []; sources = set(); timings = []; interrupted = False
-    log = (a.output/'frames.jsonl').open('w'); started = time.perf_counter()
+    log = (a.output/'frames.jsonl').open('w'); started = time.perf_counter(); processing_times = []
     try:
         if not all(cap.isOpened() for cap in captures): raise ValueError('Cannot open paired videos')
         rates = [cap.get(cv2.CAP_PROP_FPS) for cap in captures]
         if min(rates) <= 0 or abs(rates[0]-rates[1]) > 1e-6: raise ValueError('Paired video frame rates differ or are invalid')
         fps = rates[0]
         while True:
+            processing_start = time.perf_counter()
             items = [cap.read() for cap in captures]
             if items[0][0] != items[1][0]: raise ValueError('Paired videos have different frame counts')
             if not items[0][0]: break
@@ -45,7 +53,8 @@ def main():
             try:
                 prediction = predict(frame, calibration)
                 after_model = time.perf_counter()
-                canvas, metadata = overlay.render(frame, prediction)
+                canvas, metadata = (overlay.render(frame, prediction, out=canvas_buffer)
+                                    if a.backend == 'cpp' else overlay.render(frame, prediction))
                 metadata['predictor_ms'] = (after_model-start)*1000
                 sources.add(prediction.source)
             except (ValueError, KeyError, TypeError) as error:
@@ -59,9 +68,12 @@ def main():
             if writer is None:
                 writer = cv2.VideoWriter(str(a.output/'overlay.mp4'), cv2.VideoWriter_fourcc(*'mp4v'), fps, (canvas.shape[1], canvas.shape[0]))
                 if not writer.isOpened(): raise RuntimeError('Video writer unavailable')
-            writer.write(cv2.cvtColor(canvas, cv2.COLOR_RGB2BGR)); count += 1
+            bgr = cv2.cvtColor(canvas, cv2.COLOR_RGB2BGR)
+            writer.write(bgr); count += 1
             if a.show:
-                cv2.imshow('Stereo surgical pose', cv2.cvtColor(canvas, cv2.COLOR_RGB2BGR))
+                cv2.imshow('Stereo surgical pose', bgr)
+            processing_times.append((time.perf_counter()-processing_start)*1000)
+            if a.show:
                 wait = max(1, min(1000, round((started+count/fps-time.perf_counter())*1000)))
                 if cv2.waitKey(wait) & 0xff in (27, ord('q')):
                     interrupted = True; break
@@ -72,8 +84,11 @@ def main():
         check.release()
         if not valid_video: raise ValueError('Encoded video frame count/rate mismatch')
         report = {'completed': not interrupted, 'frames': count, 'input_fps': fps, 'sources': sorted(sources),
+            'overlay_backend': a.backend,
             'failed_frames': failures, 'passed': not failures and not interrupted,
             'mean_predictor_and_overlay_ms': sum(timings)/len(timings),
+            'mean_processing_ms_including_decode_log_encode': sum(processing_times)/len(processing_times),
+            'timing_scope': 'Processing includes paired reads, predictor, overlay, JSON and writer submission; excludes pacing/waitKey, encoder finalization, and display presentation latency.',
             'note': 'Files must already be synchronized. Frame-index pairing does not establish hardware synchronization.'}
         (a.output/'report.json').write_text(json.dumps(report, ensure_ascii=False, indent=2)+'\n')
         print(json.dumps(report, ensure_ascii=False))
@@ -86,6 +101,7 @@ def main():
         for cap in captures: cap.release()
         if writer is not None: writer.release()
         if a.show: cv2.destroyAllWindows()
+        if hasattr(overlay, 'close'): overlay.close()
 
 
 if __name__ == '__main__': raise SystemExit(main())

@@ -47,6 +47,10 @@ venv/
 
 *.log
 
+# Rebuild native display binaries on the target machine.
+/StereoPoseLearning/reference/pose_display/native/build/
+/StereoPoseLearning/native/libtorch/build/
+
 # Machine-specific distributed capture configuration and runtime output
 /CameraImagingConfig/src/TemporalStereo_v2/*.local.json
 /CameraImagingConfig/src/TemporalStereo_v2/runs/

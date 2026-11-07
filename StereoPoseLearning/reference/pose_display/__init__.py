@@ -1,8 +1,11 @@
 """Camera-relative surgical-pose decoding and video overlays; no Isaac Sim."""
-__all__ = ['StereoFrame', 'PosePrediction', 'StereoOverlay', 'decode', 'project']
+__all__ = ['StereoFrame', 'PosePrediction', 'StereoOverlay', 'CppStereoOverlay', 'decode', 'project']
 
 
 def __getattr__(name):
+    if name == 'CppStereoOverlay':
+        from .cpp_backend import CppStereoOverlay
+        return CppStereoOverlay
     if name in ('StereoFrame', 'PosePrediction', 'StereoOverlay'):
         from . import pipeline
         return getattr(pipeline, name)
