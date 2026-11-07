@@ -137,12 +137,7 @@ class StereoPredictor:
                     and identity[1] != self.last_frame_identity[1] + 1))
             if discontinuous:
                 self.reset()
-            inputs = self._preprocess(frame, cameras)
-            kwargs = {}
-            if self.training_config['model'].get('foreground_parts', False):
-                raw = np.stack([np.asarray(getattr(frame, eye+'_rgb')).transpose(2,0,1)
-                                for eye in ('left','right')])
-                kwargs['hires_images'] = torch.as_tensor(raw.copy(), dtype=torch.uint8, device=self.device)[None,None]
+            inputs, kwargs = self._prepare_inputs(frame, cameras)
             prediction, hidden = self.model(*inputs, hidden=self.hidden, **kwargs)
             value = self.model.export_values(prediction)[0, 0].detach().cpu().numpy()
             if value.shape != (17,) or not np.isfinite(value).all():
@@ -158,6 +153,16 @@ class StereoPredictor:
             # A failed frame cannot leave stale recurrent state for the next one.
             self.reset()
             raise
+
+    def _prepare_inputs(self, frame, cameras):
+        """Keep stream/reset logic shared with the native GPU input path."""
+        inputs = self._preprocess(frame, cameras)
+        kwargs = {}
+        if self.training_config['model'].get('foreground_parts', False):
+            raw = np.stack([np.asarray(getattr(frame, eye+'_rgb')).transpose(2,0,1)
+                            for eye in ('left','right')])
+            kwargs['hires_images'] = torch.as_tensor(raw.copy(), dtype=torch.uint8, device=self.device)[None,None]
+        return inputs, kwargs
 
 
 def build_predictor(config: dict):
