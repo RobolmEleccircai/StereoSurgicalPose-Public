@@ -2,7 +2,11 @@
 
 Stereo vision for surgical instrument localization and pose estimation, with reproducible camera configurations and simulation experiment records.
 
-## Current generator — 2026-11-09
+## Model implementation — 2026-11-11
+
+[StereoPoseLearning](StereoPoseLearning/README.md) contains the current stereo temporal estimator, separate wrist/jaw foreground branches, the landmark-ray/depth C head, and training/evaluation/prediction tools. [Architecture exploration](StereoPoseLearning/docs/ARCHITECTURE_EXPLORATION.md) documents each change and its diagnostic evidence. [Reproduction instructions](StereoPoseLearning/docs/REPRODUCING.md) cover the environment, data manifests, checkpoint relocation and overlays. Five historical architecture stages are preserved for comparison. Dataset files and learned weights are external artifacts.
+
+## Versioned generator baseline — 2026-11-09
 
 The current scene contains **one active surgical instrument** (`PSM_Right`), organs, the ECM and two cameras. `PSM_Left` is explicitly inactive. Its name can still appear in the referenced source asset; it is not a second active instrument in this capture.
 
@@ -16,7 +20,7 @@ The current entry point is [TemporalStereo_v2](CameraImagingConfig/src/TemporalS
 
 Self-occlusion and tissue occlusion are intended dataset states. Their images, complete 3D truth and visibility labels are retained. A fixed endpoint does **not** have to be directly visible; the 0/128 direct-visibility count in the bounded run is a recorded observation, not a reason to discard data or change the planned paths.
 
-The laptop validation checked all 21 paths and rendered 32 diagnostic pairs. Calculation checks covered all 2,100 planned states. Full dataset generation and target-server GPU validation have not been started.
+The laptop validation checked all 21 paths and rendered 32 diagnostic pairs. Calculation checks covered all 2,100 planned states. These counts and checks describe the versioned generator baseline. Subsequent capture and model runs use their own recorded manifests; this historical table does not override a model run’s actual configuration.
 
 ![Existing 720p stereo sample with articulated pose overlays](CameraImagingConfig/src/TemporalStereo_v2/validation_evidence/balanced_2100/examples/seq_000_validation_029.jpg)
 
@@ -29,8 +33,9 @@ The laptop validation checked all 21 paths and rendered 32 diagnostic pairs. Cal
 | `CameraImagingConfig/` | Current temporal generator, portable deployment, camera configuration and sources; earlier captures retained |
 | `StereoCalibration/` | Historical endpoint and relative-pose diagnostics, with recorded failures |
 | `SurgicalPoseEstimation/` | Pose-interface navigation and historical static examples |
+| `StereoPoseLearning/` | Current estimator, training, inference, architecture history and reproducibility tools |
 
-Each new pair saves RGB, masks, C/d/H1/H2/J1/J2/T, full part frames, joints, timestamps and visibility/contact labels. The [model interface](CameraImagingConfig/src/TemporalStereo_v2/MODEL_INPUT_OUTPUT.md) describes 17 proposed prediction values and the fixed instrument geometry used to decode them. [Shared calculation and display code](CameraImagingConfig/src/TemporalStereo_v2/pose_display/README.md) supplies the approved arrows/XYZ overlays and video callback. No trained pose estimator is included. Relative camera transforms and baseline remain separate evaluation truth, not mandatory model inputs.
+Each new pair saves RGB, masks, C/d/H1/H2/J1/J2/T, full part frames, joints, timestamps and visibility/contact labels. The [model interface](CameraImagingConfig/src/TemporalStereo_v2/MODEL_INPUT_OUTPUT.md) describes the 17 prediction values and the fixed instrument geometry used to decode them. [Shared calculation and display code](CameraImagingConfig/src/TemporalStereo_v2/pose_display/README.md) supplies the approved arrows/XYZ overlays and video callback. The estimator implementation is in `StereoPoseLearning`; trained checkpoint files are supplied separately. Relative camera transforms and baseline remain separate evaluation truth, not mandatory model inputs.
 
 The portable generator uses machine configuration files. Large USD/texture assets, render caches, recordings and model weights remain outside Git and are supplied separately in the transfer bundle. The [historical source inventory](docs/source_snapshot.json) preserves the earlier 2026-11-07 snapshots; `python3 scripts/verify_snapshot.py` checks their hashes and repository syntax without launching Isaac Sim.
 
