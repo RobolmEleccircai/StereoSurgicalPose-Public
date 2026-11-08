@@ -1,5 +1,11 @@
 # C++ 实时双目绘图
 
+版本范围：下面的 `vectors` 模式、`canvas_shape` 和C ABI 2说明对应4060上已验证的工作区修改。本次仅上传文档与测量报告，相关实现尚未随本次文档提交上传；仓库基础提交 `fce52c9` 使用原完整标注和C ABI 1。采用下面的新接口前，需要同时取得对应包装层与本地绘图库源码。
+
+当前实时模式为 `vectors`：每目只显示杆轴、两片钳口的物理箭头，三个自身XYZ面板，以及三个向量的数值。杆轴显示单位方向 `d`；钳口显示 `J1-H1`、`J2-H2`（毫米），均在对应相机光学坐标系中。它们分别从C、H1、H2出发。面板中的XYZ箭头仍随部件转动，仅移位显示。无帧号、时间戳、解释文字、关键点标签或顶部标题栏。`full` 保留原离线审阅显示，用于历史对照。
+
+本次更新C ABI为2，Python包装与本地库需要一起更新并重新编译，防止不同画布尺寸的版本混用。视频入口默认为 `--display-mode vectors`；历史完整标注可显式选择 `--display-mode full`。
+
 实时视频入口 `reference/pose_display/video.py` 默认使用 C++ 后端。训练、模型结构、权重和17维输出定义不变。旧 Pillow 后端保留，用 `--backend python` 选择；完整数字报告仍使用原 `StereoOverlay(compact=False)`。
 
 ## 实现与接口
@@ -37,7 +43,7 @@ from pose_display import CppStereoOverlay, StereoFrame, PosePrediction
 import numpy as np
 
 display = CppStereoOverlay(instrument_model, calibration, font=font_path)
-canvas = np.empty((height + 50, 2 * width, 3), dtype=np.uint8)
+canvas = np.empty(display.canvas_shape, dtype=np.uint8)
 frame = StereoFrame(frame_id, timestamp_ns, left_rgb, right_rgb)
 prediction = PosePrediction(frame_id, timestamp_ns, values17)
 image, metadata = display.render(frame, prediction, out=canvas)
@@ -45,7 +51,7 @@ image, metadata = display.render(frame, prediction, out=canvas)
 display.close()
 ```
 
-未传 `out` 时，每次返回独立图像，不会被下一次绘制覆盖。图像尺寸必须与 K/D 对应、至少每目1280×720。默认输出2560×770，包含50像素标题栏。输出不能与输入共享内存；错帧、错时间戳、关节越限、零四元数、非有限值和相机后方投影会拒绝。一个句柄用于一个流，不并发操作；Python 适配层提供锁。
+未传 `out` 时，每次返回独立图像，不会被下一次绘制覆盖。图像尺寸必须与 K/D 对应、至少每目1280×720。Python默认 `display_mode='vectors'`，720p双目输出2560×720；`display_mode='full'` 输出2560×770，包含50像素标题栏。输出不能与输入共享内存；错帧、错时间戳、关节越限、零四元数、非有限值和相机后方投影会拒绝。一个句柄用于一个流，不并发操作；Python 适配层提供锁。
 
 `geometry_log=False` 默认仅保存17值、来源、时间戳、后端及耗时，不构建详细曲线 JSON。开启 `geometry_log=True` 或视频参数 `--geometry-log` 时，输出 `geometry_schema: native_v1`：每目包含 C/d/H1/H2/J1/J2/T、三个旋转矩阵、像素位置、可见性编码、三个物理箭头和三组 XYZ 曲线。此调试结构与旧 Pillow 详细日志不同，读取器应检查 schema。`compute_geometry(values17)` 可独立返回这些结果，不绘图。
 
