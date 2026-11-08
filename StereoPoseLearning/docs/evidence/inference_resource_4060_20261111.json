@@ -1,0 +1,1123 @@
+{
+  "current_end_to_end": {
+    "mode": "measure",
+    "display_mode": "vectors",
+    "gpu": "NVIDIA GeForce RTX 4060 Laptop GPU",
+    "checkpoint_sha256": "639fc8c7e56263f4ab889aa53cc5132e3610eea4c8b2d8b0db671c41d8a30325",
+    "pairs_available": 56,
+    "batch_size": 1,
+    "precision": "FP32 plus original FP64 C unprojection",
+    "library_sha256": "c66f5ee11ef16cc3bcbd5f181b904c6acff5856abfa8330b80c91402e636bb0d",
+    "overlay_library_sha256": "1209c299aeed50c21bba4827043d2541a0cea57e14428cf42e41fb013ae3b3a9",
+    "diagnostic_overlay_pixels_equal": true,
+    "runtime": {
+      "torch": "2.9.1+cu128",
+      "cuda": "12.8",
+      "logical_cpus": 18,
+      "allowed_cpus": 18,
+      "torch_cpu_threads": 4
+    },
+    "loaded_model_process_status": {
+      "rss_mib": 958.59375,
+      "threads": 7
+    },
+    "preloaded_image_bytes": 309657600,
+    "after_warmup_process_status": {
+      "rss_mib": 2056.98828125,
+      "threads": 7
+    },
+    "measured_pairs": 560,
+    "warmup_pairs": 56,
+    "timing_ms": {
+      "total_ms": {
+        "mean": 31.28459513392857,
+        "p50": 31.215220000000002,
+        "p95": 32.4832757,
+        "min": 30.095541,
+        "max": 33.832967
+      },
+      "predictor_ms": {
+        "mean": 25.843608567857146,
+        "p50": 25.762979,
+        "p95": 26.81623595,
+        "min": 24.844074,
+        "max": 28.261832
+      },
+      "overlay_ms": {
+        "mean": 5.4409865660714285,
+        "p50": 5.413604,
+        "p95": 5.7552227,
+        "min": 5.1696,
+        "max": 6.055844
+      },
+      "host_before_gpu_submit_ms": {
+        "mean": 0.5783809196428571,
+        "p50": 0.5597705,
+        "p95": 0.7300844,
+        "min": 0.499955,
+        "max": 0.892733
+      },
+      "gpu_preprocess_interval_ms": {
+        "mean": 2.241498852627618,
+        "p50": 2.2250559329986572,
+        "p95": 2.428963100910187,
+        "min": 2.1435201168060303,
+        "max": 2.882175922393799
+      },
+      "gpu_preprocess_to_model_gap_ms": {
+        "mean": 0.003216457234728815,
+        "p50": 0.0030720001086592674,
+        "p95": 0.004095999989658594,
+        "min": 0.0030720001086592674,
+        "max": 0.004095999989658594
+      },
+      "network_cuda_interval_ms": {
+        "mean": 22.875482051713124,
+        "p50": 22.797823905944824,
+        "p95": 23.81061038970947,
+        "min": 21.980159759521484,
+        "max": 25.32147216796875
+      },
+      "network_host_call_ms": {
+        "mean": 24.627883985714288,
+        "p50": 24.5377835,
+        "p95": 25.5823453,
+        "min": 23.659634,
+        "max": 27.137418
+      },
+      "return_wait_and_validation_ms": {
+        "mean": 0.09402467321428572,
+        "p50": 0.0897355,
+        "p95": 0.11648719999999999,
+        "min": 0.068674,
+        "max": 0.152458
+      },
+      "fk_project_ms": {
+        "mean": 0.13761693392857144,
+        "p50": 0.144308,
+        "p95": 0.19260994999999997,
+        "min": 0.078899,
+        "max": 0.248203
+      },
+      "visibility_ms": {
+        "mean": 0.0005088107142857143,
+        "p50": 0.000495,
+        "p95": 0.0007212999999999997,
+        "min": 0.000319,
+        "max": 0.00107
+      },
+      "canvas_copy_ms": {
+        "mean": 0.6042259446428572,
+        "p50": 0.5742285,
+        "p95": 0.8051148499999999,
+        "min": 0.496009,
+        "max": 0.927276
+      },
+      "left_panel_ms": {
+        "mean": 2.3574175964285713,
+        "p50": 2.333614,
+        "p95": 2.52258805,
+        "min": 2.238252,
+        "max": 2.733984
+      },
+      "right_panel_ms": {
+        "mean": 2.2697041642857143,
+        "p50": 2.251905,
+        "p95": 2.3812365,
+        "min": 2.16331,
+        "max": 2.777858
+      }
+    },
+    "stage_cuda_intervals_ms": {},
+    "stereo_hz": 31.964613756995256,
+    "fraction_within_33_33_ms": 0.9946428571428572,
+    "cpu": {
+      "process_core_equivalents": 1.000868203122818,
+      "percent_of_one_core": 100.08682031228179,
+      "percent_of_available_cpus": 5.560378906237877,
+      "process_cpu_ms_per_pair": 31.357142857142858
+    },
+    "process_rss_mib": {
+      "mean": 2057.063787286932,
+      "p50": 2057.03515625,
+      "p95": 2057.184765625,
+      "min": 2057.01171875,
+      "max": 2057.21484375
+    },
+    "process_thread_count": {
+      "mean": 8.0,
+      "p50": 8.0,
+      "p95": 8.0,
+      "min": 8.0,
+      "max": 8.0
+    },
+    "cuda_allocated_mib": 93.181640625,
+    "cuda_peak_allocated_mib": 251.9091796875,
+    "cuda_reserved_mib": 330.0,
+    "cuda_peak_reserved_mib": 330.0,
+    "gpu_samples": 88,
+    "gpu_resource": {
+      "device_memory_mib": {
+        "mean": 583.0,
+        "p50": 583.0,
+        "p95": 583.0,
+        "min": 583.0,
+        "max": 583.0
+      },
+      "gpu_utilization_percent": {
+        "mean": 64.06818181818181,
+        "p50": 64.0,
+        "p95": 68.0,
+        "min": 51.0,
+        "max": 68.0
+      },
+      "memory_controller_utilization_percent": {
+        "mean": 42.10227272727273,
+        "p50": 42.0,
+        "p95": 45.0,
+        "min": 36.0,
+        "max": 45.0
+      },
+      "power_w": {
+        "mean": 49.01295454545454,
+        "p50": 49.155,
+        "p95": 49.49,
+        "min": 47.24,
+        "max": 49.79
+      },
+      "temperature_c": {
+        "mean": 57.06818181818182,
+        "p50": 58.0,
+        "p95": 58.64999999999999,
+        "min": 53.0,
+        "max": 59.0
+      },
+      "sm_clock_mhz": {
+        "mean": 2521.875,
+        "p50": 2565.0,
+        "p95": 2595.0,
+        "min": 2220.0,
+        "max": 2595.0
+      },
+      "memory_clock_mhz": {
+        "mean": 8001.0,
+        "p50": 8001.0,
+        "p95": 8001.0,
+        "min": 8001.0,
+        "max": 8001.0
+      }
+    },
+    "notes": [
+      "Wall latency is measured without torch.profiler; the diagnostic overlay adds five CPU timer reads.",
+      "CPU submission, GPU intervals and return wait overlap: do not add their columns.",
+      "return_wait includes waiting for pending model kernels, not just copying 68 bytes.",
+      "Input RGB is preloaded in RAM; disk decode, acquisition, encoding and GUI refresh are excluded.",
+      "GPU utilization measures busy time, not fraction of peak FLOPs; device memory includes context/desktop."
+    ]
+  },
+  "network_stage_intervals": {
+    "mode": "stages",
+    "gpu": "NVIDIA GeForce RTX 4060 Laptop GPU",
+    "checkpoint_sha256": "639fc8c7e56263f4ab889aa53cc5132e3610eea4c8b2d8b0db671c41d8a30325",
+    "pairs_available": 56,
+    "batch_size": 1,
+    "precision": "FP32 plus original FP64 C unprojection",
+    "library_sha256": "1cf694416495bad37bb0c0e352583412d9137894aa5f36e137949c406f6264cb",
+    "overlay_library_sha256": "8f2467e650fed61e151ad946a2c45695cf6877323fb24ab7e1ceeefda982d387",
+    "diagnostic_overlay_pixels_equal": true,
+    "runtime": {
+      "torch": "2.9.1+cu128",
+      "cuda": "12.8",
+      "logical_cpus": 18,
+      "allowed_cpus": 18,
+      "torch_cpu_threads": 4
+    },
+    "loaded_model_process_status": {
+      "rss_mib": 958.45703125,
+      "threads": 7
+    },
+    "preloaded_image_bytes": 309657600,
+    "after_warmup_process_status": {
+      "rss_mib": 2058.98046875,
+      "threads": 7
+    },
+    "measured_pairs": 168,
+    "warmup_pairs": 56,
+    "timing_ms": {
+      "total_ms": {
+        "mean": 32.25650723214286,
+        "p50": 32.1733405,
+        "p95": 33.387444599999995,
+        "min": 31.277563,
+        "max": 34.36881
+      },
+      "predictor_ms": {
+        "mean": 26.026710946428572,
+        "p50": 25.9637125,
+        "p95": 26.9579942,
+        "min": 25.224941,
+        "max": 27.720798
+      },
+      "overlay_ms": {
+        "mean": 6.229796285714286,
+        "p50": 6.2084165,
+        "p95": 6.4728698,
+        "min": 5.920558,
+        "max": 6.856391
+      },
+      "host_before_gpu_submit_ms": {
+        "mean": 0.5765779642857144,
+        "p50": 0.5613900000000001,
+        "p95": 0.7291728500000001,
+        "min": 0.498174,
+        "max": 0.764929
+      },
+      "gpu_preprocess_interval_ms": {
+        "mean": 2.262237331696919,
+        "p50": 2.25271999835968,
+        "p95": 2.4091503977775575,
+        "min": 2.1693758964538574,
+        "max": 2.5931200981140137
+      },
+      "gpu_preprocess_to_model_gap_ms": {
+        "mean": 0.002828190556361473,
+        "p50": 0.0030720001086592674,
+        "p95": 0.0030720001086592674,
+        "min": 0.002047999994829297,
+        "max": 0.004095999989658594
+      },
+      "network_cuda_interval_ms": {
+        "mean": 23.03944245974223,
+        "p50": 22.979583740234375,
+        "p95": 23.972679805755615,
+        "min": 22.29145622253418,
+        "max": 24.54630470275879
+      },
+      "network_host_call_ms": {
+        "mean": 24.75986030952381,
+        "p50": 24.6975195,
+        "p95": 25.71624565,
+        "min": 24.006464,
+        "max": 26.303032
+      },
+      "return_wait_and_validation_ms": {
+        "mean": 0.09451695238095238,
+        "p50": 0.091045,
+        "p95": 0.11578820000000001,
+        "min": 0.076593,
+        "max": 0.143939
+      },
+      "fk_project_ms": {
+        "mean": 0.13288794047619049,
+        "p50": 0.137592,
+        "p95": 0.1826346,
+        "min": 0.078018,
+        "max": 0.241915
+      },
+      "visibility_ms": {
+        "mean": 0.0003271011904761905,
+        "p50": 0.000277,
+        "p95": 0.0005119500000000001,
+        "min": 0.000248,
+        "max": 0.000651
+      },
+      "canvas_copy_ms": {
+        "mean": 0.6415184702380953,
+        "p50": 0.6172839999999999,
+        "p95": 0.8467164,
+        "min": 0.576003,
+        "max": 0.988651
+      },
+      "left_panel_ms": {
+        "mean": 2.713746136904762,
+        "p50": 2.7074415,
+        "p95": 2.8292497,
+        "min": 2.590952,
+        "max": 2.899656
+      },
+      "right_panel_ms": {
+        "mean": 2.672016244047619,
+        "p50": 2.660723,
+        "p95": 2.79367555,
+        "min": 2.532657,
+        "max": 2.881743
+      }
+    },
+    "stage_cuda_intervals_ms": {
+      "stage::upload_rgb": {
+        "mean": 1.0316386659230505,
+        "p50": 1.0250080227851868,
+        "p95": 1.1821327567100526,
+        "min": 0.9561280012130737,
+        "max": 1.3744640350341797
+      },
+      "stage::resize_horizontal": {
+        "mean": 0.8306685689659346,
+        "p50": 0.8305599987506866,
+        "p95": 0.8393792033195495,
+        "min": 0.8197759985923767,
+        "max": 0.8430719971656799
+      },
+      "stage::resize_vertical": {
+        "mean": 0.2460952385195664,
+        "p50": 0.24473600089550018,
+        "p95": 0.25702399015426636,
+        "min": 0.23449599742889404,
+        "max": 0.2682879865169525
+      },
+      "stage::normalize_layout": {
+        "mean": 0.1304198101695095,
+        "p50": 0.130048006772995,
+        "p95": 0.13619199395179749,
+        "min": 0.12492799758911133,
+        "max": 0.13926400244235992
+      },
+      "stage::backbone_stem": {
+        "mean": 0.2724388562852428,
+        "p50": 0.27033600211143494,
+        "p95": 0.28672000765800476,
+        "min": 0.26009601354599,
+        "max": 0.2979840040206909
+      },
+      "stage::backbone_0": {
+        "mean": 5.430582858267284,
+        "p50": 5.422591924667358,
+        "p95": 5.484543800354004,
+        "min": 5.370880126953125,
+        "max": 5.542912006378174
+      },
+      "stage::backbone_1": {
+        "mean": 2.273590857074374,
+        "p50": 2.2635520696640015,
+        "p95": 2.354790449142456,
+        "min": 2.2077438831329346,
+        "max": 2.407423973083496
+      },
+      "stage::backbone_2": {
+        "mean": 3.7584518109049116,
+        "p50": 3.724287986755371,
+        "p95": 3.94475519657135,
+        "min": 3.6229119300842285,
+        "max": 4.0960001945495605
+      },
+      "stage::backbone_3": {
+        "mean": 0.8520838100285757,
+        "p50": 0.8468480110168457,
+        "p95": 0.9195520281791687,
+        "min": 0.7854080200195312,
+        "max": 0.954367995262146
+      },
+      "stage::fpn_mask_keypoints": {
+        "mean": 1.5543222838924045,
+        "p50": 1.54367995262146,
+        "p95": 1.6261119842529297,
+        "min": 1.511423945426941,
+        "max": 1.6465920209884644
+      },
+      "stage::guided_roi_features": {
+        "mean": 0.6188586655826795,
+        "p50": 0.5913600027561188,
+        "p95": 0.7972352117300034,
+        "min": 0.5396479964256287,
+        "max": 0.8939520120620728
+      },
+      "stage::cross_view_attention": {
+        "mean": 0.5712740939287912,
+        "p50": 0.562175989151001,
+        "p95": 0.6430496037006378,
+        "min": 0.5242879986763,
+        "max": 0.6860799789428711
+      },
+      "stage::body_gru_pose_heads": {
+        "mean": 0.6406020976248241,
+        "p50": 0.6195200085639954,
+        "p95": 0.7361536026000977,
+        "min": 0.5775359869003296,
+        "max": 0.8386560082435608
+      },
+      "stage::C_ray_undistortion": {
+        "mean": 4.1510468778156095,
+        "p50": 4.07756781578064,
+        "p95": 4.576563239097595,
+        "min": 3.9198720455169678,
+        "max": 5.134335994720459
+      },
+      "stage::hires_mask_crop": {
+        "mean": 1.4744796206553776,
+        "p50": 1.457152009010315,
+        "p95": 1.529099178314209,
+        "min": 1.4326080083847046,
+        "max": 2.5282559394836426
+      },
+      "stage::wrist_branch": {
+        "mean": 0.5571950480696701,
+        "p50": 0.5299519896507263,
+        "p95": 0.6587392091751099,
+        "min": 0.4986880123615265,
+        "max": 1.558527946472168
+      },
+      "stage::jaw_branch": {
+        "mean": 0.4909017133925642,
+        "p50": 0.4787200093269348,
+        "p95": 0.5512192070484163,
+        "min": 0.45772799849510193,
+        "max": 0.7782400250434875
+      },
+      "stage::pack_values17": {
+        "mean": 0.3713800009517443,
+        "p50": 0.3624959886074066,
+        "p95": 0.417433600127697,
+        "min": 0.3449600040912628,
+        "max": 0.5212159752845764
+      }
+    },
+    "stereo_hz": 31.00149662216135,
+    "fraction_within_33_33_ms": 0.9345238095238095,
+    "cpu": {
+      "process_core_equivalents": 0.9999029729511482,
+      "percent_of_one_core": 99.99029729511481,
+      "percent_of_available_cpus": 5.555016516395267,
+      "process_cpu_ms_per_pair": 32.32142857142857
+    },
+    "process_rss_mib": {
+      "mean": 2059.020089285714,
+      "p50": 2059.0234375,
+      "p95": 2059.0234375,
+      "min": 2059.00390625,
+      "max": 2059.02734375
+    },
+    "process_thread_count": {
+      "mean": 8.0,
+      "p50": 8.0,
+      "p95": 8.0,
+      "min": 8.0,
+      "max": 8.0
+    },
+    "cuda_allocated_mib": 93.181640625,
+    "cuda_peak_allocated_mib": 251.9091796875,
+    "cuda_reserved_mib": 330.0,
+    "cuda_peak_reserved_mib": 330.0,
+    "gpu_samples": 28,
+    "gpu_resource": {
+      "device_memory_mib": {
+        "mean": 583.0,
+        "p50": 583.0,
+        "p95": 583.0,
+        "min": 583.0,
+        "max": 583.0
+      },
+      "gpu_utilization_percent": {
+        "mean": 58.17857142857143,
+        "p50": 62.0,
+        "p95": 65.0,
+        "min": 34.0,
+        "max": 66.0
+      },
+      "memory_controller_utilization_percent": {
+        "mean": 37.607142857142854,
+        "p50": 40.0,
+        "p95": 44.0,
+        "min": 21.0,
+        "max": 44.0
+      },
+      "power_w": {
+        "mean": 47.90714285714286,
+        "p50": 48.004999999999995,
+        "p95": 48.39,
+        "min": 46.67,
+        "max": 48.39
+      },
+      "temperature_c": {
+        "mean": 54.92857142857143,
+        "p50": 55.0,
+        "p95": 56.65,
+        "min": 53.0,
+        "max": 57.0
+      },
+      "sm_clock_mhz": {
+        "mean": 2525.8928571428573,
+        "p50": 2535.0,
+        "p95": 2610.0,
+        "min": 2355.0,
+        "max": 2610.0
+      },
+      "memory_clock_mhz": {
+        "mean": 8001.0,
+        "p50": 8001.0,
+        "p95": 8001.0,
+        "min": 8001.0,
+        "max": 8001.0
+      }
+    },
+    "notes": [
+      "Wall latency is measured without torch.profiler; the diagnostic overlay adds five CPU timer reads.",
+      "CPU submission, GPU intervals and return wait overlap: do not add their columns.",
+      "return_wait includes waiting for pending model kernels, not just copying 68 bytes.",
+      "Input RGB is preloaded in RAM; disk decode, acquisition, encoding and GUI refresh are excluded.",
+      "GPU utilization measures busy time, not fraction of peak FLOPs; device memory includes context/desktop."
+    ]
+  },
+  "operator_profile": {
+    "mode": "operators",
+    "gpu": "NVIDIA GeForce RTX 4060 Laptop GPU",
+    "checkpoint_sha256": "639fc8c7e56263f4ab889aa53cc5132e3610eea4c8b2d8b0db671c41d8a30325",
+    "pairs_available": 56,
+    "batch_size": 1,
+    "precision": "FP32 plus original FP64 C unprojection",
+    "library_sha256": "1cf694416495bad37bb0c0e352583412d9137894aa5f36e137949c406f6264cb",
+    "overlay_library_sha256": "8f2467e650fed61e151ad946a2c45695cf6877323fb24ab7e1ceeefda982d387",
+    "diagnostic_overlay_pixels_equal": true,
+    "runtime": {
+      "torch": "2.9.1+cu128",
+      "cuda": "12.8",
+      "logical_cpus": 18,
+      "allowed_cpus": 18,
+      "torch_cpu_threads": 4
+    },
+    "loaded_model_process_status": {
+      "rss_mib": 958.35546875,
+      "threads": 7
+    },
+    "preloaded_image_bytes": 309657600,
+    "after_warmup_process_status": {
+      "rss_mib": 2050.7109375,
+      "threads": 7
+    },
+    "profiled_pairs": 14,
+    "stages": [
+      {
+        "stage": "stage::upload_rgb",
+        "count": 14,
+        "cpu_inclusive_ms_per_pair": 0.07440214285713462,
+        "gpu_active_ms_per_pair": 1.0055820714285721
+      },
+      {
+        "stage": "stage::resize_horizontal",
+        "count": 14,
+        "cpu_inclusive_ms_per_pair": 0.4142681428571458,
+        "gpu_active_ms_per_pair": 0.8142591428571676
+      },
+      {
+        "stage": "stage::resize_vertical",
+        "count": 14,
+        "cpu_inclusive_ms_per_pair": 0.23660864285714184,
+        "gpu_active_ms_per_pair": 0.23960585714284593
+      },
+      {
+        "stage": "stage::normalize_layout",
+        "count": 14,
+        "cpu_inclusive_ms_per_pair": 0.12428199999999798,
+        "gpu_active_ms_per_pair": 0.12576164285714803
+      },
+      {
+        "stage": "stage::backbone_stem",
+        "count": 14,
+        "cpu_inclusive_ms_per_pair": 0.20252535714286485,
+        "gpu_active_ms_per_pair": 0.2702772857142928
+      },
+      {
+        "stage": "stage::backbone_0",
+        "count": 14,
+        "cpu_inclusive_ms_per_pair": 0.6267039285714348,
+        "gpu_active_ms_per_pair": 5.398949928571457
+      },
+      {
+        "stage": "stage::backbone_1",
+        "count": 14,
+        "cpu_inclusive_ms_per_pair": 0.632468785714296,
+        "gpu_active_ms_per_pair": 2.24403314285713
+      },
+      {
+        "stage": "stage::backbone_2",
+        "count": 14,
+        "cpu_inclusive_ms_per_pair": 1.9359547857142732,
+        "gpu_active_ms_per_pair": 3.657729285714222
+      },
+      {
+        "stage": "stage::backbone_3",
+        "count": 14,
+        "cpu_inclusive_ms_per_pair": 0.5786167142857149,
+        "gpu_active_ms_per_pair": 0.832902571428537
+      },
+      {
+        "stage": "stage::fpn_mask_keypoints",
+        "count": 14,
+        "cpu_inclusive_ms_per_pair": 0.4591610714285744,
+        "gpu_active_ms_per_pair": 1.5339375714285628
+      },
+      {
+        "stage": "stage::guided_roi_features",
+        "count": 14,
+        "cpu_inclusive_ms_per_pair": 12.117647785714283,
+        "gpu_active_ms_per_pair": 0.23983035714288833
+      },
+      {
+        "stage": "stage::cross_view_attention",
+        "count": 14,
+        "cpu_inclusive_ms_per_pair": 1.532269285714282,
+        "gpu_active_ms_per_pair": 0.12583242857148588
+      },
+      {
+        "stage": "stage::body_gru_pose_heads",
+        "count": 14,
+        "cpu_inclusive_ms_per_pair": 1.1632863571428522,
+        "gpu_active_ms_per_pair": 0.11293464285710356
+      },
+      {
+        "stage": "stage::C_ray_undistortion",
+        "count": 14,
+        "cpu_inclusive_ms_per_pair": 8.972169857142863,
+        "gpu_active_ms_per_pair": 1.1062246428574085
+      },
+      {
+        "stage": "stage::hires_mask_crop",
+        "count": 14,
+        "cpu_inclusive_ms_per_pair": 1.923323428571424,
+        "gpu_active_ms_per_pair": 1.245225428571437
+      },
+      {
+        "stage": "stage::wrist_branch",
+        "count": 14,
+        "cpu_inclusive_ms_per_pair": 1.1436145714285622,
+        "gpu_active_ms_per_pair": 0.2153257857143383
+      },
+      {
+        "stage": "stage::jaw_branch",
+        "count": 14,
+        "cpu_inclusive_ms_per_pair": 0.9781032142857258,
+        "gpu_active_ms_per_pair": 0.21383257142852433
+      },
+      {
+        "stage": "stage::pack_values17",
+        "count": 14,
+        "cpu_inclusive_ms_per_pair": 0.7571599285714292,
+        "gpu_active_ms_per_pair": 0.07308642857132926
+      }
+    ],
+    "top_operators": [
+      {
+        "name": "aten::cudnn_convolution",
+        "count_per_pair": 64.0,
+        "self_device_ms_per_pair": 6.072730571428549,
+        "self_cpu_ms_per_pair": 1.1066853571428206
+      },
+      {
+        "name": "aten::add",
+        "count_per_pair": 323.0,
+        "self_device_ms_per_pair": 2.2960004999999666,
+        "self_cpu_ms_per_pair": 1.3501727857141552
+      },
+      {
+        "name": "aten::mul",
+        "count_per_pair": 621.0,
+        "self_device_ms_per_pair": 2.031396071428765,
+        "self_cpu_ms_per_pair": 2.594218285714207
+      },
+      {
+        "name": "aten::add_",
+        "count_per_pair": 67.0,
+        "self_device_ms_per_pair": 1.5878524999999413,
+        "self_cpu_ms_per_pair": 0.2615314999999024
+      },
+      {
+        "name": "aten::copy_",
+        "count_per_pair": 51.0,
+        "self_device_ms_per_pair": 1.5275974999999782,
+        "self_cpu_ms_per_pair": 0.22866421428573389
+      },
+      {
+        "name": "aten::addcmul",
+        "count_per_pair": 14.0,
+        "self_device_ms_per_pair": 1.0441214999999642,
+        "self_cpu_ms_per_pair": 0.07982871428567224
+      },
+      {
+        "name": "aten::native_layer_norm",
+        "count_per_pair": 32.0,
+        "self_device_ms_per_pair": 1.027246500000028,
+        "self_cpu_ms_per_pair": 0.2595181428570682
+      },
+      {
+        "name": "aten::gelu",
+        "count_per_pair": 44.0,
+        "self_device_ms_per_pair": 0.959861428571448,
+        "self_cpu_ms_per_pair": 0.20890035714284333
+      },
+      {
+        "name": "aten::linalg_vector_norm",
+        "count_per_pair": 19.0,
+        "self_device_ms_per_pair": 0.45645114285712485,
+        "self_cpu_ms_per_pair": 0.13846342857148244
+      },
+      {
+        "name": "aten::div",
+        "count_per_pair": 55.0,
+        "self_device_ms_per_pair": 0.3425149285714843,
+        "self_cpu_ms_per_pair": 0.26273578571428957
+      },
+      {
+        "name": "aten::gather",
+        "count_per_pair": 10.0,
+        "self_device_ms_per_pair": 0.3049638571428551,
+        "self_cpu_ms_per_pair": 0.07457657142856136
+      },
+      {
+        "name": "aten::upsample_bilinear2d",
+        "count_per_pair": 4.0,
+        "self_device_ms_per_pair": 0.2927576428571527,
+        "self_cpu_ms_per_pair": 0.0234955714285702
+      },
+      {
+        "name": "aten::cat",
+        "count_per_pair": 43.0,
+        "self_device_ms_per_pair": 0.2868971428571988,
+        "self_cpu_ms_per_pair": 0.24798192857142287
+      },
+      {
+        "name": "aten::sub",
+        "count_per_pair": 85.0,
+        "self_device_ms_per_pair": 0.24204621428571954,
+        "self_cpu_ms_per_pair": 0.32557092857140607
+      },
+      {
+        "name": "aten::native_group_norm",
+        "count_per_pair": 10.0,
+        "self_device_ms_per_pair": 0.20373085714287506,
+        "self_cpu_ms_per_pair": 0.15210749999994005
+      },
+      {
+        "name": "aten::addmm",
+        "count_per_pair": 48.0,
+        "self_device_ms_per_pair": 0.14781614285713868,
+        "self_cpu_ms_per_pair": 0.5906340714286805
+      },
+      {
+        "name": "aten::max_pool2d_with_indices",
+        "count_per_pair": 1.0,
+        "self_device_ms_per_pair": 0.11689150000000155,
+        "self_cpu_ms_per_pair": 0.009304857142857144
+      },
+      {
+        "name": "aten::mean",
+        "count_per_pair": 18.0,
+        "self_device_ms_per_pair": 0.050784714285743056,
+        "self_cpu_ms_per_pair": 0.10918192857140704
+      },
+      {
+        "name": "aten::bitwise_right_shift",
+        "count_per_pair": 2.0,
+        "self_device_ms_per_pair": 0.04931800000000482,
+        "self_cpu_ms_per_pair": 0.01873521428569812
+      },
+      {
+        "name": "aten::_cudnn_rnn",
+        "count_per_pair": 3.0,
+        "self_device_ms_per_pair": 0.047659928571374875,
+        "self_cpu_ms_per_pair": 0.2049247857143468
+      },
+      {
+        "name": "aten::sum",
+        "count_per_pair": 11.0,
+        "self_device_ms_per_pair": 0.04323921428568792,
+        "self_cpu_ms_per_pair": 0.07405135714286325
+      },
+      {
+        "name": "aten::grid_sampler_2d",
+        "count_per_pair": 2.0,
+        "self_device_ms_per_pair": 0.037996714285722974,
+        "self_cpu_ms_per_pair": 0.013648500000021158
+      },
+      {
+        "name": "aten::clamp",
+        "count_per_pair": 3.0,
+        "self_device_ms_per_pair": 0.032093499999989165,
+        "self_cpu_ms_per_pair": 0.01586757142858265
+      },
+      {
+        "name": "aten::_conv_depthwise2d",
+        "count_per_pair": 3.0,
+        "self_device_ms_per_pair": 0.031149571428576956,
+        "self_cpu_ms_per_pair": 0.019357928571455237
+      },
+      {
+        "name": "aten::_efficient_attention_forward",
+        "count_per_pair": 4.0,
+        "self_device_ms_per_pair": 0.0279190714285934,
+        "self_cpu_ms_per_pair": 0.03827871428573365
+      },
+      {
+        "name": "aten::where",
+        "count_per_pair": 33.0,
+        "self_device_ms_per_pair": 0.02705207142862595,
+        "self_cpu_ms_per_pair": 0.18069728571427418
+      },
+      {
+        "name": "aten::fill_",
+        "count_per_pair": 29.5,
+        "self_device_ms_per_pair": 0.024793928571330847,
+        "self_cpu_ms_per_pair": 0.07940700000004267
+      },
+      {
+        "name": "aten::ge",
+        "count_per_pair": 20.0,
+        "self_device_ms_per_pair": 0.02406928571429671,
+        "self_cpu_ms_per_pair": 0.10186742857144053
+      },
+      {
+        "name": "aten::_adaptive_avg_pool2d",
+        "count_per_pair": 3.0,
+        "self_device_ms_per_pair": 0.02281628571427791,
+        "self_cpu_ms_per_pair": 0.01938385714285635
+      },
+      {
+        "name": "aten::amax",
+        "count_per_pair": 5.0,
+        "self_device_ms_per_pair": 0.012391642857149885,
+        "self_cpu_ms_per_pair": 0.03564578571429404
+      },
+      {
+        "name": "aten::abs",
+        "count_per_pair": 22.0,
+        "self_device_ms_per_pair": 0.010555000000043427,
+        "self_cpu_ms_per_pair": 0.06143185714282949
+      },
+      {
+        "name": "aten::neg",
+        "count_per_pair": 11.0,
+        "self_device_ms_per_pair": 0.010544500000015822,
+        "self_cpu_ms_per_pair": 0.043136499999977394
+      },
+      {
+        "name": "aten::clamp_min",
+        "count_per_pair": 7.0,
+        "self_device_ms_per_pair": 0.007459928571437299,
+        "self_cpu_ms_per_pair": 0.03800385714286748
+      },
+      {
+        "name": "aten::sigmoid",
+        "count_per_pair": 4.0,
+        "self_device_ms_per_pair": 0.006837714285698634,
+        "self_cpu_ms_per_pair": 0.0243131428571298
+      },
+      {
+        "name": "aten::pow",
+        "count_per_pair": 4.0,
+        "self_device_ms_per_pair": 0.0062915714285819765,
+        "self_cpu_ms_per_pair": 0.03896442857142451
+      }
+    ],
+    "supported_ops_gflops_per_pair": 54.675072245,
+    "supported_ops_gflops_by_stage": {
+      "stage::resize_horizontal": 0.0110592,
+      "stage::resize_vertical": 0.0055296,
+      "stage::normalize_layout": 1e-09,
+      "stage::backbone_stem": 0.221184,
+      "stage::backbone_0": 6.391296004,
+      "stage::backbone_1": 6.882048004,
+      "stage::backbone_2": 24.271667216,
+      "stage::backbone_3": 6.548326404,
+      "stage::fpn_mask_keypoints": 9.64354048,
+      "stage::guided_roi_features": 0.032445632,
+      "stage::cross_view_attention": 0.006370816,
+      "stage::body_gru_pose_heads": 0.001055764,
+      "stage::C_ray_undistortion": 1.642e-06,
+      "stage::hires_mask_crop": 0.005939572,
+      "stage::wrist_branch": 0.327304192,
+      "stage::jaw_branch": 0.32730368,
+      "stage::pack_values17": 3.8e-08
+    },
+    "supported_ops_gflops_by_operator": {
+      "aten::mul": 0.074337766,
+      "aten::conv2d": 54.51993088,
+      "aten::add": 0.065620715,
+      "aten::addmm": 0.015182848,
+      "aten::bmm": 3.6e-08
+    },
+    "kernels_per_pair": 1740.5,
+    "kernel_active_ms_per_pair": 18.439785714285144,
+    "memcpy_active_ms_per_pair": 1.0129135714285713,
+    "cuda_runtime": {
+      "cudaEventQuery": {
+        "calls_per_pair": 1.0,
+        "cpu_ms_per_pair": 0.008111857142857143
+      },
+      "cudaMemcpyAsync": {
+        "calls_per_pair": 12.0,
+        "cpu_ms_per_pair": 0.21761864285714289
+      },
+      "cudaLaunchKernel": {
+        "calls_per_pair": 1683.5,
+        "cpu_ms_per_pair": 5.6801484285714325
+      },
+      "cudaStreamIsCapturing": {
+        "calls_per_pair": 5.0,
+        "cpu_ms_per_pair": 0.004277071428571428
+      },
+      "cudaEventRecordWithFlags": {
+        "calls_per_pair": 1.0,
+        "cpu_ms_per_pair": 0.0034508571428571427
+      },
+      "cudaDeviceGetAttribute": {
+        "calls_per_pair": 41.0,
+        "cpu_ms_per_pair": 0.012179428571428572
+      },
+      "cudaMemsetAsync": {
+        "calls_per_pair": 8.0,
+        "cpu_ms_per_pair": 0.023406285714285713
+      },
+      "cudaPeekAtLastError": {
+        "calls_per_pair": 16.0,
+        "cpu_ms_per_pair": 0.0007826428571428564
+      },
+      "cudaFuncGetAttributes": {
+        "calls_per_pair": 2.0,
+        "cpu_ms_per_pair": 0.005783714285714287
+      },
+      "cudaLaunchKernelExC": {
+        "calls_per_pair": 2.0,
+        "cpu_ms_per_pair": 0.008410642857142856
+      },
+      "cudaFuncSetAttribute": {
+        "calls_per_pair": 4.0,
+        "cpu_ms_per_pair": 0.005986571428571429
+      },
+      "cudaStreamSynchronize": {
+        "calls_per_pair": 7.0,
+        "cpu_ms_per_pair": 11.630869357142856
+      },
+      "cudaOccupancyMaxActiveBlocksPerMultiprocessor": {
+        "calls_per_pair": 1.0,
+        "cpu_ms_per_pair": 0.002266428571428571
+      },
+      "cudaEventRecord": {
+        "calls_per_pair": 51.0,
+        "cpu_ms_per_pair": 0.01999049999999999
+      },
+      "cudaStreamWaitEvent": {
+        "calls_per_pair": 75.0,
+        "cpu_ms_per_pair": 0.027297071428571455
+      },
+      "cudaDeviceSynchronize": {
+        "calls_per_pair": 0.07142857142857142,
+        "cpu_ms_per_pair": 0.0009177142857142858
+      }
+    },
+    "transfers": {
+      "Memcpy HtoD (Pinned -> Device)": {
+        "calls_per_pair": 1.0,
+        "gpu_ms_per_pair": 1.0055820714285715,
+        "bytes_per_pair": 5529600.0
+      },
+      "Memcpy HtoD (Pageable -> Device)": {
+        "calls_per_pair": 6.0,
+        "gpu_ms_per_pair": 0.0017760000000000013,
+        "bytes_per_pair": 56.0
+      },
+      "Memcpy DtoD (Device -> Device)": {
+        "calls_per_pair": 4.0,
+        "gpu_ms_per_pair": 0.004010142857142857,
+        "bytes_per_pair": 156.0
+      },
+      "Memcpy DtoH (Device -> Pageable)": {
+        "calls_per_pair": 1.0,
+        "gpu_ms_per_pair": 0.0015453571428571432,
+        "bytes_per_pair": 68.0
+      }
+    },
+    "notes": [
+      "Intrusive operator profiling is separate from real latency measurement.",
+      "GPU active times sum attributed kernel/memcpy durations; they exclude launch gaps and CPU drawing.",
+      "FLOPs estimate profiler-supported operations; unsupported operations are not counted. See per-operator breakdown.",
+      "No large Chrome trace is retained."
+    ]
+  },
+  "model_size": {
+    "parameters": 17945453,
+    "parameter_bytes": 71781812,
+    "buffers": 6,
+    "groups": {
+      "view_embedding": 256,
+      "backbone": 14981520,
+      "laterals": 154112,
+      "spatial": 147840,
+      "mask_head": 129,
+      "heatmap_head": 645,
+      "camera": 17792,
+      "fusion": 264960,
+      "temporal": 296448,
+      "rotation_heads": 134668,
+      "depth_heads": 197634,
+      "guided_regions": 298624,
+      "guided_pose_pool": 98688,
+      "foreground_parts_net": 1352137
+    },
+    "state_bytes": 71781836,
+    "raw_pair_bytes": 5529600,
+    "network_input_bytes": 5529600,
+    "output_bytes": 68,
+    "hidden_state_bytes": 6144
+  },
+  "display_validation": {
+    "passed": true,
+    "categories": 7,
+    "geometry_max_abs_difference": 1.4210854715202004e-14,
+    "frame_id_timestamp_pixel_invariant": true,
+    "production_diagnostic_canvas_equal": true,
+    "output_shape": [
+      720,
+      2560,
+      3
+    ],
+    "vector_definitions": {
+      "shaft": "d, unit direction",
+      "jaw1": "J1-H1, mm",
+      "jaw2": "J2-H2, mm"
+    },
+    "coordinate_frame": "each corresponding camera optical frame",
+    "draw_only_timed_pairs": 210,
+    "draw_only_mean_ms": 5.132693657142856,
+    "paint_cpu_ms": {
+      "rounded_panels": 1.5194298142857152,
+      "arrows": 2.905446857142857,
+      "numeric_text": 0.07412668095238095
+    },
+    "example_vectors": {
+      "left": {
+        "d_unit": [
+          -0.4433925994710173,
+          -0.29479038733795887,
+          0.8464641931395975
+        ],
+        "J1_minus_H1_mm": [
+          -5.960164336393738,
+          5.658600334691436,
+          5.066317612161782
+        ],
+        "J2_minus_H2_mm": [
+          -4.922526024849205,
+          -3.184414365826469,
+          7.6706730831881345
+        ]
+      },
+      "right": {
+        "d_unit": [
+          -0.4125978052664072,
+          -0.30086447565855545,
+          0.8597927764153674
+        ],
+        "J1_minus_H1_mm": [
+          -5.732668500830972,
+          5.638711571108442,
+          5.3434384519070335
+        ],
+        "J2_minus_H2_mm": [
+          -4.645615913844246,
+          -3.2347958176227687,
+          7.820826789225947
+        ]
+      }
+    },
+    "note": "CPU-only drawing timing is separate from end-to-end inference. No simulation rendering."
+  },
+  "measurement_note": "Network stages/operator profile measured the same unchanged model before display simplification; current_end_to_end uses vectors-only display. Intrusive profiler timings are not used as deployment wall latency."
+}

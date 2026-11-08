@@ -7,7 +7,7 @@
 - [环境、数据和推理接口](docs/REPRODUCING.md)。
 - [C++ 实时绘图、编译和性能验证](docs/NATIVE_OVERLAY.md)。
 - [4060 推理环境与单对双目端到端计时](docs/REALTIME_BENCHMARK.md)。
-- [LibTorch直接推理、GPU预处理与原版对照](docs/LIBTORCH_INFERENCE.md)：4060完整双目流程实测均值31.02Hz（含C++投影绘图）。
+- [LibTorch直接推理、GPU预处理及资源审计](docs/LIBTORCH_INFERENCE.md)：4060工作区三向量显示模式实测均值31.96Hz，含数值、箭头、面板及投影；提供分模块耗时、资源统计及对应代码版本范围。
 - [验证方法及统计口径](docs/VALIDATION_PROTOCOL.md)。
 - [论文与实现来源](docs/SOURCES.md)。
 - [历史结构源码和复现实验](experiments/README.md)。
