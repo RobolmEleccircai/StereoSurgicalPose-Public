@@ -11,8 +11,10 @@ extern "C" {
 #endif
 /* One handle per stream. A handle must not be called concurrently.
  * Configuration: JSON {model: USD-derived model, calibration:
- * {image,left,right}}. Images are RGB uint8, with positive row strides; caller
- * owns output memory. Output is (2*width) x (height+50). Buffers must not
+ * {image,left,right}, display_mode: "full"|"vectors"}. Missing mode defaults
+ * to full for native legacy callers. RGB uint8, positive row strides; caller
+ * owns output memory. Output is (2*width) x (height+50) in full mode, or
+ * (2*width) x height in vectors mode (ABI 2). Buffers must not
  * overlap. Pose: C_L[3], q_L_xyzw[4], C_R[3], q_R_xyzw[4], pitch,yaw,jaw_half
  * [rad]. Visibility order L1,L2,R1,R2: -1 unknown, 1 visible, 2 tissue, 3 self,
  * 4 other. Out-of-frame status is recomputed. Nonzero replay means ground-truth
@@ -32,6 +34,12 @@ SD_API int sd_render(void *handle, const double *values17, const uint8_t *left,
 SD_API const char *sd_inspect(void *handle, int detailed_geometry);
 SD_API const char *sd_last_error(void);
 SD_API int sd_abi_version(void);
+#ifdef STEREO_PROFILE_RANGES
+/* Diagnostic build only: compute/project, visibility, canvas copy, left/right
+ * panel drawing. Milliseconds; read after successful sd_render. */
+SD_API int sd_profile_last(void *handle, double *milliseconds5);
+SD_API int sd_profile_paint(void *handle, double *milliseconds3);
+#endif
 #ifdef __cplusplus
 }
 #endif

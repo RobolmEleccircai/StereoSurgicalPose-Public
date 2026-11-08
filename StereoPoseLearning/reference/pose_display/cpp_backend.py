@@ -15,7 +15,9 @@ from .pipeline import find_font
 
 class CppStereoOverlay:
     def __init__(self, instrument_model, calibration, font=None, *, library=None,
-                 geometry_log=False):
+                 geometry_log=False, display_mode='vectors'):
+        if display_mode not in ('vectors','full'): raise ValueError('Invalid display mode')
+        self.display_mode=display_mode
         native = Path(__file__).parent / 'native'
         path = Path(library or os.environ.get('SURGICAL_OVERLAY_LIBRARY',
                     str(native / 'build' / 'libsurgical_overlay.so')))
@@ -23,7 +25,7 @@ class CppStereoOverlay:
             raise FileNotFoundError(f'Build the C++ renderer first; library missing: {path}')
         self._lib = lib = ct.CDLL(str(path.resolve()))
         lib.sd_abi_version.restype = ct.c_int
-        if lib.sd_abi_version() != 1:
+        if lib.sd_abi_version() != 2:
             raise RuntimeError('Incompatible C++ overlay ABI')
         lib.sd_create.argtypes = [ct.c_char_p, ct.c_char_p]; lib.sd_create.restype = ct.c_void_p
         lib.sd_destroy.argtypes = [ct.c_void_p]; lib.sd_destroy.restype = None
@@ -35,8 +37,10 @@ class CppStereoOverlay:
         lib.sd_render.restype = ct.c_int
         lib.sd_inspect.argtypes = [ct.c_void_p, ct.c_int]; lib.sd_inspect.restype = ct.c_char_p
         self.width = int(calibration['image']['width']); self.height = int(calibration['image']['height'])
+        self.header_height=0 if display_mode=='vectors' else 50
+        self.canvas_shape=(self.height+self.header_height,self.width*2,3)
         self.font = find_font(font)
-        config = json.dumps({'model': instrument_model, 'calibration': calibration}, allow_nan=False)
+        config = json.dumps({'model': instrument_model, 'calibration': calibration,'display_mode':display_mode}, allow_nan=False)
         self._handle = lib.sd_create(config.encode(), self.font.encode())
         if not self._handle:
             raise ValueError(self._error())
@@ -79,8 +83,8 @@ class CppStereoOverlay:
                 a = np.ascontiguousarray(a)
             images.append(a)
         if out is None:
-            out = np.empty((self.height + 50, 2 * self.width, 3), dtype=np.uint8)
-        if (not isinstance(out, np.ndarray) or out.shape != (self.height + 50, 2 * self.width, 3)
+            out = np.empty(self.canvas_shape, dtype=np.uint8)
+        if (not isinstance(out, np.ndarray) or out.shape != self.canvas_shape
                 or out.dtype != np.uint8 or not out.flags.c_contiguous or not out.flags.writeable):
             raise ValueError('Output must be a writable contiguous RGB stereo canvas')
         if any(np.shares_memory(out, a) for a in images):
@@ -142,6 +146,7 @@ class CppStereoOverlay:
         meta = {'frame_id': frame.frame_id, 'timestamp_ns': frame.timestamp_ns,
             'source': prediction.source, 'visibility_source': prediction.visibility_source,
             'valid': True, 'values17': values.tolist(), 'backend': 'cpp',
+            'display_mode': self.display_mode,
             'geometry_schema': 'native_v1', 'postprocess_ms': (time.perf_counter() - start) * 1000}
         if projection is not None:
             meta['projection_results'] = projection
@@ -155,7 +160,7 @@ class CppStereoOverlay:
         from .renderer import font_cached
         images, out = self._images(frame)
         out[:] = (70, 24, 32)
-        out[50:, :self.width] = images[0]; out[50:, self.width:] = images[1]
+        out[self.header_height:, :self.width] = images[0]; out[self.header_height:, self.width:] = images[1]
         canvas = Image.fromarray(out)
         ImageDraw.Draw(canvas).text((16, 10), '无有效预测 / NO VALID PREDICTION: ' + str(reason)[:110],
                                    font=font_cached(self.font, 25), fill='white')

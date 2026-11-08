@@ -11,8 +11,25 @@
 #include <stdexcept>
 #include <string>
 #include <vector>
+#ifdef STEREO_PROFILE_RANGES
+#include <chrono>
+#define SD_TICK(I) { auto now=std::chrono::steady_clock::now(); timing[I]=std::chrono::duration<double,std::milli>(now-tick).count(); tick=now; }
+#else
+#define SD_TICK(I)
+#endif
 
 namespace {
+#ifdef STEREO_PROFILE_RANGES
+thread_local std::array<double,3> paint_time{};
+struct PaintTimer {
+  int index;std::chrono::steady_clock::time_point start;
+  explicit PaintTimer(int i):index(i),start(std::chrono::steady_clock::now()){}
+  ~PaintTimer(){paint_time[index]+=std::chrono::duration<double,std::milli>(std::chrono::steady_clock::now()-start).count();}
+};
+#define PAINT_TIMER(I) PaintTimer paint_timer(I)
+#else
+#define PAINT_TIMER(I)
+#endif
 using V3 = cv::Vec3d;
 using M3 = cv::Matx33d;
 using M4 = cv::Matx44d;
@@ -193,6 +210,7 @@ public:
   }
   void ascii(cv::Mat &dst, const std::string &s, P at, int height,
              cv::Scalar color) {
+    PAINT_TIMER(2);
     const int baseline = tile("国Ag", height).height;
     for (unsigned char c : s) {
       std::string glyph(1, (c >= 32 && c < 127) ? c : '?');
@@ -208,6 +226,7 @@ void segment(cv::Mat &im, P a, P b, cv::Scalar color, int width) {
 }
 void arrow(cv::Mat &im, const Line &raw, P offset, cv::Scalar color, int width,
            bool broken = false, double head = 19) {
+  PAINT_TIMER(1);
   std::array<cv::Point, 61> pts;
   for (int i = 0; i < 61; ++i)
     pts[i] = ip(raw[i] + offset);
@@ -240,6 +259,7 @@ void arrow(cv::Mat &im, const Line &raw, P offset, cv::Scalar color, int width,
 double overlap(cv::Rect2d a, cv::Rect2d b) { return (a & b).area(); }
 void rounded(cv::Mat &dst, cv::Rect r, int radius, cv::Scalar fill,
              cv::Scalar border, int width, double alpha = 1) {
+  PAINT_TIMER(0);
   // Only the small panel is blended. No full-frame temporary images.
   cv::Rect clip = r & cv::Rect(0, 0, dst.cols, dst.rows);
   if (clip.empty())
@@ -279,6 +299,11 @@ void rounded(cv::Mat &dst, cv::Rect r, int radius, cv::Scalar fill,
   }
 }
 struct Overlay {
+  bool vectors_only=false;
+#ifdef STEREO_PROFILE_RANGES
+  std::array<double,5> timing{};
+  std::array<double,3> paint_timing{};
+#endif
   int w, h;
   std::string shaft;
   std::vector<Joint> joints;
@@ -293,6 +318,9 @@ struct Overlay {
     cv::FileStorage fs(cfg, cv::FileStorage::READ | cv::FileStorage::MEMORY |
                                 cv::FileStorage::FORMAT_JSON);
     require(fs.isOpened(), "Cannot parse configuration");
+    std::string mode=fs["display_mode"].empty()?"full":(std::string)fs["display_mode"];
+    require(mode=="full" || mode=="vectors","Invalid display mode");
+    vectors_only=mode=="vectors";
     auto m = fs["model"], cal = fs["calibration"];
     require((std::string)cal["image"]["space"] == "raw_distorted",
             "Expected raw_distorted camera profile");
@@ -438,8 +466,33 @@ struct Overlay {
     }
     valid = true;
   }
+  void vector_panel(cv::Mat im,int e) {
+    const auto &g=eyes[e];
+    arrow(im,g.main[2],{0,0},ORANGE,6,g.vis[1]!=1,21);
+    arrow(im,g.main[1],{0,0},BLUE,3,g.vis[0]!=1,14);
+    arrow(im,g.main[0],{0,0},YELLOW,3);
+    std::array<cv::Rect,3> rects={cv::Rect(16,h-252,280,240),
+                                cv::Rect(16,12,280,240),cv::Rect(w-296,12,280,240)};
+    for(int f=0;f<3;++f) {
+      auto r=rects[f];const auto &fr=g.frames[f];
+      auto border=f==0?YELLOW:f==1?BLUE:ORANGE;
+      rounded(im,r,9,cv::Scalar(17,29,42),border,2,102./255.);
+      P origin(r.x+r.width/2.,r.y+106);
+      P offset=origin-camera[e].project(fr.origin);
+      for(int a=0;a<3;++a) arrow(im,fr.axes[a].line,offset,XYZ[a],3,false,10);
+      text.ascii(im,f==0?"d [unit]":f==1?"J1-H1 [mm]":"J2-H2 [mm]",
+                 {r.x+14.,r.y+10.},20,border);
+      V3 value=f==0?g.d:g.j[f-1]-g.h[f-1];
+      for(int a=0;a<3;++a) {
+        std::ostringstream s;s<<"XYZ"[a]<<" "<<std::showpos<<std::fixed
+                              <<std::setprecision(f==0?4:3)<<value[a];
+        text.ascii(im,s.str(),{r.x+18.,r.y+169.+21*a},17,XYZ[a]);
+      }
+    }
+  }
   void panel(cv::Mat im, int e, const std::string &fid, int64_t timestamp,
              bool replay) {
+    if(vectors_only) { vector_panel(im,e); return; }
     auto &g = eyes[e];
     const auto &cam = camera[e];
     P base(0, HEADER);
@@ -584,7 +637,12 @@ struct Overlay {
     valid = false;
     require(l && r && out && fid && visibility, "Null frame buffer");
     require(ls >= w * 3 && rs >= w * 3 && os >= w * 6, "Invalid image stride");
+#ifdef STEREO_PROFILE_RANGES
+    auto tick=std::chrono::steady_clock::now();
+    paint_time.fill(0);
+#endif
     compute(v);
+    SD_TICK(0);
     for (int e = 0; e < 2; ++e)
       for (int j = 0; j < 2; ++j) {
         int vis = visibility[e * 2 + j];
@@ -593,14 +651,22 @@ struct Overlay {
         eyes[e].vis[j] =
             (uv.x >= 0 && uv.x < w && uv.y >= 0 && uv.y < h) ? vis : 0;
       }
-    cv::Mat canvas(h + HEADER, w * 2, CV_8UC3, out, os);
-    canvas.rowRange(0, HEADER).setTo(BG);
+    SD_TICK(1);
+    const int header=vectors_only?0:HEADER;
+    cv::Mat canvas(h + header, w * 2, CV_8UC3, out, os);
+    if(header) canvas.rowRange(0, header).setTo(BG);
     cv::Mat(h, w, CV_8UC3, const_cast<uint8_t *>(l), ls)
-        .copyTo(canvas(cv::Rect(0, HEADER, w, h)));
+        .copyTo(canvas(cv::Rect(0, header, w, h)));
     cv::Mat(h, w, CV_8UC3, const_cast<uint8_t *>(r), rs)
-        .copyTo(canvas(cv::Rect(w, HEADER, w, h)));
-    for (int e = 0; e < 2; ++e)
-      panel(canvas(cv::Rect(e * w, 0, w, h + HEADER)), e, fid, stamp, replay);
+        .copyTo(canvas(cv::Rect(w, header, w, h)));
+    SD_TICK(2);
+    for (int e = 0; e < 2; ++e) {
+      panel(canvas(cv::Rect(e * w, 0, w, h + header)), e, fid, stamp, replay);
+      SD_TICK(3+e);
+    }
+#ifdef STEREO_PROFILE_RANGES
+    paint_timing=paint_time;
+#endif
   }
   static void vjson(std::ostream &s, const V3 &v) {
     s << '[' << v[0] << ',' << v[1] << ',' << v[2] << ']';
@@ -748,5 +814,17 @@ const char *sd_inspect(void *h, int detail) {
   }
 }
 const char *sd_last_error() { return last_error.c_str(); }
-int sd_abi_version() { return 1; }
+int sd_abi_version() { return 2; }
+#ifdef STEREO_PROFILE_RANGES
+int sd_profile_last(void *h,double *out) {
+  if(!h || !out || !static_cast<Overlay*>(h)->valid) return -1;
+  std::copy(static_cast<Overlay*>(h)->timing.begin(),static_cast<Overlay*>(h)->timing.end(),out);
+  return 0;
+}
+int sd_profile_paint(void *h,double *out) {
+  if(!h || !out || !static_cast<Overlay*>(h)->valid) return -1;
+  std::copy(static_cast<Overlay*>(h)->paint_timing.begin(),static_cast<Overlay*>(h)->paint_timing.end(),out);
+  return 0;
+}
+#endif
 }

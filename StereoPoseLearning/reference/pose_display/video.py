@@ -17,6 +17,7 @@ def main():
     p.add_argument('--predictor-config', type=Path)
     p.add_argument('--font'); p.add_argument('--show', action='store_true')
     p.add_argument('--backend', choices=('cpp', 'python'), default='cpp')
+    p.add_argument('--display-mode',choices=('vectors','full'),default='vectors')
     p.add_argument('--geometry-log', action='store_true', help='Save all projected polyline samples; larger per-frame logs')
     p.add_argument('--start-time-ns', type=int, default=0)
     a = p.parse_args(); a.output.mkdir(parents=True, exist_ok=True)
@@ -28,8 +29,8 @@ def main():
     predict = getattr(importlib.import_module(module), factory)(config)
     if a.backend == 'cpp':
         from .cpp_backend import CppStereoOverlay
-        overlay = CppStereoOverlay(model, calibration, a.font, geometry_log=a.geometry_log)
-        canvas_buffer = np.empty((overlay.height+50, overlay.width*2, 3), np.uint8)
+        overlay = CppStereoOverlay(model, calibration, a.font, geometry_log=a.geometry_log,display_mode=a.display_mode)
+        canvas_buffer = np.empty(overlay.canvas_shape, np.uint8)
     else:
         overlay = StereoOverlay(model, calibration, a.font, compact=True)
     for name, value in [('instrument_model', model), ('calibration', calibration)]:
@@ -85,6 +86,7 @@ def main():
         if not valid_video: raise ValueError('Encoded video frame count/rate mismatch')
         report = {'completed': not interrupted, 'frames': count, 'input_fps': fps, 'sources': sorted(sources),
             'overlay_backend': a.backend,
+            'display_mode': a.display_mode if a.backend=='cpp' else 'full',
             'failed_frames': failures, 'passed': not failures and not interrupted,
             'mean_predictor_and_overlay_ms': sum(timings)/len(timings),
             'mean_processing_ms_including_decode_log_encode': sum(processing_times)/len(processing_times),

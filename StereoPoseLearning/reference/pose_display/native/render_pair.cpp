@@ -41,7 +41,8 @@ int main(int argc, char **argv) {
         sd_create(config.c_str(), argv[2]), sd_destroy);
     if (!renderer)
       throw std::runtime_error(sd_last_error());
-    cv::Mat output(h + 50, 2 * w, CV_8UC3);
+    int header=!cfg["display_mode"].empty() && (std::string)cfg["display_mode"]=="vectors"?0:50;
+    cv::Mat output(h + header, 2 * w, CV_8UC3);
     int visibility[4] = {-1, -1, -1, -1};
     if (sd_render(renderer.get(), values, left.data, left.step, right.data,
                   right.step, output.data, output.step, visibility,

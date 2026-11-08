@@ -58,7 +58,7 @@ def main():
         images = [np.asarray(Image.open(r['image_paths'][e]).convert('RGB')) for e in ('left', 'right')]
         cameras = {'image': {'width': images[0].shape[1], 'height': images[0].shape[0], 'space': 'raw_distorted'}}
         for e in ('left', 'right'): cameras[e] = {k: label['eyes'][e][k] for k in ('K', 'D')}
-        native = CppStereoOverlay(model, cameras, a.font)
+        native = CppStereoOverlay(model, cameras, a.font,display_mode='full')
         legacy = StereoOverlay(model, cameras, a.font, compact=True)
         cases.append((row, images, cameras, native, legacy))
     digests = [hashlib.sha256(im.tobytes()).hexdigest() for _, images, *_ in cases for im in images]
