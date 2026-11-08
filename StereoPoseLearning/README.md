@@ -5,6 +5,9 @@
 - [逐步架构探索记录](docs/ARCHITECTURE_EXPLORATION.md)：问题、假设、改动、受控实验、结果与未解决项。
 - [当前结构、17 个输出及损失](docs/ARCHITECTURE.md)。
 - [环境、数据和推理接口](docs/REPRODUCING.md)。
+- [C++ 实时绘图、编译和性能验证](docs/NATIVE_OVERLAY.md)。
+- [4060 推理环境与单对双目端到端计时](docs/REALTIME_BENCHMARK.md)。
+- [LibTorch直接推理、GPU预处理与原版对照](docs/LIBTORCH_INFERENCE.md)：4060完整双目流程实测均值31.02Hz（含C++投影绘图）。
 - [验证方法及统计口径](docs/VALIDATION_PROTOCOL.md)。
 - [论文与实现来源](docs/SOURCES.md)。
 - [历史结构源码和复现实验](experiments/README.md)。
@@ -18,7 +21,7 @@
 ```text
 stereo_pose/              当前网络、数据、损失、训练、推理与运动学
 assets/                  固定器械尺寸、关节链与尖端定义
-reference/pose_display/  独立 NumPy 解码及已确认的箭头/XYZ 显示接口
+reference/pose_display/  C++ 实时绘图、NumPy 对照和箭头/XYZ 显示接口
 configs/default.json     当前模型与训练配置模板
 experiments/stages/      五个历史结构的源码、配置模板及文件哈希
 requirements*.txt        依赖与已验证 Linux CUDA 环境锁定
