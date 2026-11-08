@@ -4,17 +4,28 @@
 #include <map>
 #include <string>
 #include <tuple>
+#include <memory>
+#ifdef STEREO_WITH_TENSORRT
+#include "trt_visual.h"
+#endif
 
-// Eager LibTorch forward, matching StereoPoseNet. No serialized graph/runtime.
+// Eager LibTorch forward matching StereoPoseNet. The optional TensorRT build
+// replaces only the visual frontend, keeping all downstream formulas intact.
 using TensorMap = std::map<std::string, at::Tensor>;
 using NumericConfig = std::map<std::string, double>;
 class StereoNet {
  public:
   StereoNet(const TensorMap& state, const NumericConfig& config);
+#ifdef STEREO_WITH_TENSORRT
+  void load_visual_engine(const std::string& path);
+#endif
   std::tuple<at::Tensor, at::Tensor, TensorMap> forward(
       const at::Tensor& images, const at::Tensor& K, const at::Tensor& D,
       const at::Tensor& hidden, const at::Tensor& hires, bool debug=false);
  private:
+#ifdef STEREO_WITH_TENSORRT
+  std::unique_ptr<TrtVisual> visual_engine_;
+#endif
   TensorMap weights_;
   NumericConfig config_;
   std::map<std::string, torch::nn::GRU> recurrent_;

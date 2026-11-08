@@ -1,4 +1,4 @@
-"""Original checkpoint with eager C++ LibTorch inference and CUDA preprocessing."""
+"""C++ LibTorch inference, CUDA preprocessing and an optional TensorRT frontend."""
 import importlib
 import json
 import math
@@ -11,16 +11,20 @@ from .data import resize_intrinsics
 
 
 class LibTorchModel(torch.nn.Module):
-    def __init__(self, state, config):
+    def __init__(self, state, config, visual_engine=None):
         super().__init__()
         if config.get('backbone') != 'convnextv2_nano.fcmae_ft_in22k_in1k' or config.get('c_translation_head') != 'landmark_ray_depth_v1':
             raise ValueError('This C++ definition implements the current ConvNeXtV2 Nano / unified-C model')
         sys.path.insert(0,str(Path(__file__).resolve().parents[1]/'native/libtorch/build'))
-        native=importlib.import_module('stereo_libtorch')
+        if visual_engine is not None:
+            sys.path.insert(0,str(Path(__file__).resolve().parents[1]/'native/libtorch/build/tensorrt'))
+        native=importlib.import_module('stereo_libtorch_trt' if visual_engine is not None else 'stereo_libtorch')
         numeric={k:float(v) for k,v in config.items() if isinstance(v,(int,float,bool))}
         # Transfer the original state_dict tensors directly once at startup.
-        # No exported graph, converted model or second weight file is created.
+        # The default stays eager. An explicitly selected TensorRT engine only
+        # replaces the visual frontend in the separately compiled native module.
         self.engine=native.StereoNet(dict(state),numeric)
+        if visual_engine is not None:self.engine.load_visual_engine(str(visual_engine))
 
     def forward(self, images, K, D, hidden=None, hires_images=None):
         if hidden is None: hidden=torch.zeros((3,2,256),device=images.device,dtype=torch.float32)
@@ -33,7 +37,7 @@ class LibTorchModel(torch.nn.Module):
 
 
 class LibTorchPredictor(StereoPredictor):
-    def __init__(self, checkpoint, *, fps=60.0, preprocessing='gpu'):
+    def __init__(self, checkpoint, *, fps=60.0, preprocessing='gpu', visual_engine=None):
         if preprocessing not in ('cpu','gpu'): raise ValueError('preprocessing must be cpu or gpu')
         self.checkpoint_path=Path(checkpoint).expanduser().resolve()
         data=torch.load(self.checkpoint_path,map_location='cpu',weights_only=True)
@@ -43,7 +47,17 @@ class LibTorchPredictor(StereoPredictor):
         self.training_config=data['config']; self.instrument_model=data['instrument_model']
         self.epoch=int(data['epoch']); self.image_size=tuple(self.training_config['image_size'])
         self.period_ns=1e9/fps; self.device=torch.device('cuda:0')
-        self.model=LibTorchModel(data['model'],self.training_config['model'])
+        self.visual_engine=None
+        if visual_engine is not None:
+            import hashlib
+            visual_engine=Path(visual_engine).expanduser().resolve()
+            metadata=json.loads(visual_engine.with_suffix('.json').read_text())
+            def sha(path):
+                with Path(path).open('rb') as stream:return hashlib.file_digest(stream,'sha256').hexdigest()
+            if sha(self.checkpoint_path)!=metadata['checkpoint_sha256'] or sha(visual_engine)!=metadata['engine_sha256']:
+                raise ValueError('TensorRT engine/checkpoint provenance mismatch')
+            self.visual_engine=metadata
+        self.model=LibTorchModel(data['model'],self.training_config['model'],visual_engine)
         self.preprocessing=preprocessing
         if preprocessing=='gpu':
             if self.image_size!=(360,640): raise ValueError('GPU preprocessing expects a 640x360 network input')
@@ -94,4 +108,8 @@ class LibTorchPredictor(StereoPredictor):
 def build_predictor(config):
     path=Path(config['checkpoint']).expanduser()
     if not path.is_absolute(): path=Path(config.get('_config_dir','.'))/path
-    return LibTorchPredictor(path,fps=float(config.get('fps',60)),preprocessing=config.get('preprocessing','gpu'))
+    engine=config.get('visual_engine')
+    if engine is not None:
+        engine=Path(engine).expanduser()
+        if not engine.is_absolute():engine=Path(config.get('_config_dir','.'))/engine
+    return LibTorchPredictor(path,fps=float(config.get('fps',60)),preprocessing=config.get('preprocessing','gpu'),visual_engine=engine)

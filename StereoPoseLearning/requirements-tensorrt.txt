@@ -1,0 +1,7 @@
+# Optional inference/build dependencies, in addition to the existing 4060 lock.
+# Keep NumPy unchanged; a newer ml_dtypes otherwise upgrades it unnecessarily.
+numpy==1.26.4
+ml_dtypes==0.5.3
+onnx==1.19.1
+protobuf==7.36.2
+tensorrt-cu12==10.13.3.9

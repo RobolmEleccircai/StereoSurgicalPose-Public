@@ -1,4 +1,5 @@
 #include "model.h"
+#include "profile_ranges.h"
 #include <ATen/TensorIndexing.h>
 #include <c10/core/InferenceMode.h>
 #include <limits>
@@ -70,6 +71,11 @@ T position(const T& uv,const T& z,const T& K,const T& D) {
 }
 
 const T& StereoNet::w(const std::string& name) const {return weights_.at(name);}
+#ifdef STEREO_WITH_TENSORRT
+void StereoNet::load_visual_engine(const std::string& path) {
+  visual_engine_=std::make_unique<TrtVisual>(path);
+}
+#endif
 double StereoNet::cfg(const std::string& name,double fallback) const {
   auto p=config_.find(name); return p==config_.end()?fallback:p->second;
 }
@@ -183,9 +189,21 @@ std::tuple<T,T,TensorMap> StereoNet::forward(const T& images,const T& K,const T&
   TORCH_CHECK(hires.sizes()==at::IntArrayRef({1,1,2,3,720,1280}) && hires.scalar_type()==at::kByte,"Expected uint8 native 720p input");
   TORCH_CHECK(hidden.sizes()==at::IntArrayRef({3,2,256}),"Expected three recurrent states");
   TensorMap detail;
+  ProfileStages profile;
+  T spatial,mask,heat;
+#ifdef STEREO_WITH_TENSORRT
+  if(visual_engine_) {
+    profile.next("stage::tensorrt_visual");
+    std::tie(spatial,mask,heat)=visual_engine_->forward(images.reshape({2,3,360,640}).contiguous());
+  } else
+#endif
+  {
+  profile.next("stage::backbone_stem");
   auto x=ln2(conv(images.reshape({2,3,360,640}),"backbone.stem_0",4),"backbone.stem_1");
   V maps; const int depths[]={2,2,8,2};
   for(int stage=0;stage<4;++stage) {
+    const char* names[]={"stage::backbone_0","stage::backbone_1","stage::backbone_2","stage::backbone_3"};
+    profile.next(names[stage]);
     auto p="backbone.stages_"+std::to_string(stage);
     if(stage) x=conv(ln2(x,p+".downsample.0"),p+".downsample.1",2);
     for(int block=0;block<depths[stage];++block) {
@@ -198,14 +216,18 @@ std::tuple<T,T,TensorMap> StereoNet::forward(const T& images,const T& K,const T&
     }
     maps.push_back(x); if(debug) detail["backbone_"+std::to_string(stage)]=x;
   }
+  profile.next("stage::fpn_mask_keypoints");
   T pyramid;
   for(int i=3;i>=0;--i) {
     auto projected=conv(maps[i],"laterals."+std::to_string(i));
     pyramid=i==3?projected:projected+resize(pyramid.to(at::kFloat),projected.size(2),projected.size(3));
   }
-  auto spatial=at::gelu(gn(conv(pyramid,"spatial.0",1,1),"spatial.1"));
-  auto mask=conv(spatial,"mask_head"),heat=conv(spatial,"heatmap_head");
+  spatial=at::gelu(gn(conv(pyramid,"spatial.0",1,1),"spatial.1"));
+  mask=conv(spatial,"mask_head");heat=conv(spatial,"heatmap_head");
+  }
+  profile.next("stage::guided_roi_features");
   auto region=guided(spatial,mask,heat); auto tokens=std::get<0>(region),uv=std::get<1>(region),confidence=std::get<2>(region);
+  profile.next("stage::cross_view_attention");
   auto camera=at::cat({at::stack({K.index({Ellipsis,0,0})/640,K.index({Ellipsis,1,1})/360,
        K.index({Ellipsis,0,2})/640,K.index({Ellipsis,1,2})/360},-1),D},-1);
   tokens=tokens.reshape({1,2,6,128})+mlp(camera.reshape({1,2,9}),"camera").unsqueeze(2);
@@ -218,6 +240,7 @@ std::tuple<T,T,TensorMap> StereoNet::forward(const T& images,const T& K,const T&
     auto ffn=[&](const T& v){return linear(at::gelu(linear(ln(v,p+".ffn.0"),p+".ffn.1")),p+".ffn.3");};
     tokens=at::stack({left+ffn(left),right+ffn(right)},1);
   }
+  profile.next("stage::body_gru_pose_heads");
   auto pooled=at::gelu(ln(linear(tokens.flatten(-2),"guided_pose_pool.0"),"guided_pose_pool.1")).reshape({1,1,2,128});
   auto Ctoken=tokens.select(2,1).reshape({1,1,2,128});
   auto body=recurrent_.at("temporal")->forward(pooled.permute({0,2,1,3}).reshape({2,1,128}),hidden.slice(0,0,1));
@@ -229,7 +252,9 @@ std::tuple<T,T,TensorMap> StereoNet::forward(const T& images,const T& K,const T&
   }
   auto R=rotation(at::stack(rots,2));
   auto z=at::softplus(at::stack(depths_raw,2))*cfg("depth_scale_mm",100)+.001;
+  profile.next("stage::C_ray_undistortion");
   auto alluv=uv.reshape({1,1,2,5,2}),Cuv=alluv.select(3,0),C=position(Cuv,z,K,D);
+  profile.next("stage::hires_mask_crop");
   // Original two foreground-masked local crops, with unchanged interpolation.
   auto hinge=uv.slice(1,1,3).mean(1,true);
   V selected={at::cat({uv.slice(1,0,1),hinge,uv.slice(1,3,5)},1),at::cat({hinge,uv.slice(1,3,5)},1)};
@@ -261,11 +286,13 @@ std::tuple<T,T,TensorMap> StereoNet::forward(const T& images,const T& K,const T&
   auto boxmeta=at::cat({(centre+.5)/divisor,extent/divisor},-1);
   auto conf=confidence.mean(-1); V logits,heats,nextlocal;
   for(int i=0;i<2;++i) {
+    profile.next(i==0?"stage::wrist_branch":"stage::jaw_branch");
     auto meta=at::cat({camera.reshape({2,9}),boxmeta.select(1,i),observed.select(1,i).unsqueeze(-1),conf.unsqueeze(-1)},-1);
     auto p=std::string("foreground_parts_net.")+(i==0?"wrist_branch":"jaw_branch");
     auto branch=local_branch(crop.select(1,i).contiguous(),meta,hidden.slice(0,i+1,i+2),p);
     logits.push_back(std::get<0>(branch));heats.push_back(std::get<1>(branch));nextlocal.push_back(std::get<2>(branch));
   }
+  profile.next("stage::pack_values17");
   auto joint=w("joint_lower")+(w("joint_upper")-w("joint_lower"))*at::cat(logits,-1).sigmoid();
   auto q=quaternion(R); auto values=at::cat({at::cat({C,q},-1).flatten(-2),joint},-1);
   auto next=at::cat({std::get<1>(body),at::cat(nextlocal,0)},0);

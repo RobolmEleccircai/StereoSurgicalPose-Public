@@ -1,4 +1,5 @@
 #include "preprocess.h"
+#include "profile_ranges.h"
 #include <cmath>
 
 namespace {
@@ -56,10 +57,17 @@ std::tuple<torch::Tensor,torch::Tensor,torch::Tensor> StereoPreprocess::run() {
     torch::InferenceMode guard;
     // Caller owns the single in-flight frame and must not overwrite host_input
     // until its preceding CUDA work has completed (also on exceptional paths).
+    ProfileStages profile;
+    profile.next("stage::upload_rgb");
     raw_.copy_(host_,true);
-    auto small=pass(pass(raw_,2,x_indices_,x_weights_),1,y_indices_,y_weights_);
+    profile.next("stage::resize_horizontal");
+    auto horizontal=pass(raw_,2,x_indices_,x_weights_);
+    profile.next("stage::resize_vertical");
+    auto small=pass(horizontal,1,y_indices_,y_weights_);
+    horizontal=torch::Tensor();
     // Lookup on GPU preserves NumPy FP32 divide/subtract/divide rounding for
     // every possible uint8 RGB value, without uploading normalized images.
+    profile.next("stage::normalize_layout");
     auto lookup=small.to(torch::kInt64).mul_(3).add_(channels_);
     auto normalized=lut_.index_select(0,lookup.reshape({-1})).view({2,360,640,3});
     auto images=normalized.permute({0,3,1,2}).unsqueeze(0).unsqueeze(0);
