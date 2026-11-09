@@ -135,7 +135,9 @@ def main():
     result={'completed':True,'passed_numerical_tolerances':bool(passed),'pairs':len(rows),
         'categories':len(previews),'engine':accelerated.visual_engine,
         'baseline_execution':original.execution_mode,'candidate_execution':accelerated.execution_mode,
-        'baseline_engine':original.visual_engine,'summary':summary,'layers':layers,
+        'baseline_engine':original.visual_engine,
+        'actual_candidate_execution':getattr(accelerated.model,'actual_execution','reference'),
+        'graph_error':getattr(accelerated.model,'graph_error',None),'summary':summary,'layers':layers,
         'conversion_limits':limits,'scope':'Difference from original eager C++ FP32 model, not error against ground truth. Independent recurrent state within each sequence. Shared unchanged GPU preprocessing.',
         'preview_layout':'top: original; bottom: TensorRT; each row left/right stereo',
         'previews':previews,'per_category':{c:{k:stats([v for r in rows if r['category']==c for v in r[k]]) for k in

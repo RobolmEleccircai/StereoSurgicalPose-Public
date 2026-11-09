@@ -4,6 +4,7 @@ import json
 import math
 from pathlib import Path
 import sys
+import warnings
 import numpy as np
 import torch
 from .predict import StereoPredictor, _display_api
@@ -23,6 +24,9 @@ class LibTorchModel(torch.nn.Module):
         self.native_module='stereo_libtorch_opt' if execution_mode != 'reference' else ('stereo_libtorch_trt' if visual_engine is not None else 'stereo_libtorch')
         native=importlib.import_module(self.native_module)
         self.execution_mode=execution_mode
+        self.actual_execution=execution_mode
+        self._graph=None
+        self.graph_error=None
         numeric={k:float(v) for k,v in config.items() if isinstance(v,(int,float,bool))}
         # Transfer the original state_dict tensors directly once at startup.
         # The default stays eager. An explicitly selected TensorRT engine only
@@ -32,8 +36,30 @@ class LibTorchModel(torch.nn.Module):
 
     def forward(self, images, K, D, hidden=None, hires_images=None):
         if hidden is None: hidden=torch.zeros((3,2,256),device=images.device,dtype=torch.float32)
-        values,state,_=self.engine.forward(images,K,D,hidden,hires_images,False)
-        return values,state
+        if self.execution_mode!='optimized_graph' or self.graph_error is not None:
+            values,state,_=self.engine.forward(images,K,D,hidden,hires_images,False)
+            return values,state
+        if self._graph is None:
+            try:
+                self._static=[x.clone() for x in (images,K,D,hidden,hires_images)]
+                # Warm with scratch history; the real history is copied only for replay.
+                self._static[3].zero_()
+                for _ in range(3):self.engine.forward(*self._static,False)
+                torch.cuda.current_stream().synchronize()
+                graph=torch.cuda.CUDAGraph()
+                with torch.cuda.graph(graph,stream=torch.cuda.current_stream()):
+                    self._graph_values,self._graph_next,_=self.engine.forward(*self._static,False)
+                self._graph=graph
+            except RuntimeError as exc:
+                self.graph_error=str(exc);self.actual_execution='optimized_eager'
+                self._graph=None
+                warnings.warn('CUDA Graph unavailable; explicit optimized_eager fallback: '+str(exc),RuntimeWarning)
+                values,state,_=self.engine.forward(images,K,D,hidden,hires_images,False)
+                return values,state
+        for target,source in zip(self._static,(images,K,D,hidden,hires_images)):
+            target.copy_(source)
+        self._graph.replay()
+        return self._graph_values,self._graph_next
 
     @staticmethod
     def export_values(values):
@@ -42,7 +68,7 @@ class LibTorchModel(torch.nn.Module):
 
 class LibTorchPredictor(StereoPredictor):
     def __init__(self, checkpoint, *, fps=60.0, preprocessing='gpu', visual_engine=None, execution_mode='reference'):
-        if execution_mode not in ('reference','optimized_eager'):
+        if execution_mode not in ('reference','optimized_eager','optimized_graph'):
             raise ValueError('Unsupported execution_mode')
         if execution_mode!='reference' and preprocessing!='gpu':
             raise ValueError('Optimized execution requires GPU preprocessing')
@@ -81,6 +107,15 @@ class LibTorchPredictor(StereoPredictor):
             self._input_pending=False
             self._calibration_key=None
         self.pipeline=_display_api(); self.reset_count=0; self.reset()
+        self._stream=None
+        if execution_mode=='optimized_graph':
+            self._stream=torch.cuda.Stream(device=self.device)
+            self._stream.wait_stream(torch.cuda.current_stream(self.device))
+
+    def __call__(self, frame, calibration):
+        if self._stream is None:return super().__call__(frame,calibration)
+        with torch.cuda.stream(self._stream):
+            return super().__call__(frame,calibration)
 
     def _preprocess(self, frame, calibration):
         if self.preprocessing=='cpu': return super()._preprocess(frame,calibration)

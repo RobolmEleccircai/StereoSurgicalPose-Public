@@ -1,0 +1,801 @@
+{
+  "performance": {
+    "completed": true,
+    "gpu": "NVIDIA GeForce RTX 4060 Laptop GPU",
+    "gpu_before": "name, driver_version, memory.total [MiB], memory.used [MiB], utilization.gpu [%], power.draw [W], temperature.gpu, clocks.current.sm [MHz], clocks.current.memory [MHz]\nNVIDIA GeForce RTX 4060 Laptop GPU, 580.95.05, 8188 MiB, 128 MiB, 0 %, 1.39 W, 44, 210 MHz, 405 MHz",
+    "gpu_after": "name, driver_version, memory.total [MiB], memory.used [MiB], utilization.gpu [%], power.draw [W], temperature.gpu, clocks.current.sm [MHz], clocks.current.memory [MHz]\nNVIDIA GeForce RTX 4060 Laptop GPU, 580.95.05, 8188 MiB, 791 MiB, 69 %, 55.22 W, 59, 2385 MHz, 8001 MHz",
+    "inference_backend": "libtorch",
+    "execution_mode": "optimized_graph",
+    "actual_execution": "optimized_graph",
+    "graph_error": null,
+    "preprocessing": "gpu",
+    "display_mode": "vectors",
+    "visual_engine": {
+      "schema": "stereo_visual_trt_v1",
+      "checkpoint_sha256": "639fc8c7e56263f4ab889aa53cc5132e3610eea4c8b2d8b0db671c41d8a30325",
+      "engine_sha256": "7b74e39eca0e693f87878cead96e2d15c843c2e0cbf9460347dabd6a96ad1c83",
+      "onnx_sha256": "bfa3b0c5d686a1fecc1fb0aa5dfd58e17202aa2cc847aca0ba870454a6052bb5",
+      "precision": "fp16",
+      "build_seconds": 31.677622777999204,
+      "engine_bytes": 34153076,
+      "tensorrt": "10.13.3.9",
+      "torch": "2.9.1+cu128",
+      "onnx": "1.19.1",
+      "gpu": "NVIDIA GeForce RTX 4060 Laptop GPU",
+      "input_shape": [
+        2,
+        3,
+        360,
+        640
+      ],
+      "outputs": {
+        "spatial": [
+          2,
+          128,
+          90,
+          160
+        ],
+        "mask": [
+          2,
+          1,
+          90,
+          160
+        ],
+        "heat": [
+          2,
+          5,
+          90,
+          160
+        ]
+      },
+      "boundary_dtype": "float32",
+      "tf32": false,
+      "fp16_layers": [
+        "/backbone/stem_0/Conv",
+        "/backbone/stages_0/blocks/blocks.0/conv_dw/Conv",
+        "/backbone/stages_0/blocks/blocks.0/mlp/fc1/Conv",
+        "/backbone/stages_0/blocks/blocks.0/mlp/fc2/Conv",
+        "/backbone/stages_0/blocks/blocks.1/conv_dw/Conv",
+        "/backbone/stages_0/blocks/blocks.1/mlp/fc1/Conv",
+        "/backbone/stages_0/blocks/blocks.1/mlp/fc2/Conv",
+        "/backbone/stages_1/downsample/downsample.1/Conv",
+        "/backbone/stages_1/blocks/blocks.0/conv_dw/Conv",
+        "/backbone/stages_1/blocks/blocks.0/mlp/fc1/Conv",
+        "/backbone/stages_1/blocks/blocks.0/mlp/fc2/Conv",
+        "/backbone/stages_1/blocks/blocks.1/conv_dw/Conv",
+        "/backbone/stages_1/blocks/blocks.1/mlp/fc1/Conv",
+        "/backbone/stages_1/blocks/blocks.1/mlp/fc2/Conv",
+        "/backbone/stages_2/downsample/downsample.1/Conv",
+        "/backbone/stages_2/blocks/blocks.0/conv_dw/Conv",
+        "/backbone/stages_2/blocks/blocks.0/mlp/fc1/Conv",
+        "/backbone/stages_2/blocks/blocks.0/mlp/fc2/Conv",
+        "/backbone/stages_2/blocks/blocks.1/conv_dw/Conv",
+        "/backbone/stages_2/blocks/blocks.1/mlp/fc1/Conv",
+        "/backbone/stages_2/blocks/blocks.1/mlp/fc2/Conv",
+        "/backbone/stages_2/blocks/blocks.2/conv_dw/Conv",
+        "/backbone/stages_2/blocks/blocks.2/mlp/fc1/Conv",
+        "/backbone/stages_2/blocks/blocks.2/mlp/fc2/Conv",
+        "/backbone/stages_2/blocks/blocks.3/conv_dw/Conv",
+        "/backbone/stages_2/blocks/blocks.3/mlp/fc1/Conv",
+        "/backbone/stages_2/blocks/blocks.3/mlp/fc2/Conv",
+        "/backbone/stages_2/blocks/blocks.4/conv_dw/Conv",
+        "/backbone/stages_2/blocks/blocks.4/mlp/fc1/Conv",
+        "/backbone/stages_2/blocks/blocks.4/mlp/fc2/Conv",
+        "/backbone/stages_2/blocks/blocks.5/conv_dw/Conv",
+        "/backbone/stages_2/blocks/blocks.5/mlp/fc1/Conv",
+        "/backbone/stages_2/blocks/blocks.5/mlp/fc2/Conv",
+        "/backbone/stages_2/blocks/blocks.6/conv_dw/Conv",
+        "/backbone/stages_2/blocks/blocks.6/mlp/fc1/Conv",
+        "/backbone/stages_2/blocks/blocks.6/mlp/fc2/Conv",
+        "/backbone/stages_2/blocks/blocks.7/conv_dw/Conv",
+        "/backbone/stages_2/blocks/blocks.7/mlp/fc1/Conv",
+        "/backbone/stages_2/blocks/blocks.7/mlp/fc2/Conv",
+        "/backbone/stages_3/downsample/downsample.1/Conv",
+        "/backbone/stages_3/blocks/blocks.0/conv_dw/Conv",
+        "/backbone/stages_3/blocks/blocks.0/mlp/fc1/Conv",
+        "/backbone/stages_3/blocks/blocks.0/mlp/fc2/Conv",
+        "/backbone/stages_3/blocks/blocks.1/conv_dw/Conv",
+        "/backbone/stages_3/blocks/blocks.1/mlp/fc1/Conv",
+        "/backbone/stages_3/blocks/blocks.1/mlp/fc2/Conv",
+        "/laterals.3/Conv",
+        "/laterals.2/Conv",
+        "/laterals.1/Conv",
+        "/laterals.0/Conv",
+        "/spatial/spatial.0/Conv",
+        "/mask_head/Conv",
+        "/heatmap_head/Conv"
+      ],
+      "source_sha256": "14490c8e3369d39b888b7b9b69bf50bead6a69f99b024ecee250d368d6329f28",
+      "workspace_limit_bytes": 1073741824
+    },
+    "checkpoint_sha256": "639fc8c7e56263f4ab889aa53cc5132e3610eea4c8b2d8b0db671c41d8a30325",
+    "raw_resolution_per_eye": [
+      1280,
+      720
+    ],
+    "network_resolution_hw": [
+      360,
+      640
+    ],
+    "batch_size": 1,
+    "time_steps_per_call": 1,
+    "causal_states": "body/wrist/jaw, retained within each eight-frame sequence",
+    "input_pairs": 56,
+    "sequences": 7,
+    "results": {
+      "fp32": {
+        "predictor_including_preprocess_transfer_export_ms": {
+          "mean_ms": 14.333173635714283,
+          "median_ms": 14.289084500000001,
+          "p95_ms": 14.69146875,
+          "p99_ms": 14.83953474,
+          "min_ms": 13.967961,
+          "max_ms": 15.010089
+        },
+        "cpp_projection_and_draw_ms": {
+          "mean_ms": 5.427577449999999,
+          "median_ms": 5.384659,
+          "p95_ms": 5.8816925,
+          "p99_ms": 6.174525119999998,
+          "min_ms": 4.988226,
+          "max_ms": 6.401806
+        },
+        "end_to_end_ms": {
+          "mean_ms": 19.760751085714283,
+          "median_ms": 19.690535500000003,
+          "p95_ms": 20.39868965,
+          "p99_ms": 20.839001189999998,
+          "min_ms": 19.038101,
+          "max_ms": 21.380292
+        },
+        "network_cuda_interval_ms": {
+          "mean_ms": 11.34316623210907,
+          "median_ms": 11.341311931610107,
+          "p95_ms": 11.48221435546875,
+          "p99_ms": 11.566340856552124,
+          "min_ms": 11.101183891296387,
+          "max_ms": 11.759615898132324
+        },
+        "input_preparation_host_wall_ms": {
+          "mean_ms": 0.9738319785714286,
+          "median_ms": 0.909306,
+          "p95_ms": 1.28234605,
+          "p99_ms": 1.3322619100000002,
+          "min_ms": 0.77357,
+          "max_ms": 1.390656
+        },
+        "measured_pairs": 560,
+        "warmup_pairs": 56,
+        "first_warmup_pair_ms": 487.391688,
+        "hz": 50.60536391872948,
+        "inverse_p95_hz": 49.02275671417943,
+        "fraction_within_33_33_ms": 1.0,
+        "peak_cuda_allocated_mib": 153.708984375,
+        "peak_cuda_reserved_mib": 360.0,
+        "per_category": {
+          "combined_pose_jaw": {
+            "mean_ms": 19.816269075,
+            "median_ms": 19.7368005,
+            "p95_ms": 20.48206325,
+            "p99_ms": 20.95303628,
+            "min_ms": 19.31915,
+            "max_ms": 21.158253
+          },
+          "ecm_motion": {
+            "mean_ms": 19.679871374999998,
+            "median_ms": 19.620217,
+            "p95_ms": 20.2951187,
+            "p99_ms": 20.51122997,
+            "min_ms": 19.192713,
+            "max_ms": 20.878625
+          },
+          "lighting": {
+            "mean_ms": 19.7512745875,
+            "median_ms": 19.632656500000003,
+            "p95_ms": 20.3617244,
+            "p99_ms": 20.641261219999993,
+            "min_ms": 19.099144,
+            "max_ms": 21.380292
+          },
+          "occlusion": {
+            "mean_ms": 19.7634929375,
+            "median_ms": 19.6922745,
+            "p95_ms": 20.402324200000002,
+            "p99_ms": 20.742480609999998,
+            "min_ms": 19.210886,
+            "max_ms": 20.881553
+          },
+          "pose_motion": {
+            "mean_ms": 19.758325537500003,
+            "median_ms": 19.672734,
+            "p95_ms": 20.23632745,
+            "p99_ms": 20.510284679999998,
+            "min_ms": 19.338892,
+            "max_ms": 20.635664
+          },
+          "sensor_quality": {
+            "mean_ms": 19.801416775,
+            "median_ms": 19.786753500000003,
+            "p95_ms": 20.3180916,
+            "p99_ms": 20.46014155,
+            "min_ms": 19.218267,
+            "max_ms": 20.562885
+          },
+          "stereo_rig": {
+            "mean_ms": 19.754607312500003,
+            "median_ms": 19.662304,
+            "p95_ms": 20.50770365,
+            "p99_ms": 20.83980382,
+            "min_ms": 19.038101,
+            "max_ms": 20.946408
+          }
+        }
+      }
+    },
+    "mixed_precision_drift": {},
+    "timing_scope": "RAM RGB -> resize/normalize -> all H2D transfers -> real model -> 17 values D2H -> C++ FK/distortion projection/Chinese arrows and XYZ panels -> completed RGB canvas. No disk/image decoding, capture latency, video encoding, imshow or refresh.",
+    "cuda_timing_note": "Network CUDA interval excludes preprocessing and CPU drawing; end-to-end wall time is the primary result. GPU input_preparation_host_wall_ms is submission time, not completed GPU time, and cannot be added to the model interval to obtain latency. Records and metrics are written after timing.",
+    "runtime": {
+      "python": "3.11.18",
+      "torch": "2.9.1+cu128",
+      "cuda": "12.8",
+      "cpu_threads": 4,
+      "cudnn_benchmark": false,
+      "matmul_tf32": false,
+      "cudnn_tf32": true
+    },
+    "source_sha256": {
+      "stereo_pose/predict.py": "2d0e72e50c331580e0e9ea5b9056a20a113ea686a5704702fdf66ee0f972307d",
+      "stereo_pose/model.py": "c31443b7b447dcfe7eee4543bfcbc0e27cb2d44fdbef7c644a42d7b273ae8d1a",
+      "reference/pose_display/native/overlay.cpp": "6cc695c44355118aca545db39443679039fec054ef5cd2e99531495c015ba8ce",
+      "tools/benchmark_realtime.py": "68fe19bb1025add9b55506f5379e7b9bfad805a3be73f4899865b64d35b1b20f",
+      "native/libtorch/model.cpp": "47b676e426d9661d87d545e70cebe543ab87c1bbd0018e5dcfff169265c1f2d2",
+      "native/libtorch/model.h": "ceb76dff5e4750c5be401552fa0ba35cf34e471111affda31a9575b5fef81806",
+      "native/libtorch/bindings.cpp": "63ebf03f6f1f3b7a932fbe746936ded29c5f884b000519b6e2eaf194606f0965",
+      "native/libtorch/preprocess.cpp": "1743f875db47e6cf9d5449ec008387ca218755b931c8fcdf3210a5813195acb5",
+      "native/libtorch/preprocess.h": "e29580fc2223c2455140a1805f338db663a5c7b5d3efd90ba2c6376edac13934",
+      "stereo_pose/libtorch_predict.py": "c301f9e4e39a0af8492e3a72cecf0c572b07b33e97e6530c2c1b54caf08a00dd"
+    },
+    "native_library_sha256": "fb0089a61e9fd47a5dcc223e3cdfc5e3d5f860c2cfb5aaebf4c0a34a812322fb",
+    "preprocess_library_sha256": "c66f5ee11ef16cc3bcbd5f181b904c6acff5856abfa8330b80c91402e636bb0d"
+  },
+  "accuracy": {
+    "completed": true,
+    "passed_numerical_tolerances": true,
+    "pairs": 56,
+    "categories": 7,
+    "engine": {
+      "schema": "stereo_visual_trt_v1",
+      "checkpoint_sha256": "639fc8c7e56263f4ab889aa53cc5132e3610eea4c8b2d8b0db671c41d8a30325",
+      "engine_sha256": "7b74e39eca0e693f87878cead96e2d15c843c2e0cbf9460347dabd6a96ad1c83",
+      "onnx_sha256": "bfa3b0c5d686a1fecc1fb0aa5dfd58e17202aa2cc847aca0ba870454a6052bb5",
+      "precision": "fp16",
+      "build_seconds": 31.677622777999204,
+      "engine_bytes": 34153076,
+      "tensorrt": "10.13.3.9",
+      "torch": "2.9.1+cu128",
+      "onnx": "1.19.1",
+      "gpu": "NVIDIA GeForce RTX 4060 Laptop GPU",
+      "input_shape": [
+        2,
+        3,
+        360,
+        640
+      ],
+      "outputs": {
+        "spatial": [
+          2,
+          128,
+          90,
+          160
+        ],
+        "mask": [
+          2,
+          1,
+          90,
+          160
+        ],
+        "heat": [
+          2,
+          5,
+          90,
+          160
+        ]
+      },
+      "boundary_dtype": "float32",
+      "tf32": false,
+      "fp16_layers": [
+        "/backbone/stem_0/Conv",
+        "/backbone/stages_0/blocks/blocks.0/conv_dw/Conv",
+        "/backbone/stages_0/blocks/blocks.0/mlp/fc1/Conv",
+        "/backbone/stages_0/blocks/blocks.0/mlp/fc2/Conv",
+        "/backbone/stages_0/blocks/blocks.1/conv_dw/Conv",
+        "/backbone/stages_0/blocks/blocks.1/mlp/fc1/Conv",
+        "/backbone/stages_0/blocks/blocks.1/mlp/fc2/Conv",
+        "/backbone/stages_1/downsample/downsample.1/Conv",
+        "/backbone/stages_1/blocks/blocks.0/conv_dw/Conv",
+        "/backbone/stages_1/blocks/blocks.0/mlp/fc1/Conv",
+        "/backbone/stages_1/blocks/blocks.0/mlp/fc2/Conv",
+        "/backbone/stages_1/blocks/blocks.1/conv_dw/Conv",
+        "/backbone/stages_1/blocks/blocks.1/mlp/fc1/Conv",
+        "/backbone/stages_1/blocks/blocks.1/mlp/fc2/Conv",
+        "/backbone/stages_2/downsample/downsample.1/Conv",
+        "/backbone/stages_2/blocks/blocks.0/conv_dw/Conv",
+        "/backbone/stages_2/blocks/blocks.0/mlp/fc1/Conv",
+        "/backbone/stages_2/blocks/blocks.0/mlp/fc2/Conv",
+        "/backbone/stages_2/blocks/blocks.1/conv_dw/Conv",
+        "/backbone/stages_2/blocks/blocks.1/mlp/fc1/Conv",
+        "/backbone/stages_2/blocks/blocks.1/mlp/fc2/Conv",
+        "/backbone/stages_2/blocks/blocks.2/conv_dw/Conv",
+        "/backbone/stages_2/blocks/blocks.2/mlp/fc1/Conv",
+        "/backbone/stages_2/blocks/blocks.2/mlp/fc2/Conv",
+        "/backbone/stages_2/blocks/blocks.3/conv_dw/Conv",
+        "/backbone/stages_2/blocks/blocks.3/mlp/fc1/Conv",
+        "/backbone/stages_2/blocks/blocks.3/mlp/fc2/Conv",
+        "/backbone/stages_2/blocks/blocks.4/conv_dw/Conv",
+        "/backbone/stages_2/blocks/blocks.4/mlp/fc1/Conv",
+        "/backbone/stages_2/blocks/blocks.4/mlp/fc2/Conv",
+        "/backbone/stages_2/blocks/blocks.5/conv_dw/Conv",
+        "/backbone/stages_2/blocks/blocks.5/mlp/fc1/Conv",
+        "/backbone/stages_2/blocks/blocks.5/mlp/fc2/Conv",
+        "/backbone/stages_2/blocks/blocks.6/conv_dw/Conv",
+        "/backbone/stages_2/blocks/blocks.6/mlp/fc1/Conv",
+        "/backbone/stages_2/blocks/blocks.6/mlp/fc2/Conv",
+        "/backbone/stages_2/blocks/blocks.7/conv_dw/Conv",
+        "/backbone/stages_2/blocks/blocks.7/mlp/fc1/Conv",
+        "/backbone/stages_2/blocks/blocks.7/mlp/fc2/Conv",
+        "/backbone/stages_3/downsample/downsample.1/Conv",
+        "/backbone/stages_3/blocks/blocks.0/conv_dw/Conv",
+        "/backbone/stages_3/blocks/blocks.0/mlp/fc1/Conv",
+        "/backbone/stages_3/blocks/blocks.0/mlp/fc2/Conv",
+        "/backbone/stages_3/blocks/blocks.1/conv_dw/Conv",
+        "/backbone/stages_3/blocks/blocks.1/mlp/fc1/Conv",
+        "/backbone/stages_3/blocks/blocks.1/mlp/fc2/Conv",
+        "/laterals.3/Conv",
+        "/laterals.2/Conv",
+        "/laterals.1/Conv",
+        "/laterals.0/Conv",
+        "/spatial/spatial.0/Conv",
+        "/mask_head/Conv",
+        "/heatmap_head/Conv"
+      ],
+      "source_sha256": "14490c8e3369d39b888b7b9b69bf50bead6a69f99b024ecee250d368d6329f28",
+      "workspace_limit_bytes": 1073741824
+    },
+    "baseline_execution": "reference",
+    "candidate_execution": "optimized_graph",
+    "baseline_engine": {
+      "schema": "stereo_visual_trt_v1",
+      "checkpoint_sha256": "639fc8c7e56263f4ab889aa53cc5132e3610eea4c8b2d8b0db671c41d8a30325",
+      "engine_sha256": "7b74e39eca0e693f87878cead96e2d15c843c2e0cbf9460347dabd6a96ad1c83",
+      "onnx_sha256": "bfa3b0c5d686a1fecc1fb0aa5dfd58e17202aa2cc847aca0ba870454a6052bb5",
+      "precision": "fp16",
+      "build_seconds": 31.677622777999204,
+      "engine_bytes": 34153076,
+      "tensorrt": "10.13.3.9",
+      "torch": "2.9.1+cu128",
+      "onnx": "1.19.1",
+      "gpu": "NVIDIA GeForce RTX 4060 Laptop GPU",
+      "input_shape": [
+        2,
+        3,
+        360,
+        640
+      ],
+      "outputs": {
+        "spatial": [
+          2,
+          128,
+          90,
+          160
+        ],
+        "mask": [
+          2,
+          1,
+          90,
+          160
+        ],
+        "heat": [
+          2,
+          5,
+          90,
+          160
+        ]
+      },
+      "boundary_dtype": "float32",
+      "tf32": false,
+      "fp16_layers": [
+        "/backbone/stem_0/Conv",
+        "/backbone/stages_0/blocks/blocks.0/conv_dw/Conv",
+        "/backbone/stages_0/blocks/blocks.0/mlp/fc1/Conv",
+        "/backbone/stages_0/blocks/blocks.0/mlp/fc2/Conv",
+        "/backbone/stages_0/blocks/blocks.1/conv_dw/Conv",
+        "/backbone/stages_0/blocks/blocks.1/mlp/fc1/Conv",
+        "/backbone/stages_0/blocks/blocks.1/mlp/fc2/Conv",
+        "/backbone/stages_1/downsample/downsample.1/Conv",
+        "/backbone/stages_1/blocks/blocks.0/conv_dw/Conv",
+        "/backbone/stages_1/blocks/blocks.0/mlp/fc1/Conv",
+        "/backbone/stages_1/blocks/blocks.0/mlp/fc2/Conv",
+        "/backbone/stages_1/blocks/blocks.1/conv_dw/Conv",
+        "/backbone/stages_1/blocks/blocks.1/mlp/fc1/Conv",
+        "/backbone/stages_1/blocks/blocks.1/mlp/fc2/Conv",
+        "/backbone/stages_2/downsample/downsample.1/Conv",
+        "/backbone/stages_2/blocks/blocks.0/conv_dw/Conv",
+        "/backbone/stages_2/blocks/blocks.0/mlp/fc1/Conv",
+        "/backbone/stages_2/blocks/blocks.0/mlp/fc2/Conv",
+        "/backbone/stages_2/blocks/blocks.1/conv_dw/Conv",
+        "/backbone/stages_2/blocks/blocks.1/mlp/fc1/Conv",
+        "/backbone/stages_2/blocks/blocks.1/mlp/fc2/Conv",
+        "/backbone/stages_2/blocks/blocks.2/conv_dw/Conv",
+        "/backbone/stages_2/blocks/blocks.2/mlp/fc1/Conv",
+        "/backbone/stages_2/blocks/blocks.2/mlp/fc2/Conv",
+        "/backbone/stages_2/blocks/blocks.3/conv_dw/Conv",
+        "/backbone/stages_2/blocks/blocks.3/mlp/fc1/Conv",
+        "/backbone/stages_2/blocks/blocks.3/mlp/fc2/Conv",
+        "/backbone/stages_2/blocks/blocks.4/conv_dw/Conv",
+        "/backbone/stages_2/blocks/blocks.4/mlp/fc1/Conv",
+        "/backbone/stages_2/blocks/blocks.4/mlp/fc2/Conv",
+        "/backbone/stages_2/blocks/blocks.5/conv_dw/Conv",
+        "/backbone/stages_2/blocks/blocks.5/mlp/fc1/Conv",
+        "/backbone/stages_2/blocks/blocks.5/mlp/fc2/Conv",
+        "/backbone/stages_2/blocks/blocks.6/conv_dw/Conv",
+        "/backbone/stages_2/blocks/blocks.6/mlp/fc1/Conv",
+        "/backbone/stages_2/blocks/blocks.6/mlp/fc2/Conv",
+        "/backbone/stages_2/blocks/blocks.7/conv_dw/Conv",
+        "/backbone/stages_2/blocks/blocks.7/mlp/fc1/Conv",
+        "/backbone/stages_2/blocks/blocks.7/mlp/fc2/Conv",
+        "/backbone/stages_3/downsample/downsample.1/Conv",
+        "/backbone/stages_3/blocks/blocks.0/conv_dw/Conv",
+        "/backbone/stages_3/blocks/blocks.0/mlp/fc1/Conv",
+        "/backbone/stages_3/blocks/blocks.0/mlp/fc2/Conv",
+        "/backbone/stages_3/blocks/blocks.1/conv_dw/Conv",
+        "/backbone/stages_3/blocks/blocks.1/mlp/fc1/Conv",
+        "/backbone/stages_3/blocks/blocks.1/mlp/fc2/Conv",
+        "/laterals.3/Conv",
+        "/laterals.2/Conv",
+        "/laterals.1/Conv",
+        "/laterals.0/Conv",
+        "/spatial/spatial.0/Conv",
+        "/mask_head/Conv",
+        "/heatmap_head/Conv"
+      ],
+      "source_sha256": "14490c8e3369d39b888b7b9b69bf50bead6a69f99b024ecee250d368d6329f28",
+      "workspace_limit_bytes": 1073741824
+    },
+    "actual_candidate_execution": "optimized_graph",
+    "graph_error": null,
+    "summary": {
+      "C_mm": {
+        "mean": 0.0,
+        "p95": 0.0,
+        "max": 0.0
+      },
+      "tip_mm": {
+        "mean": 0.0,
+        "p95": 0.0,
+        "max": 0.0
+      },
+      "hinge_mm": {
+        "mean": 0.0,
+        "p95": 0.0,
+        "max": 0.0
+      },
+      "rotation_deg": {
+        "mean": 0.0,
+        "p95": 0.0,
+        "max": 0.0
+      },
+      "point_projection_px": {
+        "mean": 0.0,
+        "p95": 0.0,
+        "max": 0.0
+      },
+      "joint_deg": {
+        "pitch": {
+          "mean": 0.0,
+          "p95": 0.0,
+          "max": 0.0
+        },
+        "yaw": {
+          "mean": 0.0,
+          "p95": 0.0,
+          "max": 0.0
+        },
+        "jaw_half": {
+          "mean": 0.0,
+          "p95": 0.0,
+          "max": 0.0
+        }
+      },
+      "mask_iou": {
+        "mean": 1.0,
+        "p95": 1.0,
+        "max": 1.0
+      }
+    },
+    "layers": {
+      "spatial": {
+        "max_abs": 0.0,
+        "rms_mean": 0.0,
+        "reference_rms_mean": 0.9354873544403485
+      },
+      "mask_logits": {
+        "max_abs": 0.0,
+        "rms_mean": 0.0,
+        "reference_rms_mean": 28.75751314844404
+      },
+      "heatmap_logits": {
+        "max_abs": 0.0,
+        "rms_mean": 0.0,
+        "reference_rms_mean": 8.987668309892927
+      },
+      "landmark_uv": {
+        "max_abs": 0.0,
+        "rms_mean": 0.0,
+        "reference_rms_mean": 329.09188079833984
+      },
+      "hidden": {
+        "max_abs": 0.0,
+        "rms_mean": 0.0,
+        "reference_rms_mean": 0.34599391610494684
+      }
+    },
+    "conversion_limits": {
+      "position_max_mm": 0.1,
+      "rotation_max_deg": 0.1,
+      "joint_max_deg": 0.1,
+      "projection_max_px": 0.25
+    },
+    "scope": "Difference from original eager C++ FP32 model, not error against ground truth. Independent recurrent state within each sequence. Shared unchanged GPU preprocessing.",
+    "per_category": {
+      "pose_motion": {
+        "C_mm": {
+          "mean": 0.0,
+          "p95": 0.0,
+          "max": 0.0
+        },
+        "tip_mm": {
+          "mean": 0.0,
+          "p95": 0.0,
+          "max": 0.0
+        },
+        "joint_deg": {
+          "mean": 0.0,
+          "p95": 0.0,
+          "max": 0.0
+        },
+        "point_projection_px": {
+          "mean": 0.0,
+          "p95": 0.0,
+          "max": 0.0
+        }
+      },
+      "lighting": {
+        "C_mm": {
+          "mean": 0.0,
+          "p95": 0.0,
+          "max": 0.0
+        },
+        "tip_mm": {
+          "mean": 0.0,
+          "p95": 0.0,
+          "max": 0.0
+        },
+        "joint_deg": {
+          "mean": 0.0,
+          "p95": 0.0,
+          "max": 0.0
+        },
+        "point_projection_px": {
+          "mean": 0.0,
+          "p95": 0.0,
+          "max": 0.0
+        }
+      },
+      "sensor_quality": {
+        "C_mm": {
+          "mean": 0.0,
+          "p95": 0.0,
+          "max": 0.0
+        },
+        "tip_mm": {
+          "mean": 0.0,
+          "p95": 0.0,
+          "max": 0.0
+        },
+        "joint_deg": {
+          "mean": 0.0,
+          "p95": 0.0,
+          "max": 0.0
+        },
+        "point_projection_px": {
+          "mean": 0.0,
+          "p95": 0.0,
+          "max": 0.0
+        }
+      },
+      "occlusion": {
+        "C_mm": {
+          "mean": 0.0,
+          "p95": 0.0,
+          "max": 0.0
+        },
+        "tip_mm": {
+          "mean": 0.0,
+          "p95": 0.0,
+          "max": 0.0
+        },
+        "joint_deg": {
+          "mean": 0.0,
+          "p95": 0.0,
+          "max": 0.0
+        },
+        "point_projection_px": {
+          "mean": 0.0,
+          "p95": 0.0,
+          "max": 0.0
+        }
+      },
+      "ecm_motion": {
+        "C_mm": {
+          "mean": 0.0,
+          "p95": 0.0,
+          "max": 0.0
+        },
+        "tip_mm": {
+          "mean": 0.0,
+          "p95": 0.0,
+          "max": 0.0
+        },
+        "joint_deg": {
+          "mean": 0.0,
+          "p95": 0.0,
+          "max": 0.0
+        },
+        "point_projection_px": {
+          "mean": 0.0,
+          "p95": 0.0,
+          "max": 0.0
+        }
+      },
+      "stereo_rig": {
+        "C_mm": {
+          "mean": 0.0,
+          "p95": 0.0,
+          "max": 0.0
+        },
+        "tip_mm": {
+          "mean": 0.0,
+          "p95": 0.0,
+          "max": 0.0
+        },
+        "joint_deg": {
+          "mean": 0.0,
+          "p95": 0.0,
+          "max": 0.0
+        },
+        "point_projection_px": {
+          "mean": 0.0,
+          "p95": 0.0,
+          "max": 0.0
+        }
+      },
+      "combined_pose_jaw": {
+        "C_mm": {
+          "mean": 0.0,
+          "p95": 0.0,
+          "max": 0.0
+        },
+        "tip_mm": {
+          "mean": 0.0,
+          "p95": 0.0,
+          "max": 0.0
+        },
+        "joint_deg": {
+          "mean": 0.0,
+          "p95": 0.0,
+          "max": 0.0
+        },
+        "point_projection_px": {
+          "mean": 0.0,
+          "p95": 0.0,
+          "max": 0.0
+        }
+      }
+    }
+  },
+  "state": {
+    "passed": true,
+    "cases": [
+      {
+        "case": "continuous_0",
+        "values_max_abs": 0.0,
+        "hidden_max_abs": 0.0,
+        "reset_count": 1
+      },
+      {
+        "case": "continuous_1",
+        "values_max_abs": 0.0,
+        "hidden_max_abs": 0.0,
+        "reset_count": 1
+      },
+      {
+        "case": "continuous_2",
+        "values_max_abs": 0.0,
+        "hidden_max_abs": 0.0,
+        "reset_count": 1
+      },
+      {
+        "case": "continuous_3",
+        "values_max_abs": 0.0,
+        "hidden_max_abs": 0.0,
+        "reset_count": 1
+      },
+      {
+        "case": "continuous_4",
+        "values_max_abs": 0.0,
+        "hidden_max_abs": 0.0,
+        "reset_count": 1
+      },
+      {
+        "case": "continuous_5",
+        "values_max_abs": 0.0,
+        "hidden_max_abs": 0.0,
+        "reset_count": 1
+      },
+      {
+        "case": "continuous_6",
+        "values_max_abs": 0.0,
+        "hidden_max_abs": 0.0,
+        "reset_count": 1
+      },
+      {
+        "case": "continuous_7",
+        "values_max_abs": 0.0,
+        "hidden_max_abs": 0.0,
+        "reset_count": 1
+      },
+      {
+        "case": "explicit_reset",
+        "values_max_abs": 0.0,
+        "hidden_max_abs": 0.0,
+        "reset_count": 2
+      },
+      {
+        "case": "duplicate_timestamp",
+        "values_max_abs": 0.0,
+        "hidden_max_abs": 0.0,
+        "reset_count": 3
+      },
+      {
+        "case": "time_gap",
+        "values_max_abs": 0.0,
+        "hidden_max_abs": 0.0,
+        "reset_count": 4
+      },
+      {
+        "case": "sequence_change",
+        "values_max_abs": 0.0,
+        "hidden_max_abs": 0.0,
+        "reset_count": 5
+      },
+      {
+        "case": "calibration_change",
+        "values_max_abs": 0.0,
+        "hidden_max_abs": 0.0,
+        "reset_count": 6
+      },
+      {
+        "case": "invalid_image",
+        "rejected_and_reset": true
+      },
+      {
+        "case": "recovery",
+        "values_max_abs": 0.0,
+        "hidden_max_abs": 0.0,
+        "reset_count": 7
+      }
+    ],
+    "candidate_execution": "optimized_graph"
+  }
+}

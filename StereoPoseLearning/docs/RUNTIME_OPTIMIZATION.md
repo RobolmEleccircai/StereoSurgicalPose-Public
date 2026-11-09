@@ -115,3 +115,44 @@ changes, not a claim that the CUDA kernel alone saved all 5.898 ms.
 
 Machine-readable evidence: `evidence/runtime_optimization_A_4060_20261111.json`.
 
+## B — Fixed buffers and CUDA Graph replay
+
+### Why and implementation
+
+After A, the eager downstream still dispatches many individual ATen operations.
+This stage replays the fixed-shape native network with CUDA Graph, leaving GPU
+preprocessing and final CPU export outside capture. Python only controls the
+existing API and capture; all network operations remain C++ LibTorch/TensorRT.
+
+- The optional optimized TensorRT context keeps three output buffers. Original
+  builds retain independently allocated outputs. Debug consumers of optimized
+  buffers must finish before the next call.
+- `optimized_graph` runs preprocessing and inference on one non-default stream.
+  This is for capture ordering, not a claim that changing stream alone is faster.
+- Fixed buffers hold images, K, D, history and high-resolution RGB. Before replay,
+  the actual current inputs and previous state are copied into these buffers.
+- Three warmup passes use zero scratch history. Capture does not advance the
+  external predictor history. Each real input causes exactly one replay.
+- The existing predictor still owns discontinuity checks and state reset. Camera
+  calibration caches update in place, retaining captured addresses.
+- A capture exception emits a warning and records `actual_execution=optimized_eager`
+  plus the error; it cannot silently count as a successful graph result.
+
+Status: B completed and accepted; actual execution was `optimized_graph`, with no fallback.
+
+### B verification, performance and decision
+
+The 56-pair comparison, all per-category truth checks and all 15 state/reset cases
+passed. Output values and the three hidden states matched the reference exactly
+in these cases, including changed calibration and recovery after an invalid input.
+No failure workaround was needed to capture the network.
+
+With 56 warmup pairs and 560 measured pairs, total mean was **19.7608 ms**,
+P95 **20.3987 ms**, or **50.6054 Hz**. The preceding A measurement was
+20.6431 ms / 48.4423 Hz. This single-stage measurement supports retaining graph
+execution for final repeated testing; it is not an isolated causal attribution
+between output-buffer reuse and graph launch savings.
+
+Use the same commands as A with `configs/inference/optimized_graph.example.json`.
+Machine-readable evidence: `evidence/runtime_optimization_B_4060_20261111.json`.
+

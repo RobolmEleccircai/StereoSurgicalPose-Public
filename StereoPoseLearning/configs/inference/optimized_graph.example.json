@@ -1,0 +1,7 @@
+{
+  "checkpoint": "../../inputs/best_val.pt",
+  "fps": 60,
+  "preprocessing": "gpu",
+  "visual_engine": "../../native/libtorch/build/tensorrt/visual_fp16.engine",
+  "execution_mode": "optimized_graph"
+}

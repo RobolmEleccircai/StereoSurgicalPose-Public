@@ -37,7 +37,12 @@ std::tuple<at::Tensor,at::Tensor,at::Tensor> TrtVisual::forward(const at::Tensor
   TORCH_CHECK(dims.nbDims==images.dim(),"TensorRT input rank mismatch");
   for(int i=0;i<dims.nbDims;++i) TORCH_CHECK(dims.d[i]==images.size(i),"TensorRT input size mismatch");
   TORCH_CHECK(context_->setTensorAddress("images",images.data_ptr()),"Cannot bind TensorRT input");
+#ifdef STEREO_OPTIMIZED
+  auto& outputs=output_buffers_;
+  if(outputs.empty()) {
+#else
   std::vector<at::Tensor> outputs;
+#endif
   for(const char* name:{"spatial","mask","heat"}) {
     auto shape=engine_->getTensorShape(name);
     std::vector<int64_t> sizes;
@@ -45,6 +50,9 @@ std::tuple<at::Tensor,at::Tensor,at::Tensor> TrtVisual::forward(const at::Tensor
     outputs.push_back(at::empty(sizes,images.options()));
     TORCH_CHECK(context_->setTensorAddress(name,outputs.back().data_ptr()),"Cannot bind TensorRT output");
   }
+#ifdef STEREO_OPTIMIZED
+  }
+#endif
   TORCH_CHECK(outputs[0].sizes()==at::IntArrayRef({2,128,90,160}) &&
               outputs[1].sizes()==at::IntArrayRef({2,1,90,160}) &&
               outputs[2].sizes()==at::IntArrayRef({2,5,90,160}),"TensorRT output sizes differ from the trained model");

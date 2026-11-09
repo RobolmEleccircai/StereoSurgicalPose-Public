@@ -220,6 +220,8 @@ def main():
         result = {'completed': True, 'gpu': name, 'gpu_before': gpu_before, 'gpu_after': gpu_snapshot(),
             'inference_backend': args.inference_backend,
             'execution_mode':getattr(predictor,'execution_mode','reference'),
+            'actual_execution':getattr(predictor.model,'actual_execution','reference'),
+            'graph_error':getattr(predictor.model,'graph_error',None),
             'preprocessing': args.preprocessing,
             'display_mode': args.display_mode,
             'visual_engine':getattr(predictor,'visual_engine',None),
