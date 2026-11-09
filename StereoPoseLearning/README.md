@@ -8,6 +8,7 @@
 - [C++ 实时绘图、编译和性能验证](docs/NATIVE_OVERLAY.md)。
 - [4060 推理环境与单对双目端到端计时](docs/REALTIME_BENCHMARK.md)。
 - [LibTorch直接推理、GPU预处理及资源审计](docs/LIBTORCH_INFERENCE.md)：4060工作区三向量显示模式实测均值31.96Hz，含数值、箭头、面板及投影；提供分模块耗时、资源统计及对应代码版本范围。
+- [TensorRT视觉前端与原版对照](docs/TENSORRT_VISUAL.md)：4060完整双目流程约37.76Hz，记录56对样本的实现转换差异。
 - [验证方法及统计口径](docs/VALIDATION_PROTOCOL.md)。
 - [论文与实现来源](docs/SOURCES.md)。
 - [历史结构源码和复现实验](experiments/README.md)。
