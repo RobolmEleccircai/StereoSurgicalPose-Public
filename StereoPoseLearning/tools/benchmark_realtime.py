@@ -54,7 +54,11 @@ def main():
     parser.add_argument('--modes', nargs='+', choices=('fp32', 'bf16'), default=['fp32', 'bf16'])
     parser.add_argument('--inference-backend', choices=('python', 'libtorch'), default='python')
     parser.add_argument('--preprocessing', choices=('cpu','gpu'), default=None)
+    parser.add_argument('--display-mode',choices=('vectors','full'),default='vectors')
+    parser.add_argument('--visual-engine',type=Path,help='Optional TensorRT visual frontend; downstream remains LibTorch')
     args = parser.parse_args()
+    if args.visual_engine is not None and args.inference_backend!='libtorch':
+        parser.error('--visual-engine requires --inference-backend libtorch')
     if args.preprocessing is None:
         args.preprocessing='gpu' if args.inference_backend=='libtorch' else 'cpu'
     if args.preprocessing=='gpu' and args.inference_backend!='libtorch':
@@ -82,8 +86,8 @@ def main():
     if free < 3 * 1024**3:
         raise RuntimeError('Insufficient free GPU memory for an isolated inference test')
     torch.cuda.set_per_process_memory_fraction(.75, 0)
-    # Keep the predictor's default FP32 / cuDNN / TF32 behavior. No model rewrite,
-    # TensorRT, torch.compile, QAT, altered resolution or microbatch throughput.
+    # Keep downstream FP32 / cuDNN / TF32 behavior. An optional visual engine
+    # changes only the frontend; input size and single-pair scope stay fixed.
     modes = args.modes
     if 'bf16' in modes and not torch.cuda.is_bf16_supported():
         raise RuntimeError('Requested BF16 comparison is unsupported')
@@ -94,7 +98,7 @@ def main():
         raise ValueError('Transferred checkpoint hash mismatch')
     if args.inference_backend == 'libtorch':
         from stereo_pose.libtorch_predict import LibTorchPredictor
-        predictor = LibTorchPredictor(checkpoint, preprocessing=args.preprocessing)
+        predictor = LibTorchPredictor(checkpoint, preprocessing=args.preprocessing,visual_engine=args.visual_engine)
     else:
         predictor = StereoPredictor(checkpoint, device='cuda')
     if predictor.instrument_model['source_scene_sha256'] != bundle['source_scene_sha256']:
@@ -105,7 +109,7 @@ def main():
         calibration = row['calibration']
         fingerprint = json.dumps(calibration, sort_keys=True)
         if fingerprint not in overlays:
-            overlays[fingerprint] = CppStereoOverlay(predictor.instrument_model, calibration, args.font)
+            overlays[fingerprint] = CppStereoOverlay(predictor.instrument_model, calibration, args.font,display_mode=args.display_mode)
         images = [np.asarray(Image.open(args.inputs/row['images'][e]).convert('RGB'))
                   for e in ('left', 'right')]
         frame = StereoFrame(f"{row['sequence_id']}/{row['frame_index']:06d}", row['timestamp_ns'], *images)
@@ -115,7 +119,7 @@ def main():
         for a, b in zip(rows, rows[1:]):
             assert b[0]['frame_index'] == a[0]['frame_index']+1
             assert abs(b[0]['timestamp_ns']-a[0]['timestamp_ns']-1e9/60) <= 1
-    canvas = np.empty((770, 2560, 3), dtype=np.uint8)
+    canvas = np.empty(next(iter(overlays.values())).canvas_shape, dtype=np.uint8)
     events = [torch.cuda.Event(enable_timing=True), torch.cuda.Event(enable_timing=True)]
     hooks = [predictor.model.register_forward_pre_hook(lambda *_: events[0].record()),
              predictor.model.register_forward_hook(lambda *_: events[1].record())]
@@ -209,6 +213,8 @@ def main():
         result = {'completed': True, 'gpu': name, 'gpu_before': gpu_before, 'gpu_after': gpu_snapshot(),
             'inference_backend': args.inference_backend,
             'preprocessing': args.preprocessing,
+            'display_mode': args.display_mode,
+            'visual_engine':getattr(predictor,'visual_engine',None),
             'checkpoint_epoch': predictor.epoch+1, 'checkpoint_sha256': checkpoint_hash,
             'raw_resolution_per_eye': [1280,720], 'network_resolution_hw': list(predictor.image_size),
             'batch_size': 1, 'time_steps_per_call': 1, 'causal_states': 'body/wrist/jaw, retained within each eight-frame sequence',
@@ -223,6 +229,10 @@ def main():
                 [args.project/'stereo_pose/predict.py', args.project/'stereo_pose/model.py',
                  args.project/'reference/pose_display/native/overlay.cpp', Path(__file__).resolve()]}}
         if args.inference_backend == 'libtorch':
+            import importlib
+            module=importlib.import_module('stereo_libtorch_trt' if args.visual_engine else 'stereo_libtorch')
+            result['native_library_sha256']=digest(module.__file__)
+            result['preprocess_library_sha256']=digest(importlib.import_module('stereo_libtorch').__file__)
             result['source_sha256'].update({str(p.relative_to(args.project)): digest(p) for p in
                 [args.project/'native/libtorch/model.cpp', args.project/'native/libtorch/model.h',
                  args.project/'native/libtorch/bindings.cpp', args.project/'native/libtorch/preprocess.cpp',
