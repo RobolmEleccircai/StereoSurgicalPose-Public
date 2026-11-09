@@ -3,6 +3,9 @@
 #include <ATen/TensorIndexing.h>
 #include <c10/core/InferenceMode.h>
 #include <limits>
+#ifdef STEREO_OPTIMIZED
+#include "position_cuda.h"
+#endif
 
 using T = at::Tensor;
 using V = std::vector<T>;
@@ -70,6 +73,25 @@ T position(const T& uv,const T& z,const T& K,const T& D) {
 }
 }
 
+T stereo_position_reference(const T& uv,const T& z,const T& K,const T& D) {return position(uv,z,K,D);}
+T StereoNet::constant(const std::string& name,const std::function<T()>& create) const {
+#ifdef STEREO_OPTIMIZED
+  auto found=constants_.find(name);
+  if(found!=constants_.end())return found->second;
+  auto value=create();constants_[name]=value;return value;
+#else
+  return create();
+#endif
+}
+void StereoNet::set_calibration(const T& K,const T& D) {
+#ifdef STEREO_OPTIMIZED
+  auto inv=std::get<0>(at::linalg_inv_ex(K.to(at::kDouble),false)).contiguous();
+  auto distortion=D.to(at::kDouble).contiguous();
+  if(inverse_.defined()) {inverse_.copy_(inv);distortion_.copy_(distortion);}
+  else {inverse_=inv;distortion_=distortion;}
+#endif
+}
+
 const T& StereoNet::w(const std::string& name) const {return weights_.at(name);}
 #ifdef STEREO_WITH_TENSORRT
 void StereoNet::load_visual_engine(const std::string& path) {
@@ -128,14 +150,14 @@ std::tuple<T,T,T> StereoNet::guided(const T& spatial,const T& mask_logits,const 
   int64_t h=spatial.size(2),ww=spatial.size(3),patch=static_cast<int64_t>(cfg("roi_patch_size",8));
   auto probs=heat.to(at::kFloat).sigmoid();
   auto options=probs.options().dtype(at::kLong);
-  auto grid=at::meshgrid({(at::arange(h,options)+.5)*2/h-1,(at::arange(ww,options)+.5)*2/ww-1},"ij");
+  auto grid=constant("guided_grid",[&]{return at::stack(at::meshgrid({(at::arange(h,options)+.5)*2/h-1,(at::arange(ww,options)+.5)*2/ww-1},"ij"));});
   auto yy=grid[0],xx=grid[1],weights=probs.pow(cfg("landmark_power",4))+1e-12;
   weights=weights/weights.sum({-2,-1},true).clamp_min(1e-12);
   auto xy=at::stack({(weights*xx).sum({-2,-1}),(weights*yy).sum({-2,-1})},-1);
   auto confidence=probs.amax({-2,-1});
-  auto radius=fresh(xy,{static_cast<float>(2*cfg("roi_radius_px",24)/640),static_cast<float>(2*cfg("roi_radius_px",24)/360)});
-  auto t=(at::arange(patch,options)+.5)*2/patch-1;
-  auto gg=at::meshgrid({t,t},"ij"); auto offsets=at::stack({gg[1],gg[0]},-1)*radius;
+  auto radius=constant("guided_radius",[&]{return fresh(xy,{static_cast<float>(2*cfg("roi_radius_px",24)/640),static_cast<float>(2*cfg("roi_radius_px",24)/360)});});
+  auto offsets=constant("guided_offsets",[&]{auto t=(at::arange(patch,options)+.5)*2/patch-1;
+    auto gg=at::meshgrid({t,t},"ij");return at::stack({gg[1],gg[0]},-1)*radius;});
   auto sample=xy.unsqueeze(2).unsqueeze(2)+offsets.unsqueeze(0).unsqueeze(0);
   auto patches=at::grid_sampler(spatial.to(at::kFloat),sample.reshape({2,5*patch,patch,2}),0,1,false);
   patches=patches.reshape({2,128,5,patch,patch}).permute({0,2,1,3,4}).reshape({10,128,patch,patch});
@@ -157,11 +179,11 @@ std::tuple<T,T,T> StereoNet::guided(const T& spatial,const T& mask_logits,const 
   auto meta=at::cat({wholemeta.unsqueeze(1),localmeta},1);
   auto tokens=at::cat({whole.unsqueeze(1),local},1);
   tokens=tokens+mlp(meta,p+".metadata")+w(p+".region_embedding").unsqueeze(0);
-  auto uv=(xy+1)*fresh(xy,{640,360})/2-.5;
+  auto uv=(xy+1)*constant("size",[&]{return fresh(xy,{640,360});})/2-.5;
   return {tokens,uv,confidence};
 }
 
-std::tuple<T,T,T> StereoNet::local_branch(const T& crop,const T& meta,const T& hidden,const std::string& p) {
+std::tuple<T,T,T> StereoNet::local_branch(const T& crop,const T& meta,const T& hidden,const std::string& p,bool debug) {
   auto x=crop;
   for(int i=0;i<3;++i) {
     auto stem=p+".encoder.stem."+std::to_string(i);
@@ -169,7 +191,11 @@ std::tuple<T,T,T> StereoNet::local_branch(const T& crop,const T& meta,const T& h
   }
   auto refine=conv(at::gelu(gn(conv(x,p+".encoder.refine.0",1,1,64),p+".encoder.refine.1")),p+".encoder.refine.3");
   x=x+refine;
-  auto heat=conv(x,p+".encoder.heatmap");
+  T heat;
+#ifdef STEREO_OPTIMIZED
+  if(debug)
+#endif
+    heat=conv(x,p+".encoder.heatmap");
   auto desc=at::gelu(ln(linear(at::adaptive_avg_pool2d(x,{4,4}).flatten(1),p+".encoder.project.0"),p+".encoder.project.1"));
   desc=desc+mlp(meta,p+".metadata"); auto paired=desc.reshape({1,2,128});
   auto joined=at::cat({paired,paired.flip({1})},-1);
@@ -253,7 +279,13 @@ std::tuple<T,T,TensorMap> StereoNet::forward(const T& images,const T& K,const T&
   auto R=rotation(at::stack(rots,2));
   auto z=at::softplus(at::stack(depths_raw,2))*cfg("depth_scale_mm",100)+.001;
   profile.next("stage::C_ray_undistortion");
-  auto alluv=uv.reshape({1,1,2,5,2}),Cuv=alluv.select(3,0),C=position(Cuv,z,K,D);
+  auto alluv=uv.reshape({1,1,2,5,2}),Cuv=alluv.select(3,0);
+#ifdef STEREO_OPTIMIZED
+  TORCH_CHECK(inverse_.defined(),"Call set_calibration before optimized forward");
+  auto C=stereo_position_cuda(Cuv,z,inverse_,distortion_);
+#else
+  auto C=position(Cuv,z,K,D);
+#endif
   profile.next("stage::hires_mask_crop");
   // Original two foreground-masked local crops, with unchanged interpolation.
   auto hinge=uv.slice(1,1,3).mean(1,true);
@@ -268,11 +300,11 @@ std::tuple<T,T,TensorMap> StereoNet::forward(const T& images,const T& K,const T&
   }
   auto centre=at::stack(centres,1),extent=at::stack(extents,1);
   int64_t size=static_cast<int64_t>(cfg("part_crop_size",160));
-  auto axis=(at::arange(size,images.options())+.5)*2/size-1;
-  auto grids=at::meshgrid({axis,axis},"ij"); auto offsets=at::stack({grids[1],grids[0]},-1);
+  auto offsets=constant("crop_offsets",[&]{auto axis=(at::arange(size,images.options())+.5)*2/size-1;
+    auto grids=at::meshgrid({axis,axis},"ij");return at::stack({grids[1],grids[0]},-1);});
   auto pixel_grid=centre.unsqueeze(2).unsqueeze(2)+extent.unsqueeze(2).unsqueeze(2)*offsets;
-  auto grid=(pixel_grid+.5)*fresh(pixel_grid,{2.f/640,2.f/360})-1;
-  auto mean=fresh(grid,{.485f,.456f,.406f}).view({1,3,1,1}),sd=fresh(grid,{.229f,.224f,.225f}).view({1,3,1,1});
+  auto grid=(pixel_grid+.5)*constant("crop_scale",[&]{return fresh(pixel_grid,{2.f/640,2.f/360});})-1;
+  auto mean=constant("mean",[&]{return fresh(grid,{.485f,.456f,.406f});}).view({1,3,1,1}),sd=constant("std",[&]{return fresh(grid,{.229f,.224f,.225f});}).view({1,3,1,1});
   auto probability=resize(mask.sigmoid(),720,1280); double cutoff=cfg("part_mask_cutoff",.2);
   probability=((probability-cutoff)/(1-cutoff)).clamp(0,1);
   int dilation=static_cast<int>(cfg("part_mask_dilation_px",1));
@@ -282,22 +314,25 @@ std::tuple<T,T,TensorMap> StereoNet::forward(const T& images,const T& K,const T&
   auto crop=at::grid_sampler(masked,grid.reshape({2,2*size,size,2}),0,0,false);
   crop=crop.reshape({2,4,2,size,size}).permute({0,2,1,3,4});
   auto observed=crop.select(2,3).mean({-2,-1});
-  auto divisor=fresh(centre,{640,360});
+  auto divisor=constant("size",[&]{return fresh(centre,{640,360});});
   auto boxmeta=at::cat({(centre+.5)/divisor,extent/divisor},-1);
   auto conf=confidence.mean(-1); V logits,heats,nextlocal;
   for(int i=0;i<2;++i) {
     profile.next(i==0?"stage::wrist_branch":"stage::jaw_branch");
     auto meta=at::cat({camera.reshape({2,9}),boxmeta.select(1,i),observed.select(1,i).unsqueeze(-1),conf.unsqueeze(-1)},-1);
     auto p=std::string("foreground_parts_net.")+(i==0?"wrist_branch":"jaw_branch");
-    auto branch=local_branch(crop.select(1,i).contiguous(),meta,hidden.slice(0,i+1,i+2),p);
+    auto branch=local_branch(crop.select(1,i).contiguous(),meta,hidden.slice(0,i+1,i+2),p,debug);
     logits.push_back(std::get<0>(branch));heats.push_back(std::get<1>(branch));nextlocal.push_back(std::get<2>(branch));
   }
   profile.next("stage::pack_values17");
   auto joint=w("joint_lower")+(w("joint_upper")-w("joint_lower"))*at::cat(logits,-1).sigmoid();
   auto q=quaternion(R); auto values=at::cat({at::cat({C,q},-1).flatten(-2),joint},-1);
   auto next=at::cat({std::get<1>(body),at::cat(nextlocal,0)},0);
-  // Preserve auxiliary computations from the Python forward (no branch pruning).
-  auto part_heat=at::stack(heats,1).reshape({1,1,2,2,3,heats[0].size(2),heats[0].size(3)});
+  T part_heat;
+#ifdef STEREO_OPTIMIZED
+  if(debug)
+#endif
+    part_heat=at::stack(heats,1).reshape({1,1,2,2,3,heats[0].size(2),heats[0].size(3)});
   if(debug) {
     detail["spatial"]=spatial;detail["tokens"]=tokens;detail["C"]=C;detail["R"]=R;detail["joints"]=joint;
     detail["landmark_uv"]=alluv;detail["landmark_confidence"]=confidence.reshape({1,1,2,5});

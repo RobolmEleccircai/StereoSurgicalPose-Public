@@ -56,6 +56,7 @@ def main():
     parser.add_argument('--preprocessing', choices=('cpu','gpu'), default=None)
     parser.add_argument('--display-mode',choices=('vectors','full'),default='vectors')
     parser.add_argument('--visual-engine',type=Path,help='Optional TensorRT visual frontend; downstream remains LibTorch')
+    parser.add_argument('--predictor-config',type=Path,help='Native runtime configuration; overrides checkpoint/engine/execution selection')
     args = parser.parse_args()
     if args.visual_engine is not None and args.inference_backend!='libtorch':
         parser.error('--visual-engine requires --inference-backend libtorch')
@@ -98,7 +99,13 @@ def main():
         raise ValueError('Transferred checkpoint hash mismatch')
     if args.inference_backend == 'libtorch':
         from stereo_pose.libtorch_predict import LibTorchPredictor
-        predictor = LibTorchPredictor(checkpoint, preprocessing=args.preprocessing,visual_engine=args.visual_engine)
+        if args.predictor_config:
+            from stereo_pose.libtorch_predict import build_predictor
+            config=json.loads(args.predictor_config.read_text());config['_config_dir']=str(args.predictor_config.resolve().parent)
+            predictor=build_predictor(config)
+            if digest(predictor.checkpoint_path)!=checkpoint_hash:raise ValueError('Configuration checkpoint mismatch')
+        else:
+            predictor = LibTorchPredictor(checkpoint, preprocessing=args.preprocessing,visual_engine=args.visual_engine)
     else:
         predictor = StereoPredictor(checkpoint, device='cuda')
     if predictor.instrument_model['source_scene_sha256'] != bundle['source_scene_sha256']:
@@ -212,6 +219,7 @@ def main():
                      'joint_deg_max_pitch_yaw_half': np.max(joints,0).tolist()}
         result = {'completed': True, 'gpu': name, 'gpu_before': gpu_before, 'gpu_after': gpu_snapshot(),
             'inference_backend': args.inference_backend,
+            'execution_mode':getattr(predictor,'execution_mode','reference'),
             'preprocessing': args.preprocessing,
             'display_mode': args.display_mode,
             'visual_engine':getattr(predictor,'visual_engine',None),
@@ -230,7 +238,7 @@ def main():
                  args.project/'reference/pose_display/native/overlay.cpp', Path(__file__).resolve()]}}
         if args.inference_backend == 'libtorch':
             import importlib
-            module=importlib.import_module('stereo_libtorch_trt' if args.visual_engine else 'stereo_libtorch')
+            module=importlib.import_module(predictor.model.native_module)
             result['native_library_sha256']=digest(module.__file__)
             result['preprocess_library_sha256']=digest(importlib.import_module('stereo_libtorch').__file__)
             result['source_sha256'].update({str(p.relative_to(args.project)): digest(p) for p in

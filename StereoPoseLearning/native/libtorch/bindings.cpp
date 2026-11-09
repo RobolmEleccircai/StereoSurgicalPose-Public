@@ -1,5 +1,8 @@
 #include "model.h"
 #include "preprocess.h"
+#ifdef STEREO_OPTIMIZED
+#include "position_cuda.h"
+#endif
 #include "profile_ranges.h"
 #include <torch/csrc/utils/pybind.h>
 #include <pybind11/pybind11.h>
@@ -22,6 +25,10 @@ PYBIND11_MODULE(STEREO_MODULE_NAME,m) {
       };
   });
 #endif
+  m.def("position_reference",&stereo_position_reference);
+#ifdef STEREO_OPTIMIZED
+  m.def("position_cuda",&stereo_position_cuda);
+#endif
   pybind11::class_<StereoPreprocess>(m,"StereoPreprocess",pybind11::module_local())
       .def(pybind11::init<const torch::Tensor&>())
       .def("host_input",&StereoPreprocess::host_input)
@@ -31,6 +38,7 @@ PYBIND11_MODULE(STEREO_MODULE_NAME,m) {
 #ifdef STEREO_WITH_TENSORRT
       .def("load_visual_engine",&StereoNet::load_visual_engine)
 #endif
+      .def("set_calibration",&StereoNet::set_calibration)
       .def("forward",&StereoNet::forward,pybind11::arg("images"),pybind11::arg("K"),
            pybind11::arg("D"),pybind11::arg("hidden"),pybind11::arg("hires"),
            pybind11::arg("debug")=false,pybind11::call_guard<pybind11::gil_scoped_release>());

@@ -23,7 +23,9 @@ def stats(x):
 def main():
     p=argparse.ArgumentParser(description=__doc__)
     p.add_argument('--inputs',type=Path,required=True)
-    p.add_argument('--engine',type=Path,required=True)
+    p.add_argument('--engine',type=Path)
+    p.add_argument('--baseline-config',type=Path)
+    p.add_argument('--candidate-config',type=Path)
     p.add_argument('--output',type=Path,required=True)
     p.add_argument('--truth',type=Path,help='Optional hash-matched label values, used only after inference')
     a=p.parse_args()
@@ -37,8 +39,15 @@ def main():
     from pose_display.projection import project as project_points
     from scipy.spatial.transform import Rotation
     torch.set_num_threads(4);torch.set_num_interop_threads(1)
-    original=LibTorchPredictor(a.inputs/'best_val.pt',preprocessing='gpu')
-    accelerated=LibTorchPredictor(a.inputs/'best_val.pt',preprocessing='gpu',visual_engine=a.engine)
+    def configured(path, engine=None):
+        if path:
+            from stereo_pose.libtorch_predict import build_predictor
+            config=json.loads(path.read_text());config['_config_dir']=str(path.resolve().parent)
+            return build_predictor(config)
+        return LibTorchPredictor(a.inputs/'best_val.pt',preprocessing='gpu',visual_engine=engine)
+    if not a.candidate_config and not a.engine:raise ValueError('Provide candidate configuration or engine')
+    original=configured(a.baseline_config)
+    accelerated=configured(a.candidate_config,a.engine)
     bundle=json.loads((a.inputs/'samples.json').read_text())
     truths={}
     if a.truth:
@@ -47,6 +56,7 @@ def main():
     with torch.inference_mode():
         for number,row in enumerate(bundle['samples']):
             if row['sequence_id']!=previous:
+                original.reset();accelerated.reset()
                 h0=torch.zeros(3,2,256,device='cuda');h1=h0.clone()
             images=[np.asarray(Image.open(a.inputs/row['images'][e]).convert('RGB')) for e in ('left','right')]
             truth=truths.get((row['sequence_id'],row['frame_index']))
@@ -56,6 +66,7 @@ def main():
                     with (a.inputs/row['images'][eye]).open('rb') as f:
                         assert hashlib.file_digest(f,'sha256').hexdigest()==truth['image_sha256'][eye]
             frame=StereoFrame(f"{row['sequence_id']}/{row['frame_index']:06d}",row['timestamp_ns'],*images)
+            pred0=original(frame,row['calibration']);pred1=accelerated(frame,row['calibration'])
             inputs=original._preprocess(frame,row['calibration']);hires=original._hires
             v0,h0,d0=original.model.engine.forward(*inputs,h0,hires,True)
             v1,h1,d1=accelerated.model.engine.forward(*inputs,h1,hires,True)
@@ -67,7 +78,9 @@ def main():
                 r['max_abs']=max(r['max_abs'],float(diff.abs().max()))
                 r['rms'].append(float(diff.square().mean().sqrt()))
                 r['reference_rms'].append(float(t0.float().square().mean().sqrt()))
-            x,y=v0.flatten().cpu().numpy(),v1.flatten().cpu().numpy()
+            x,y=pred0.values17,pred1.values17
+            if not np.allclose(y,v1.flatten().cpu().numpy(),atol=1e-5,rtol=1e-6):
+                raise ValueError('Runtime and diagnostic forward disagree')
             if not np.isfinite(y).all():raise ValueError('Non-finite pose')
             xx,yy=decode(x,original.instrument_model),decode(y,original.instrument_model)
             record={'sequence_id':row['sequence_id'],'category':row['category'],'frame_index':row['frame_index'],
@@ -120,7 +133,9 @@ def main():
         r['rms_mean']=float(np.mean(r.pop('rms')))
         r['reference_rms_mean']=float(np.mean(r.pop('reference_rms')))
     result={'completed':True,'passed_numerical_tolerances':bool(passed),'pairs':len(rows),
-        'categories':len(previews),'engine':accelerated.visual_engine,'summary':summary,'layers':layers,
+        'categories':len(previews),'engine':accelerated.visual_engine,
+        'baseline_execution':original.execution_mode,'candidate_execution':accelerated.execution_mode,
+        'baseline_engine':original.visual_engine,'summary':summary,'layers':layers,
         'conversion_limits':limits,'scope':'Difference from original eager C++ FP32 model, not error against ground truth. Independent recurrent state within each sequence. Shared unchanged GPU preprocessing.',
         'preview_layout':'top: original; bottom: TensorRT; each row left/right stereo',
         'previews':previews,'per_category':{c:{k:stats([v for r in rows if r['category']==c for v in r[k]]) for k in
@@ -134,6 +149,23 @@ def main():
                 n:stats([r['task_error'][name]['joint_deg'][i] for r in rows])
                 for i,n in enumerate(('pitch','yaw','jaw_half'))}
         result['accuracy_scope']='Same 56 test pairs only, seven independent 8-frame clips; not full test evaluation. Image hashes match immutable label manifest.'
+    if truths and a.baseline_config:
+        comparisons={}
+        for category in ['all']+sorted({r['category'] for r in rows}):
+            selected=[r for r in rows if category=='all' or r['category']==category]
+            comparison={}
+            for metric in ('C_mm','tip_mm','pitch_deg','yaw_deg','jaw_half_deg'):
+                def errors(name):
+                    if metric.endswith('_mm'):return [v for r in selected for v in r['task_error'][name][metric]]
+                    index=('pitch_deg','yaw_deg','jaw_half_deg').index(metric)
+                    return [r['task_error'][name]['joint_deg'][index] for r in selected]
+                base=stats(errors('original'));cand=stats(errors('tensorrt'))
+                delta={k:cand[k]-base[k] for k in ('mean','p95')}
+                comparison[metric]={'baseline':base,'candidate':cand,'increase':delta,'passed':max(delta.values())<=.005}
+            comparisons[category]=comparison
+        result['truth_accuracy_comparison']=comparisons
+        result['passed_truth_accuracy']=all(m['passed'] for c in comparisons.values() for m in c.values())
+        passed=passed and result['passed_truth_accuracy']
     (a.output/'report.json').write_text(json.dumps(result,indent=2)+'\n')
     (a.output/'frames.jsonl').write_text(''.join(json.dumps(r)+'\n' for r in rows))
     print(json.dumps(result,indent=2),flush=True)

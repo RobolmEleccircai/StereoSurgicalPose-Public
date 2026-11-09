@@ -11,14 +11,18 @@ from .data import resize_intrinsics
 
 
 class LibTorchModel(torch.nn.Module):
-    def __init__(self, state, config, visual_engine=None):
+    def __init__(self, state, config, visual_engine=None, execution_mode="reference"):
         super().__init__()
         if config.get('backbone') != 'convnextv2_nano.fcmae_ft_in22k_in1k' or config.get('c_translation_head') != 'landmark_ray_depth_v1':
             raise ValueError('This C++ definition implements the current ConvNeXtV2 Nano / unified-C model')
         sys.path.insert(0,str(Path(__file__).resolve().parents[1]/'native/libtorch/build'))
         if visual_engine is not None:
             sys.path.insert(0,str(Path(__file__).resolve().parents[1]/'native/libtorch/build/tensorrt'))
-        native=importlib.import_module('stereo_libtorch_trt' if visual_engine is not None else 'stereo_libtorch')
+        if execution_mode != 'reference':
+            sys.path.insert(0,str(Path(__file__).resolve().parents[1]/'native/libtorch/build/optimized'))
+        self.native_module='stereo_libtorch_opt' if execution_mode != 'reference' else ('stereo_libtorch_trt' if visual_engine is not None else 'stereo_libtorch')
+        native=importlib.import_module(self.native_module)
+        self.execution_mode=execution_mode
         numeric={k:float(v) for k,v in config.items() if isinstance(v,(int,float,bool))}
         # Transfer the original state_dict tensors directly once at startup.
         # The default stays eager. An explicitly selected TensorRT engine only
@@ -37,7 +41,12 @@ class LibTorchModel(torch.nn.Module):
 
 
 class LibTorchPredictor(StereoPredictor):
-    def __init__(self, checkpoint, *, fps=60.0, preprocessing='gpu', visual_engine=None):
+    def __init__(self, checkpoint, *, fps=60.0, preprocessing='gpu', visual_engine=None, execution_mode='reference'):
+        if execution_mode not in ('reference','optimized_eager'):
+            raise ValueError('Unsupported execution_mode')
+        if execution_mode!='reference' and preprocessing!='gpu':
+            raise ValueError('Optimized execution requires GPU preprocessing')
+        self.execution_mode=execution_mode
         if preprocessing not in ('cpu','gpu'): raise ValueError('preprocessing must be cpu or gpu')
         self.checkpoint_path=Path(checkpoint).expanduser().resolve()
         data=torch.load(self.checkpoint_path,map_location='cpu',weights_only=True)
@@ -57,7 +66,7 @@ class LibTorchPredictor(StereoPredictor):
             if sha(self.checkpoint_path)!=metadata['checkpoint_sha256'] or sha(visual_engine)!=metadata['engine_sha256']:
                 raise ValueError('TensorRT engine/checkpoint provenance mismatch')
             self.visual_engine=metadata
-        self.model=LibTorchModel(data['model'],self.training_config['model'],visual_engine)
+        self.model=LibTorchModel(data['model'],self.training_config['model'],visual_engine,execution_mode)
         self.preprocessing=preprocessing
         if preprocessing=='gpu':
             if self.image_size!=(360,640): raise ValueError('GPU preprocessing expects a 640x360 network input')
@@ -96,6 +105,7 @@ class LibTorchPredictor(StereoPredictor):
             D=np.asarray([calibration[e]['D'] for e in ('left','right')])
             self._K=torch.as_tensor(K,dtype=torch.float32,device=self.device)[None,None]
             self._D=torch.as_tensor(D,dtype=torch.float32,device=self.device)[None,None]
+            if self.execution_mode!='reference':self.model.engine.set_calibration(self._K,self._D)
             self._calibration_key=key
         return small,self._K,self._D
 
@@ -112,4 +122,4 @@ def build_predictor(config):
     if engine is not None:
         engine=Path(engine).expanduser()
         if not engine.is_absolute():engine=Path(config.get('_config_dir','.'))/engine
-    return LibTorchPredictor(path,fps=float(config.get('fps',60)),preprocessing=config.get('preprocessing','gpu'),visual_engine=engine)
+    return LibTorchPredictor(path,fps=float(config.get('fps',60)),preprocessing=config.get('preprocessing','gpu'),visual_engine=engine,execution_mode=config.get('execution_mode','reference'))

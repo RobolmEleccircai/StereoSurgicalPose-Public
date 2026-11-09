@@ -5,6 +5,7 @@
 #include <string>
 #include <tuple>
 #include <memory>
+#include <functional>
 #ifdef STEREO_WITH_TENSORRT
 #include "trt_visual.h"
 #endif
@@ -22,7 +23,11 @@ class StereoNet {
   std::tuple<at::Tensor, at::Tensor, TensorMap> forward(
       const at::Tensor& images, const at::Tensor& K, const at::Tensor& D,
       const at::Tensor& hidden, const at::Tensor& hires, bool debug=false);
+  void set_calibration(const at::Tensor& K, const at::Tensor& D);
  private:
+  mutable TensorMap constants_;
+  at::Tensor inverse_, distortion_;
+  at::Tensor constant(const std::string&, const std::function<at::Tensor()>&) const;
 #ifdef STEREO_WITH_TENSORRT
   std::unique_ptr<TrtVisual> visual_engine_;
 #endif
@@ -41,5 +46,7 @@ class StereoNet {
   std::tuple<at::Tensor,at::Tensor,at::Tensor> guided(
       const at::Tensor&,const at::Tensor&,const at::Tensor&) const;
   std::tuple<at::Tensor,at::Tensor,at::Tensor> local_branch(
-      const at::Tensor&,const at::Tensor&,const at::Tensor&,const std::string&);
+      const at::Tensor&,const at::Tensor&,const at::Tensor&,const std::string&, bool debug);
 };
+
+at::Tensor stereo_position_reference(const at::Tensor&,const at::Tensor&,const at::Tensor&,const at::Tensor&);
