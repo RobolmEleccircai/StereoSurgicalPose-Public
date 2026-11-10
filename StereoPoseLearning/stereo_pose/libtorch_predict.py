@@ -12,7 +12,7 @@ from .data import resize_intrinsics
 
 
 class LibTorchModel(torch.nn.Module):
-    def __init__(self, state, config, visual_engine=None, execution_mode="reference"):
+    def __init__(self, state, config, visual_engine=None, execution_mode="reference", cuda_fusions=()):
         super().__init__()
         if config.get('backbone') != 'convnextv2_nano.fcmae_ft_in22k_in1k' or config.get('c_translation_head') != 'landmark_ray_depth_v1':
             raise ValueError('This C++ definition implements the current ConvNeXtV2 Nano / unified-C model')
@@ -22,6 +22,9 @@ class LibTorchModel(torch.nn.Module):
         if execution_mode != 'reference':
             sys.path.insert(0,str(Path(__file__).resolve().parents[1]/'native/libtorch/build/optimized'))
         self.native_module='stereo_libtorch_opt' if execution_mode != 'reference' else ('stereo_libtorch_trt' if visual_engine is not None else 'stereo_libtorch')
+        if cuda_fusions:
+            sys.path.insert(0,str(Path(__file__).resolve().parents[1]/'native/libtorch/build/fused'))
+            self.native_module='stereo_libtorch_fused'
         native=importlib.import_module(self.native_module)
         self.execution_mode=execution_mode
         self.actual_execution=execution_mode
@@ -31,6 +34,7 @@ class LibTorchModel(torch.nn.Module):
         # Transfer the original state_dict tensors directly once at startup.
         # The default stays eager. An explicitly selected TensorRT engine only
         # replaces the visual frontend in the separately compiled native module.
+        numeric.update({'fusion_'+name:1.0 for name in cuda_fusions})
         self.engine=native.StereoNet(dict(state),numeric)
         if visual_engine is not None:self.engine.load_visual_engine(str(visual_engine))
 
@@ -67,12 +71,17 @@ class LibTorchModel(torch.nn.Module):
 
 
 class LibTorchPredictor(StereoPredictor):
-    def __init__(self, checkpoint, *, fps=60.0, preprocessing='gpu', visual_engine=None, execution_mode='reference'):
+    def __init__(self, checkpoint, *, fps=60.0, preprocessing='gpu', visual_engine=None, execution_mode='reference', cuda_fusions=()):
         if execution_mode not in ('reference','optimized_eager','optimized_graph'):
             raise ValueError('Unsupported execution_mode')
         if execution_mode!='reference' and preprocessing!='gpu':
             raise ValueError('Optimized execution requires GPU preprocessing')
         self.execution_mode=execution_mode
+        self.cuda_fusions=tuple(cuda_fusions)
+        if len(set(cuda_fusions))!=len(cuda_fusions) or set(cuda_fusions)-{'preprocess','hires_crop','landmark_reduce'}:
+            raise ValueError('Invalid cuda_fusions')
+        if cuda_fusions and (execution_mode=='reference' or preprocessing!='gpu' or visual_engine is None):
+            raise ValueError('CUDA fusions require optimized execution, GPU input and TensorRT')
         if preprocessing not in ('cpu','gpu'): raise ValueError('preprocessing must be cpu or gpu')
         self.checkpoint_path=Path(checkpoint).expanduser().resolve()
         data=torch.load(self.checkpoint_path,map_location='cpu',weights_only=True)
@@ -92,7 +101,7 @@ class LibTorchPredictor(StereoPredictor):
             if sha(self.checkpoint_path)!=metadata['checkpoint_sha256'] or sha(visual_engine)!=metadata['engine_sha256']:
                 raise ValueError('TensorRT engine/checkpoint provenance mismatch')
             self.visual_engine=metadata
-        self.model=LibTorchModel(data['model'],self.training_config['model'],visual_engine,execution_mode)
+        self.model=LibTorchModel(data['model'],self.training_config['model'],visual_engine,execution_mode,cuda_fusions)
         self.preprocessing=preprocessing
         if preprocessing=='gpu':
             if self.image_size!=(360,640): raise ValueError('GPU preprocessing expects a 640x360 network input')
@@ -101,7 +110,9 @@ class LibTorchPredictor(StereoPredictor):
             mean=np.asarray([.485,.456,.406],np.float32)
             std=np.asarray([.229,.224,.225],np.float32)
             lut=(np.arange(256,dtype=np.float32)[:,None]/255.0-mean)/std
-            self.preprocessor=importlib.import_module('stereo_libtorch').StereoPreprocess(torch.from_numpy(lut))
+            self.preprocess_module=self.model.native_module if 'preprocess' in cuda_fusions else 'stereo_libtorch'
+            factory=importlib.import_module(self.preprocess_module).StereoPreprocess
+            self.preprocessor=factory(torch.from_numpy(lut),True) if 'preprocess' in cuda_fusions else factory(torch.from_numpy(lut))
             self._host_rgb=self.preprocessor.host_input().numpy()
             self._input_done=torch.cuda.Event()
             self._input_pending=False
@@ -157,4 +168,4 @@ def build_predictor(config):
     if engine is not None:
         engine=Path(engine).expanduser()
         if not engine.is_absolute():engine=Path(config.get('_config_dir','.'))/engine
-    return LibTorchPredictor(path,fps=float(config.get('fps',60)),preprocessing=config.get('preprocessing','gpu'),visual_engine=engine,execution_mode=config.get('execution_mode','reference'))
+    return LibTorchPredictor(path,fps=float(config.get('fps',60)),preprocessing=config.get('preprocessing','gpu'),visual_engine=engine,execution_mode=config.get('execution_mode','reference'),cuda_fusions=config.get('cuda_fusions',()))

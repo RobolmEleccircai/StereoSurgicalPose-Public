@@ -1,6 +1,9 @@
 #include "preprocess.h"
 #include "profile_ranges.h"
 #include <cmath>
+#ifdef STEREO_FUSIONS
+#include "fusion_cuda.h"
+#endif
 
 namespace {
 // Pillow 11.3 RGB BILINEAR downsampling by two: separable four-tap filter,
@@ -43,7 +46,10 @@ torch::Tensor pass(const torch::Tensor& input, int dimension,
 }
 }
 
-StereoPreprocess::StereoPreprocess(const torch::Tensor& normalization_lut) {
+StereoPreprocess::StereoPreprocess(const torch::Tensor& normalization_lut, bool fused) : fused_(fused) {
+#ifndef STEREO_FUSIONS
+    TORCH_CHECK(!fused_,"Fused preprocessing requires the separate fusion library");
+#endif
     TORCH_CHECK(normalization_lut.sizes()==torch::IntArrayRef({256,3}) &&
                 normalization_lut.scalar_type()==torch::kFloat32,"Expected 256x3 FP32 RGB normalization table");
     host_=torch::empty({2,720,1280,3},torch::TensorOptions().dtype(torch::kUInt8).pinned_memory(true));
@@ -51,6 +57,13 @@ StereoPreprocess::StereoPreprocess(const torch::Tensor& normalization_lut) {
     lut_=normalization_lut.contiguous().view({-1}).to(torch::kCUDA);
     channels_=torch::arange(3,torch::TensorOptions().dtype(torch::kInt64).device(torch::kCUDA)).view({1,1,1,3});
     axis(1280,2,x_indices_,x_weights_); axis(720,1,y_indices_,y_weights_);
+    if(fused_) {
+        xi_=torch::stack(x_indices_).contiguous();xw_=torch::stack(x_weights_).contiguous();
+        yi_=torch::stack(y_indices_).contiguous();yw_=torch::stack(y_weights_).contiguous();
+        horizontal_=torch::empty({2,720,640,3},raw_.options());
+        small_=torch::empty({2,360,640,3},raw_.options());
+        normalized_=torch::empty({2,360,640,3},raw_.options().dtype(torch::kFloat32));
+    }
 }
 
 std::tuple<torch::Tensor,torch::Tensor,torch::Tensor> StereoPreprocess::run() {
@@ -60,6 +73,15 @@ std::tuple<torch::Tensor,torch::Tensor,torch::Tensor> StereoPreprocess::run() {
     ProfileStages profile;
     profile.next("stage::upload_rgb");
     raw_.copy_(host_,true);
+#ifdef STEREO_FUSIONS
+    if(fused_) {
+        profile.next("stage::fused_resize_normalize");
+        stereo_resize_normalize_cuda(raw_,lut_,xi_,xw_,yi_,yw_,horizontal_,small_,normalized_);
+        auto images=normalized_.permute({0,3,1,2}).unsqueeze(0).unsqueeze(0);
+        auto hires=raw_.permute({0,3,1,2}).contiguous().unsqueeze(0).unsqueeze(0);
+        return {images,hires,small_};
+    }
+#endif
     profile.next("stage::resize_horizontal");
     auto horizontal=pass(raw_,2,x_indices_,x_weights_);
     profile.next("stage::resize_vertical");

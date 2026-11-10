@@ -1,0 +1,219 @@
+{
+  "step": "A",
+  "preprocess": {
+    "passed": true,
+    "stereo_pairs": 56,
+    "categories": 7,
+    "synthetic_stereo_pairs": 6,
+    "maximum_differences": {
+      "resized_uint8": 0,
+      "normalized_fp32": 0,
+      "K": 0,
+      "D": 0,
+      "hires": 0,
+      "values17": 0,
+      "hidden": 0,
+      "derived_point_mm": 0,
+      "joint_deg": 0,
+      "overlay_rgb": 0
+    },
+    "calibration_change_and_stream_reset_checked": true,
+    "noncontiguous_inputs_and_error_recovery_checked": true,
+    "checkpoint_sha256": "639fc8c7e56263f4ab889aa53cc5132e3610eea4c8b2d8b0db671c41d8a30325",
+    "meaning": "Implementation equivalence to CPU preprocessing, not accuracy against ground truth."
+  },
+  "performance": {
+    "baseline": {
+      "predictor_including_preprocess_transfer_export_ms": {
+        "mean_ms": 11.728351912499997,
+        "median_ms": 11.753128,
+        "p95_ms": 12.091693150000001,
+        "p99_ms": 12.27251523,
+        "min_ms": 11.132675,
+        "max_ms": 13.287771
+      },
+      "cpp_projection_and_draw_ms": {
+        "mean_ms": 3.5408684321428567,
+        "median_ms": 3.465976,
+        "p95_ms": 3.9677838999999997,
+        "p99_ms": 4.92675185,
+        "min_ms": 2.968826,
+        "max_ms": 6.580867
+      },
+      "end_to_end_ms": {
+        "mean_ms": 15.269220344642855,
+        "median_ms": 15.2338585,
+        "p95_ms": 15.985803849999998,
+        "p99_ms": 16.855326469999998,
+        "min_ms": 14.378922,
+        "max_ms": 18.327866
+      },
+      "process_cpu_seconds": 9.823347894999998,
+      "process_cpu_percent": 114.73533058773856,
+      "process_peak_rss_mib": 2160.8359375,
+      "measured_pairs": 560,
+      "warmup_pairs": 56,
+      "first_warmup_pair_ms": 457.211395,
+      "hz": 65.49122859117335,
+      "inverse_p95_hz": 62.55550295645596,
+      "fraction_within_16_67_ms": 0.9821428571428571,
+      "fraction_within_33_33_ms": 1.0,
+      "peak_cuda_allocated_mib": 153.708984375,
+      "peak_cuda_reserved_mib": 360.0,
+      "per_category": {
+        "combined_pose_jaw": {
+          "mean_ms": 15.28568845,
+          "median_ms": 15.232096,
+          "p95_ms": 15.989738249999998,
+          "p99_ms": 16.39999146,
+          "min_ms": 14.378922,
+          "max_ms": 16.635511
+        },
+        "ecm_motion": {
+          "mean_ms": 15.205616962499999,
+          "median_ms": 15.2009975,
+          "p95_ms": 15.80090195,
+          "p99_ms": 16.31837919999999,
+          "min_ms": 14.445805,
+          "max_ms": 17.933471
+        },
+        "lighting": {
+          "mean_ms": 15.255354287500001,
+          "median_ms": 15.2581555,
+          "p95_ms": 15.9063012,
+          "p99_ms": 16.210002319999997,
+          "min_ms": 14.5926,
+          "max_ms": 16.33055
+        },
+        "occlusion": {
+          "mean_ms": 15.298083887500002,
+          "median_ms": 15.2734685,
+          "p95_ms": 15.9480691,
+          "p99_ms": 16.43002481999999,
+          "min_ms": 14.569334,
+          "max_ms": 17.624696
+        },
+        "pose_motion": {
+          "mean_ms": 15.268467562500001,
+          "median_ms": 15.200378,
+          "p95_ms": 16.34670745,
+          "p99_ms": 16.8943181,
+          "min_ms": 14.614049,
+          "max_ms": 16.967164
+        },
+        "sensor_quality": {
+          "mean_ms": 15.271513774999999,
+          "median_ms": 15.2543195,
+          "p95_ms": 15.98307675,
+          "p99_ms": 16.71245166,
+          "min_ms": 14.648386,
+          "max_ms": 16.719677
+        },
+        "stereo_rig": {
+          "mean_ms": 15.299817487500002,
+          "median_ms": 15.216839,
+          "p95_ms": 16.07874425,
+          "p99_ms": 17.559937019999992,
+          "min_ms": 14.594292,
+          "max_ms": 18.327866
+        }
+      }
+    },
+    "A": {
+      "predictor_including_preprocess_transfer_export_ms": {
+        "mean_ms": 10.676817608928571,
+        "median_ms": 10.6516015,
+        "p95_ms": 11.03092515,
+        "p99_ms": 11.28772305,
+        "min_ms": 10.174847,
+        "max_ms": 11.728787
+      },
+      "cpp_projection_and_draw_ms": {
+        "mean_ms": 3.3836535321428567,
+        "median_ms": 3.307766,
+        "p95_ms": 3.78612265,
+        "p99_ms": 4.84283767,
+        "min_ms": 3.009334,
+        "max_ms": 5.381191
+      },
+      "end_to_end_ms": {
+        "mean_ms": 14.060471141071428,
+        "median_ms": 13.9933245,
+        "p95_ms": 14.74009585,
+        "p99_ms": 15.78633605,
+        "min_ms": 13.397096,
+        "max_ms": 16.584523
+      },
+      "process_cpu_seconds": 9.145442563,
+      "process_cpu_percent": 115.97149626888552,
+      "process_peak_rss_mib": 2142.59375,
+      "measured_pairs": 560,
+      "warmup_pairs": 56,
+      "first_warmup_pair_ms": 440.560151,
+      "hz": 71.12137210530192,
+      "inverse_p95_hz": 67.84216399786844,
+      "fraction_within_16_67_ms": 1.0,
+      "fraction_within_33_33_ms": 1.0,
+      "peak_cuda_allocated_mib": 132.65771484375,
+      "peak_cuda_reserved_mib": 324.0,
+      "per_category": {
+        "combined_pose_jaw": {
+          "mean_ms": 14.1080697125,
+          "median_ms": 14.018943499999999,
+          "p95_ms": 14.76934335,
+          "p99_ms": 14.975232129999998,
+          "min_ms": 13.465941,
+          "max_ms": 15.188574
+        },
+        "ecm_motion": {
+          "mean_ms": 14.044588612500002,
+          "median_ms": 13.9550415,
+          "p95_ms": 14.6349875,
+          "p99_ms": 15.608216699999995,
+          "min_ms": 13.417918,
+          "max_ms": 16.13457
+        },
+        "lighting": {
+          "mean_ms": 14.1427253,
+          "median_ms": 14.0750705,
+          "p95_ms": 15.266900599999998,
+          "p99_ms": 16.094337479999997,
+          "min_ms": 13.550885,
+          "max_ms": 16.584523
+        },
+        "occlusion": {
+          "mean_ms": 14.053137562500002,
+          "median_ms": 14.026467499999999,
+          "p95_ms": 14.694834049999999,
+          "p99_ms": 15.027711309999999,
+          "min_ms": 13.47979,
+          "max_ms": 15.223561
+        },
+        "pose_motion": {
+          "mean_ms": 13.997653775,
+          "median_ms": 13.8927945,
+          "p95_ms": 14.593312749999999,
+          "p99_ms": 15.840000069999999,
+          "min_ms": 13.431957,
+          "max_ms": 15.980831
+        },
+        "sensor_quality": {
+          "mean_ms": 14.06254405,
+          "median_ms": 14.0191395,
+          "p95_ms": 14.700702549999999,
+          "p99_ms": 15.07316699,
+          "min_ms": 13.466709,
+          "max_ms": 15.106915
+        },
+        "stereo_rig": {
+          "mean_ms": 14.014578975000001,
+          "median_ms": 13.971682,
+          "p95_ms": 14.556112950000001,
+          "p99_ms": 15.301299709999995,
+          "min_ms": 13.397096,
+          "max_ms": 15.917461
+        }
+      }
+    }
+  }
+}
