@@ -1,273 +1,169 @@
-# Native stereo inference optimization — step-by-step record
+# 4060 双目推理优化：逐步实现、验证与结果
 
-## Scope and reference
+## 固定条件与测量口径
 
-Work takes place on the RTX 4060 Laptop GPU, using fixed-checkpoint checkpoint SHA256
-`639fc8c7e56263f4ab889aa53cc5132e3610eea4c8b2d8b0db671c41d8a30325`.
-The reference is the accepted TensorRT visual frontend plus eager C++ LibTorch,
-GPU preprocessing and the three-vector C++ display. Original eager and TensorRT
-libraries are retained. No training, new rendering, resolution reduction or
-quantization-aware training is part of this work.
+本记录按 A → B → C → D 的顺序展开。每步先完成实现、正确性检查和独立测速，再进入下一步；每步单独提交，保留机器可读证据。只在4060笔记本运行，没有改动服务器训练，也没有重新渲染或训练模型。
 
-Every stage records its purpose, implementation, commands, failures, numerical
-checks and complete stereo latency before the next stage begins. Measurements
-include preprocessing, inference, output transfer, FK, projection and completed
-RGB drawing, excluding disk decoding, camera acquisition, encoding and refresh.
-The existing 56 pairs are seven separate eight-frame sequences, not a full-test
-accuracy assessment. All three recurrent states persist within each sequence.
+- 硬件：RTX 4060 Laptop 8GB；驱动580.95.05，CUDA工具链12.8.93。
+- 环境：Ubuntu22.04、Python3.11.18、PyTorch2.9.1+cu128、TensorRT10.13.3.9。
+- 权重：固定权重；SHA256 `639fc8c7e56263f4ab889aa53cc5132e3610eea4c8b2d8b0db671c41d8a30325`。
+- 每目输入1280×720，主干640×360，局部裁剪160×160；单对双目、单时刻输入，三个GRU状态在序列内连续保留。
+- 输出17值的定义、坐标系、运动学和三个向量的数值／箭头／自身XYZ轴／透明面板不变。
+- 基线是先前通过验收的TensorRT视觉前端＋普通C++ LibTorch＋GPU预处理＋原C++绘图；基线源码提交为 `dbe9ffb`，原库和引擎保留，没有覆盖。
 
-## A — Fused C reconstruction and reusable constants
+**完整耗时**：RAM中的左右RGB → GPU预处理 → 完整模型 → 17值回传 → 运动学与投影 → 标注画布完成。不包含读盘、图片解码、相机采集等待、编码、窗口提交和显示器刷新。
 
-### Why
+它是样本回归检查，**不是完整测试集精度**。
 
-`position()` reconstructs two C points from predicted image coordinates and depth.
-The old eager implementation recomputed K inverse and launched many small tensor
-operations for ten Newton iterations every frame. Fixed ROI grids, normalization
-constants and image-size vectors were also rebuilt. Local auxiliary heatmaps were
-computed despite not contributing to the 17 inference values or recurrent states.
+## A：合并 C 点计算，缓存固定内容
 
-### What changes
+### 为什么这样修改
 
-- A separate `STEREO_OPTIMIZED` build produces `stereo_libtorch_opt.so`.
-- `position_cuda.cu` performs the same inverse-camera multiplication, ten Newton
-  steps, determinant epsilon protection and depth scaling in FP64, then stores
-  FP32. `--fmad=false` is used; fast math is not enabled.
-- `set_calibration` updates FP64 K inverse and D only when the existing camera
-  configuration key changes. Existing buffers are updated in place.
-- Per-model lazy caches hold guided-region grids/radii, crop offsets, size vectors
-  and normalization constants. Reference builds still execute the old expressions.
-- Normal optimized inference skips only the wrist/jaw auxiliary heatmaps. Debug
-  execution retains them; main landmark heatmaps and segmentation are unchanged.
-- `execution_mode=optimized_eager` selects the new library; absent configuration
-  selects `reference`. The 17-value public output and state reset rules are unchanged.
+原 `position()` 每帧重新求K的逆矩阵，并用大量零碎ATen操作对两个C点执行10次牛顿迭代。固定ROI网格、归一化常量和尺寸向量也反复构造；腕部／钳口辅助热图即使不用于17值输出或时序状态，仍在计算。
 
-### Build attempts and corrections
+### 如何实现
 
-1. The first launch incorrectly assumed CMake was in the inference Conda environment.
-   It was not. The verified system executable is `/usr/bin/cmake`; Python remains the
-   existing inference environment's Python 3.11.18. No environment was replaced.
-2. NVCC rejected `std::numeric_limits<double>::epsilon()` in a device function.
-   It was replaced by the numerically identical compile-time `DBL_EPSILON`, retaining
-   multiplication by eight. No relaxed constexpr or reduced precision was introduced.
+1. 新增独立 `STEREO_OPTIMIZED` 构建，生成 `stereo_libtorch_opt.so`，不替换原库。
+2. `position_cuda.cu` 将逆相机变换、10次去畸变迭代、行列式保护及深度缩放合为一个CUDA核。中间量保持FP64，最终存为FP32；使用 `--fmad=false`，不开启快速数学。
+3. 相机配置键变化时才更新左右K逆矩阵和D，更新现有缓存内容，避免改变以后被图捕获的地址。
+4. 按模型缓存固定网格、ROI半径、归一化和尺寸常量；参考构建仍执行原表达式。
+5. 普通优化推理跳过仅用于调试的局部辅助热图；调试路径保留。主关键点热图和整器械分割仍参与推理。
 
-### Verification protocol
+### 遇到的问题及处理
 
-`verify_position_cuda.py` tests source-image edges/interior, each stored camera,
-zero and actual distortion, and depths 10/30/100/300/1000 mm against the original
-ATen formula. Maximum permitted position disagreement is 0.0001 mm.
+- 首次构建错误地假定Conda环境中有CMake。核查后使用系统 `/usr/bin/cmake`，Python仍使用现有推理环境，没有更换环境。
+- NVCC不接受在设备函数中调用 `std::numeric_limits<double>::epsilon()`。改用数值相同的编译期 `DBL_EPSILON`，仍乘以8；没有通过放宽精度解决。
+- 第一组测速末尾可能与状态检查重叠，因此不采用它作为正式结果，重新顺序执行独占测速。
 
-`verify_trt_visual.py` now accepts baseline/candidate predictor configurations,
-executes the real public predictor and independently checks diagnostic forward.
-It reports physical outputs, projected points, internal tensors and ground-truth
-errors, with per-category mean/P95 truth error increases limited to 0.005 mm/degree.
-A separate comparison against original eager LibTorch retains the established
-0.1 mm / 0.1 degree / 0.25 pixel numerical conversion limits.
+### 检查与结果
 
-Status: A completed and accepted; numerical and state checks passed.
+- `verify_position_cuda.py` 检查左右相机、图像边缘与内部位置、零／实际畸变，以及10/30/100/300/1000 mm深度，共720点。最大差 **0 mm**，通过0.0001 mm阈值。
+- 56对真实预测的17值与当前TensorRT基线逐值一致；C、铰链、尖端、旋转、角度及投影差均为0。
 
-### Reproduction commands
+- 连续状态、主动重置、重复时间戳、时间间隔过大、序列切换、K/D变化、坏图拒绝及恢复均通过。
 
-Run from `StereoPoseLearning` with the existing inference environment active.
-The pinned TensorRT headers and reference engine are prepared by the existing
-TensorRT setup described in `TENSORRT_VISUAL.md`.
+| 独占测速，预热56对、测量560对 | 总均值 | P95 | Hz |
+|---|---:|---:|---:|
+| TensorRT基线 | 26.5411 ms | 27.8082 ms | 37.6775 |
+| A完成后 | 20.6431 ms | 21.1289 ms | 48.4423 |
+
+A组合修改使均值下降22.22%；不能将全部收益归因于CUDA核单项。另与原始纯LibTorch版比较，也通过原转换阈值。证据：[A记录](evidence/runtime_optimization_A_4060_20261111.json)。
+
+## B：固定缓冲区与 CUDA Graph
+
+### 为什么与如何实现
+
+A完成后，剩余网络仍逐个提交ATen操作。B捕获固定形状的完整原生网络，预处理及最终CPU回传留在捕获外。Python负责已有接口和捕获调度，网络计算仍由C++ LibTorch／TensorRT执行。
+
+- 优化版TensorRT复用三个输出缓冲区；原构建仍返回独立张量。优化版调试结果应在下一次调用前消费。
+- 预处理和推理在同一非默认流执行，建立固定图像、K、D、历史状态和高分辨率RGB缓冲区。
+- 三次预热用零临时历史；捕获不推进外部历史。每帧写入真实输入和上一帧状态后，只重放一次。
+- 原有时间／序列／相机变化重置规则继续生效；相机缓存原地更新。
+- 捕获失败会警告，并记录 `actual_execution=optimized_eager` 和原因，不将回退冒充CUDA Graph成功。
+
+### 检查与结果
+
+实际运行模式为 `optimized_graph`，没有发生回退。总均值 **19.7608 ms**，P95 **20.3987 ms**，**50.6054 Hz**。这是固定缓冲区与图执行的组合收益，不把单独换CUDA流宣传为主要加速来源。
+
+最终还增加了128次连续调用检查：循环使用已有8帧，保持连续时间和编号，确认状态缓冲区长期复用正确；这不是新增准确率样本。故意制造一次捕获拒绝，验证明确回退及预测正确。使用同一最终引擎的普通执行作为状态对照，避免把引擎数值变化混入状态检查。
+
+证据：[B记录](evidence/runtime_optimization_B_4060_20261111.json)。
+
+## C：缓存面板，左右目并行绘图
+
+### 为什么与如何实现
+
+原绘图约5.4 ms，左右串行，每目三个透明面板重复计算。新增独立 `STEREO_OPTIMIZED_OVERLAY` 构建，C接口保持兼容。
+
+- 两个常驻工作线程分别绘制左右半幅，各持有独立FreeType／文字缓存；两侧都结束才返回当前帧。
+- 缓存圆角填充掩码和逐字节混合表。边框缓存由原OpenCV绘制顺序生成的逐通道查找表，保留抗锯齿交叠处的整数舍入，而非换用近似透明遮罩。
+- 每线程最多缓存16种样式，超出后调用原逻辑；线程退出释放缓存。正常三向量显示只有三种边框样式。
+- 保留原字符缓存、动态数值格式、61点带畸变曲线、箭头尺寸／颜色和面板布局。没有隔帧绘制。
+- 收集工作线程异常前先等待两侧结束，失败时不返回有效结果。诊断版两线程CPU绘制时间可以相加表示CPU工作量，但不能当作串行墙钟耗时。
+
+### 检查与结果
+
+56对已有图片，另对七类各测试随机噪声、纯黑、纯白背景，共77次对比：**像素通道最大差0，几何完全相同**。保存七类上下对照图，上排原绘图，下排优化绘图。
+
+预热56对、测量560对：绘图均值 **3.8993 ms**；完整均值 **18.4561 ms**，P95 **19.2374 ms**，**54.1825 Hz**。进程CPU占用约114.7%，相当于平均使用1.15个逻辑核；峰值RSS约2367 MiB，包含PyTorch、权重、预载图片和缓存，不是显存。
+
+证据：[C记录](evidence/runtime_optimization_C_4060_20261111.json)。
+
+## D：仅比较两个 TensorRT 候选
+
+### 候选定义与过程
+
+1. **level5**：构建优化等级由3升至5，保持53个Conv/MatMul层FP16及其余精度约束。
+2. **gelu**：在level5基础上，仅允许紧邻Conv的GELU运算使用FP16，共123层FP16。
+
+第二项按ONNX依赖判断：激活组必须含Erf、只由Constant/Div/Erf/Add/Mul构成，而且唯一非常量外部输入来自Conv。LayerNorm、GRN、归约和几何计算不包括在内。没有合格层时构建直接报错，避免把未变化的引擎当作新实验。两者边界仍为FP32，TF32关闭。逐层请求精度和引擎检查报告保存在构建证据中。
+
+| 候选 | 构建耗时 | 完整均值 | P95 | Hz |
+|---|---:|---:|---:|---:|
+| level5，原精度约束 | 96.34 s | 15.3075 ms | 16.1567 ms | 65.3273 |
+| level5＋GELU FP16 | 109.25 s | 15.6916 ms | 16.4194 ms | 63.7285 |
+
+**采用level5，拒绝额外GELU FP16候选**：后者更慢，没有理由扩大低精度范围。采用的引擎从 `candidate_level5.engine` 改名为 `visual_level5.engine`，内容和哈希不变；原 `visual_fp16.engine` 保留。
+
+证据：[D记录](evidence/runtime_optimization_D_4060_20261111.json)。旧报告的 `original` / `tensorrt` 是比较槽位名称：A/B/D中前者指当前TensorRT基线；原LibTorch转换检查中前者才是纯LibTorch。新版报告增加显式槽位说明。
+
+## 构建、选择与复现
+
+在 `StereoPoseLearning` 目录、现有推理环境中执行。TensorRT头文件按 [TensorRT说明](TENSORRT_VISUAL.md)准备；原库用于基线和预处理，不能删除。
 
 ```bash
 python tools/build_optimized_runtime.py --cuda-root /usr/local/cuda-12.8
-python tools/verify_position_cuda.py --inputs inputs --output runs/optimization/A_position.json
-python tools/verify_runtime_state.py --inputs inputs --baseline-config inputs/predictor_tensorrt.json --candidate-config configs/inference/optimized_eager.example.json --output runs/optimization/A_state.json
-python tools/verify_trt_visual.py --inputs inputs --baseline-config inputs/predictor_tensorrt.json --candidate-config configs/inference/optimized_eager.example.json --truth inputs/accuracy_truth.json --output runs/optimization/A_accuracy
-python tools/benchmark_realtime.py --inputs inputs --inference-backend libtorch --modes fp32 --predictor-config configs/inference/optimized_eager.example.json --rounds 10 --output runs/optimization/A_performance
-```
-
-The predictor paths resolve relative to their JSON file. The example expects the
-original checkpoint in `inputs/best_val.pt`. Use a new output directory for each run.
-
-### Correctness results
-
-- 720 point cases across both cameras, zero/actual distortion and five depths:
-  maximum FP32 output difference **0 mm**; 0.0001 mm requirement passed.
-- All 56 real predictor outputs match the current TensorRT reference exactly;
-  C, hinges, tips, shaft rotation, joint angles and projections have zero difference.
-- Ground-truth mean errors are unchanged: C **0.158457824 mm**, tips
-  **0.197426894 mm**, pitch **0.186402860°**, yaw **0.285754152°**, jaw half-angle
-  **0.126455538°**. Per-category mean/P95 requirements passed.
-- Continuous state, explicit reset, duplicate timestamps, time gaps, sequence
-  changes, changed K/D, invalid image and recovery checks passed. All three hidden
-  states are compared, not just the final 17 values.
-- The first performance pair was superseded because the state-check process
-  might have overlapped its ending. The reported results use the subsequent
-  sequential, isolated rerun; the superseded logs are not evidence of speed.
-
-### Isolated performance result and decision
-
-Both runs warmed 56 pairs and measured 560 pairs, with original drawing unchanged.
-
-| Runtime | Mean total | P95 total | Hz |
-|---|---:|---:|---:|
-| Accepted TensorRT reference | 26.5411 ms | 27.8082 ms | 37.6775 |
-| A: fused C + caches + auxiliary pruning | 20.6431 ms | 21.1289 ms | 48.4423 |
-
-Mean complete-pair latency decreased **22.22%**. This stage passes the 10% goal
-on this isolated comparison; final acceptance still requires three alternating
-baseline/final runs. A separate comparison against original eager LibTorch also
-passed the existing conversion tolerances. This result is for the combined A
-changes, not a claim that the CUDA kernel alone saved all 5.898 ms.
-
-Machine-readable evidence: `evidence/runtime_optimization_A_4060_20261111.json`.
-
-## B — Fixed buffers and CUDA Graph replay
-
-### Why and implementation
-
-After A, the eager downstream still dispatches many individual ATen operations.
-This stage replays the fixed-shape native network with CUDA Graph, leaving GPU
-preprocessing and final CPU export outside capture. Python only controls the
-existing API and capture; all network operations remain C++ LibTorch/TensorRT.
-
-- The optional optimized TensorRT context keeps three output buffers. Original
-  builds retain independently allocated outputs. Debug consumers of optimized
-  buffers must finish before the next call.
-- `optimized_graph` runs preprocessing and inference on one non-default stream.
-  This is for capture ordering, not a claim that changing stream alone is faster.
-- Fixed buffers hold images, K, D, history and high-resolution RGB. Before replay,
-  the actual current inputs and previous state are copied into these buffers.
-- Three warmup passes use zero scratch history. Capture does not advance the
-  external predictor history. Each real input causes exactly one replay.
-- The existing predictor still owns discontinuity checks and state reset. Camera
-  calibration caches update in place, retaining captured addresses.
-- A capture exception emits a warning and records `actual_execution=optimized_eager`
-  plus the error; it cannot silently count as a successful graph result.
-
-Status: B completed and accepted; actual execution was `optimized_graph`, with no fallback.
-
-### B verification, performance and decision
-
-The 56-pair comparison, all per-category truth checks and all 15 state/reset cases
-passed. Output values and the three hidden states matched the reference exactly
-in these cases, including changed calibration and recovery after an invalid input.
-No failure workaround was needed to capture the network.
-
-With 56 warmup pairs and 560 measured pairs, total mean was **19.7608 ms**,
-P95 **20.3987 ms**, or **50.6054 Hz**. The preceding A measurement was
-20.6431 ms / 48.4423 Hz. This single-stage measurement supports retaining graph
-execution for final repeated testing; it is not an isolated causal attribution
-between output-buffer reuse and graph launch savings.
-
-Use the same commands as A with `configs/inference/optimized_graph.example.json`.
-Machine-readable evidence: `evidence/runtime_optimization_B_4060_20261111.json`.
-
-## C — Cached panels and two persistent painting workers
-
-### Why and implementation
-
-The original complete-pair drawing costs approximately 5.4 ms and paints the two
-eyes serially. The three translucent rounded panels per eye repeat identical
-mask/border work on every frame.
-
-A separate `STEREO_OPTIMIZED_OVERLAY` build retains the C ABI and original layout:
-
-- Two persistent workers paint separate halves of the current RGB output. Each
-  has its own FreeType/text cache; both finish before `render` returns.
-- Rounded fill masks and per-byte fill transforms are cached. Borders are cached
-  as exact per-channel input-byte lookup tables derived from the original ordered
-  OpenCV border rasterization. This preserves antialias overlap rounding instead
-  of approximating the border with a different alpha mask.
-- Caches are thread-local and bounded to 16 styles per worker; additional styles
-  use the original renderer. Worker destruction releases its caches and font data.
-- Existing glyph caching, dynamic numeric formatting, 61-point distorted curves,
-  arrow widths/colors and XYZ panel geometry remain unchanged.
-- Worker exceptions are collected only after both jobs finish; output is not
-  returned as valid after failure. No frame skipping or asynchronous stale output.
-
-The renderer build command is:
-
-```bash
 cmake -S reference/pose_display/native -B reference/pose_display/native/build/optimized -DSTEREO_OPTIMIZED_OVERLAY=ON -DCMAKE_BUILD_TYPE=Release
 cmake --build reference/pose_display/native/build/optimized -j2
+python tools/build_trt_visual.py --checkpoint inputs/best_val.pt --output native/libtorch/build/tensorrt/visual_level5.engine --builder-level 5
 ```
 
-The benchmark accepts `--overlay-library reference/pose_display/native/build/optimized/libsurgical_overlay.so`.
-CPU process utilization and peak resident memory are now recorded in addition to
-GPU telemetry. CPU utilization can exceed 100% when multiple cores are active.
+引擎存在时构建器拒绝覆盖。换机器应在目标GPU重新构建并重新验收；TensorRT计算方案选择可能导致重建引擎的字节哈希不同，不能承诺跨构建逐字节复现。
 
-Status: C completed and accepted; cached/parallel drawing preserves all tested pixels.
-
-### C verification, performance and decision
-
-77 comparisons (56 actual pairs plus seven examples each with random, black and
-white backgrounds) had **zero changed pixel channels** and identical detailed
-geometry. Seven before/after previews were saved outside Git. The compiled
-reference renderer remains untouched.
-
-With 56 warmup pairs / 560 measured pairs, drawing mean is **3.8993 ms**;
-complete-pair mean **18.4561 ms**, P95 **19.2374 ms**, or **54.1825 Hz**.
-Process CPU utilization is **114.7%** (approximately 1.15 logical cores on average)
-and peak process RSS **2367 MiB**, including Python/PyTorch, weights, all preloaded
-images and renderer caches. This is not GPU memory. Detailed diagnostic paint
-CPU times sum the two worker contributions; they must not be added as serial
-latency because the workers overlap.
-
-The result supports retaining the cache/worker implementation for final testing.
-Machine-readable evidence: `evidence/runtime_optimization_C_4060_20261111.json`.
-
-## D — Two bounded TensorRT candidates
-
-### Why and exact candidate definitions
-
-The accepted engine uses builder optimization level 3 with 53 Conv/MatMul layers
-in FP16 and other floating arithmetic constrained to FP32. Two candidates are
-built, rather than sweeping arbitrary precision combinations:
-
-1. `candidate_level5`: builder level 5, otherwise identical precision constraints.
-2. `candidate_gelu`: level 5 plus FP16 for Conv-adjacent GELU arithmetic only.
-
-The second candidate checks ONNX dependencies: a GELU group must contain Erf and
-only Constant/Div/Erf/Add/Mul operations, with exactly one nonconstant external
-input produced by Conv. LayerNorm, GRN, reductions and geometric math are excluded.
-The builder fails if no eligible activation exists, rather than claiming an
-unchanged engine is a new precision experiment. FP32 output boundaries and disabled
-TF32 are retained. Requested precision per layer and TensorRT engine-inspector
-output are recorded next to each candidate; the original engine is not overwritten.
+推理配置使用 `execution_mode`：缺省或 `reference` 保持旧行为；`optimized_eager` 选择A；`optimized_graph` 选择图执行。`configs/inference/optimized_final.example.json` 选择最终引擎。路径相对配置文件，17值接口不变。绘图库独立选择，保留原版默认值。
 
 ```bash
-python tools/build_trt_visual.py --checkpoint inputs/best_val.pt --output native/libtorch/build/tensorrt/candidate_level5.engine --builder-level 5
-python tools/build_trt_visual.py --checkpoint inputs/best_val.pt --output native/libtorch/build/tensorrt/candidate_gelu.engine --builder-level 5 --activation-policy conv_gelu
+python tools/verify_position_cuda.py --inputs inputs --output runs/new_check/position.json
+python tools/verify_trt_visual.py --inputs inputs --baseline-config inputs/predictor_tensorrt.json --candidate-config configs/inference/optimized_final.example.json --truth inputs/accuracy_truth.json --output runs/new_check/accuracy
+python tools/benchmark_comparison.py --inputs inputs --baseline-config inputs/predictor_tensorrt.json --candidate-config configs/inference/optimized_final.example.json --candidate-overlay reference/pose_display/native/build/optimized/libsurgical_overlay.so --output runs/new_comparison
 ```
 
-Each candidate receives the same 56-pair truth comparison and complete 560-pair
-benchmark as C. Any truth-accuracy violation rejects the candidate; a speed change
-within repeat variability is not considered sufficient evidence to replace the
-accepted engine. Status: both candidates passed sample accuracy; level 5 with original precision constraints is selected for final repeated testing.
+`benchmark_comparison.py` 顺序执行基线／最终版各三次；每次预热56对，正式560对。每组进程结束后才启动下一组。输出逐次报告、GPU遥测和汇总，正式测速不启用详细性能追踪。GPU遥测覆盖预热及测量，CPU使用率统计正式循环；PyTorch显存统计不含TensorRT直接分配。
 
-### Final state-regression extension
+这些是实现优化验收阈值，不是模型任务精度目标。
 
-The final configuration additionally replays 128 consecutive calls using the
-existing eight images cyclically, with continuous frame identifiers/timestamps.
-This checks long-running state-buffer reuse; it is explicitly synthetic runtime
-input, not 128 additional accuracy samples. A deterministic capture rejection
-also verifies the warning, recorded fallback mode and correct first prediction.
 
-### D results and selection
+## 最终验收结果
 
-| Candidate | FP16 layers | Build time | Mean complete pair | P95 | Hz |
-|---|---:|---:|---:|---:|---:|
-| Level 5, existing constraints | 53 | 96.34 s | 15.3075 ms | 16.1567 ms | 65.3273 |
-| Level 5 + eligible GELU | 123 | 109.25 s | 15.6916 ms | 16.4194 ms | 63.7285 |
+基线／最终版交替三轮，各1680次正式双目测量。每轮最终版均快于所有基线轮次，P95也更低，实际执行模式全部为 `optimized_graph`，没有回退。
 
-Both passed the 56-pair conversion and per-category truth-accuracy checks. Neither
-is numerically identical to the previous TensorRT engine: maximum C disagreement
-is 0.006277 mm / 0.005205 mm respectively. Actual truth errors, not this numerical
-drift alone, determine acceptance; every per-class mean/P95 increase stays within
-the specified 0.005 mm/degree limits.
+| 完整流程指标 | 当前TensorRT基线 | 最终优化版 |
+|---|---:|---:|
+| 总耗时均值 | 26.5158 ms | **15.2257 ms** |
+| P50 | 26.4290 ms | 15.1962 ms |
+| P95 | 27.5560 ms | 15.8574 ms |
+| P99 | 28.3415 ms | 16.3335 ms |
+| 最大值 | 36.6681 ms | 19.5506 ms |
+| 双目处理速率 | 37.7133 Hz | **65.6786 Hz** |
+| 超过33.33 ms | 1/1680 | 0/1680 |
+| 预处理＋完整推理＋回传均值 | 21.1107 ms | 11.7157 ms |
+| 运动学＋投影＋绘图均值 | 5.4051 ms | 3.5100 ms |
 
-The GELU candidate is slower and brings no reason to relax more precision, so it
-is **not selected**. The level-5 conservative engine is retained as
-`visual_level5.engine` (same bytes/hash, renamed from `candidate_level5.engine`).
-This result reflects builder tactic/fusion choices; no retraining or image-size
-change occurred. The final repeated benchmark will compare this complete runtime
-against the original TensorRT baseline, not against a different-resolution model.
+平均完整耗时降低 **42.58%**，达到至少10%的目标。最终版三轮均值为15.2542、15.2075、15.2152 ms；这不是只测前端引擎的结果。平均超过60 Hz不代表任何时刻都低于16.67 ms，最大单对耗时仍有19.55 ms；此次没有超过30 Hz所对应的33.33 ms，但不能保证未来永不超时。
 
-Layer requests and engine-inspector reports are retained with the build evidence;
-only the reference and selected engine binaries remain after final verification.
-Machine-readable evidence: `evidence/runtime_optimization_D_4060_20261111.json`.
+左右目合并，尖端包括J1/J2；仅56对样本。下表为真实标签误差，**不是优化前后数值差**。
+
+最终存在微小变化，不声称逐值完全相同。七类及整体的均值/P95增量均满足0.005 mm／0.005°要求。相比原始纯LibTorch，最大C差0.004911 mm、尖端差0.006031 mm、杆体旋转差0.012681°、投影差0.044234像素，也通过原转换上限。
+
+128次连续状态复用及全部重置／异常恢复检查通过；使用最终预测的77次绘图比较仍为逐像素一致。捕获拒绝的故障注入正确回退，并明确记录模式，没有被当作图执行成功。
+
+### 资源与保留内容
+
+- 正式循环进程CPU占用：基线约100%，最终约115.5%；最终峰值RSS约2161～2163 MiB。
+- PyTorch分配峰值：基线210.66 MiB、最终153.71 MiB；**不能据此宣称整卡显存降低**。
+- 含预热的整卡遥测峰值：701 → 769 MiB；平均GPU占用约54.0% → 59.8%，平均功率45.29 → 46.18 W。此遥测包括桌面及TensorRT分配，采样区间与正式帧计时不同。
+- 原权重、原LibTorch库、原TensorRT库／引擎、原绘图库的哈希均复核一致。
+- 未采用的GELU引擎已删除，释放34,831,132字节；构建参数、逐层精度与结果仍保留。Git不包含权重、引擎、原始图片或构建缓存。
+
+最终证据：[完整验收JSON](evidence/runtime_optimization_final_4060_20261111.json)。4060运行记录位于 `runs/runtime_optimization_20261111/`，七类绘图对照位于其中 `final_pixels/`；当前TensorRT与最终预测对照位于 `D_level5_accuracy/`。本地完整报告和预览同步到工作区的 `outputs/runtime_optimization_4060_20261111/`。
 
