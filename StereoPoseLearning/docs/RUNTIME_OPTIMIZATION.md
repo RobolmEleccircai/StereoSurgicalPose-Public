@@ -156,3 +156,57 @@ between output-buffer reuse and graph launch savings.
 Use the same commands as A with `configs/inference/optimized_graph.example.json`.
 Machine-readable evidence: `evidence/runtime_optimization_B_4060_20261111.json`.
 
+## C — Cached panels and two persistent painting workers
+
+### Why and implementation
+
+The original complete-pair drawing costs approximately 5.4 ms and paints the two
+eyes serially. The three translucent rounded panels per eye repeat identical
+mask/border work on every frame.
+
+A separate `STEREO_OPTIMIZED_OVERLAY` build retains the C ABI and original layout:
+
+- Two persistent workers paint separate halves of the current RGB output. Each
+  has its own FreeType/text cache; both finish before `render` returns.
+- Rounded fill masks and per-byte fill transforms are cached. Borders are cached
+  as exact per-channel input-byte lookup tables derived from the original ordered
+  OpenCV border rasterization. This preserves antialias overlap rounding instead
+  of approximating the border with a different alpha mask.
+- Caches are thread-local and bounded to 16 styles per worker; additional styles
+  use the original renderer. Worker destruction releases its caches and font data.
+- Existing glyph caching, dynamic numeric formatting, 61-point distorted curves,
+  arrow widths/colors and XYZ panel geometry remain unchanged.
+- Worker exceptions are collected only after both jobs finish; output is not
+  returned as valid after failure. No frame skipping or asynchronous stale output.
+
+The renderer build command is:
+
+```bash
+cmake -S reference/pose_display/native -B reference/pose_display/native/build/optimized -DSTEREO_OPTIMIZED_OVERLAY=ON -DCMAKE_BUILD_TYPE=Release
+cmake --build reference/pose_display/native/build/optimized -j2
+```
+
+The benchmark accepts `--overlay-library reference/pose_display/native/build/optimized/libsurgical_overlay.so`.
+CPU process utilization and peak resident memory are now recorded in addition to
+GPU telemetry. CPU utilization can exceed 100% when multiple cores are active.
+
+Status: C completed and accepted; cached/parallel drawing preserves all tested pixels.
+
+### C verification, performance and decision
+
+77 comparisons (56 actual pairs plus seven examples each with random, black and
+white backgrounds) had **zero changed pixel channels** and identical detailed
+geometry. Seven before/after previews were saved outside Git. The compiled
+reference renderer remains untouched.
+
+With 56 warmup pairs / 560 measured pairs, drawing mean is **3.8993 ms**;
+complete-pair mean **18.4561 ms**, P95 **19.2374 ms**, or **54.1825 Hz**.
+Process CPU utilization is **114.7%** (approximately 1.15 logical cores on average)
+and peak process RSS **2367 MiB**, including Python/PyTorch, weights, all preloaded
+images and renderer caches. This is not GPU memory. Detailed diagnostic paint
+CPU times sum the two worker contributions; they must not be added as serial
+latency because the workers overlap.
+
+The result supports retaining the cache/worker implementation for final testing.
+Machine-readable evidence: `evidence/runtime_optimization_C_4060_20261111.json`.
+

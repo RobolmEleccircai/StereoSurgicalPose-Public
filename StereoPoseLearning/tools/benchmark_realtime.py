@@ -15,6 +15,7 @@ import hashlib
 import json
 from pathlib import Path
 import platform
+import resource
 import subprocess
 import sys
 import time
@@ -56,6 +57,7 @@ def main():
     parser.add_argument('--preprocessing', choices=('cpu','gpu'), default=None)
     parser.add_argument('--display-mode',choices=('vectors','full'),default='vectors')
     parser.add_argument('--visual-engine',type=Path,help='Optional TensorRT visual frontend; downstream remains LibTorch')
+    parser.add_argument('--overlay-library',type=Path,help='Optional separately built native renderer')
     parser.add_argument('--predictor-config',type=Path,help='Native runtime configuration; overrides checkpoint/engine/execution selection')
     args = parser.parse_args()
     if args.visual_engine is not None and args.inference_backend!='libtorch':
@@ -116,7 +118,7 @@ def main():
         calibration = row['calibration']
         fingerprint = json.dumps(calibration, sort_keys=True)
         if fingerprint not in overlays:
-            overlays[fingerprint] = CppStereoOverlay(predictor.instrument_model, calibration, args.font,display_mode=args.display_mode)
+            overlays[fingerprint] = CppStereoOverlay(predictor.instrument_model, calibration, args.font,display_mode=args.display_mode,library=args.overlay_library)
         images = [np.asarray(Image.open(args.inputs/row['images'][e]).convert('RGB'))
                   for e in ('left', 'right')]
         frame = StereoFrame(f"{row['sequence_id']}/{row['frame_index']:06d}", row['timestamp_ns'], *images)
@@ -159,6 +161,7 @@ def main():
             torch.cuda.synchronize()
             torch.cuda.reset_peak_memory_stats()
             measured = []
+            measured_wall=time.perf_counter();measured_cpu=time.process_time()
             example = None
             for repeat in range(args.rounds):
                 for sid, rows in groups.items():
@@ -191,7 +194,11 @@ def main():
                       'end_to_end_ms', 'network_cuda_interval_ms', 'input_preparation_host_wall_ms')
             summary = {field: statistics([r[field] for r in measured]) for field in fields}
             total_times = [r['end_to_end_ms'] for r in measured]
-            summary.update(measured_pairs=len(measured), warmup_pairs=len(bundle['samples']),
+            cpu_seconds=time.process_time()-measured_cpu
+            process_wall=time.perf_counter()-measured_wall
+            summary.update(process_cpu_seconds=cpu_seconds,process_cpu_percent=100*cpu_seconds/process_wall,
+                process_peak_rss_mib=resource.getrusage(resource.RUSAGE_SELF).ru_maxrss/1024,
+                measured_pairs=len(measured), warmup_pairs=len(bundle['samples']),
                 first_warmup_pair_ms=cold_ms, hz=1000/np.mean(total_times),
                 inverse_p95_hz=1000/np.percentile(total_times,95),
                 fraction_within_33_33_ms=float(np.mean(np.asarray(total_times)<=1000/30)),
@@ -224,6 +231,8 @@ def main():
             'graph_error':getattr(predictor.model,'graph_error',None),
             'preprocessing': args.preprocessing,
             'display_mode': args.display_mode,
+            'overlay_library':str(args.overlay_library) if args.overlay_library else 'reference',
+            'overlay_library_sha256':digest(args.overlay_library or args.project/'reference/pose_display/native/build/libsurgical_overlay.so'),
             'visual_engine':getattr(predictor,'visual_engine',None),
             'checkpoint_epoch': predictor.epoch+1, 'checkpoint_sha256': checkpoint_hash,
             'raw_resolution_per_eye': [1280,720], 'network_resolution_hw': list(predictor.image_size),

@@ -11,6 +11,13 @@
 #include <stdexcept>
 #include <string>
 #include <vector>
+#include <condition_variable>
+#include <functional>
+#include <future>
+#include <memory>
+#include <mutex>
+#include <thread>
+#include <tuple>
 #ifdef STEREO_PROFILE_RANGES
 #include <chrono>
 #define SD_TICK(I) { auto now=std::chrono::steady_clock::now(); timing[I]=std::chrono::duration<double,std::milli>(now-tick).count(); tick=now; }
@@ -257,7 +264,25 @@ void arrow(cv::Mat &im, const Line &raw, P offset, cv::Scalar color, int width,
   cv::fillConvexPoly(im, tri.data(), 3, color, cv::LINE_AA, 4);
 }
 double overlap(cv::Rect2d a, cv::Rect2d b) { return (a & b).area(); }
-void rounded(cv::Mat &dst, cv::Rect r, int radius, cv::Scalar fill,
+void rounded_border(cv::Mat& dst,cv::Rect r,int radius,cv::Scalar border,int width) {
+  cv::line(dst, {r.x + radius, r.y}, {r.x + r.width - radius - 1, r.y}, border,
+           width, cv::LINE_AA);
+  cv::line(dst, {r.x + radius, r.y + r.height - 1},
+           {r.x + r.width - radius - 1, r.y + r.height - 1}, border, width,
+           cv::LINE_AA);
+  cv::line(dst, {r.x, r.y + radius}, {r.x, r.y + r.height - radius - 1}, border,
+           width, cv::LINE_AA);
+  cv::line(dst, {r.x + r.width - 1, r.y + radius},
+           {r.x + r.width - 1, r.y + r.height - radius - 1}, border, width,
+           cv::LINE_AA);
+  for (int j = 0; j < 4; ++j) {
+    int x = (j == 0 || j == 3) ? r.x + radius : r.x + r.width - radius - 1;
+    int y = j < 2 ? r.y + radius : r.y + r.height - radius - 1;
+    cv::ellipse(dst, {x, y}, {radius, radius}, 0, 180 + 90 * j, 270 + 90 * j,
+                border, width, cv::LINE_AA);
+  }
+}
+void rounded_uncached(cv::Mat &dst, cv::Rect r, int radius, cv::Scalar fill,
              cv::Scalar border, int width, double alpha = 1) {
   PAINT_TIMER(0);
   // Only the small panel is blended. No full-frame temporary images.
@@ -281,28 +306,100 @@ void rounded(cv::Mat &dst, cv::Rect r, int radius, cv::Scalar fill,
               cv::saturate_cast<uint8_t>(out[x][c] * (1 - a) + fill[c] * a);
     }
   }
-  cv::line(dst, {r.x + radius, r.y}, {r.x + r.width - radius - 1, r.y}, border,
-           width, cv::LINE_AA);
-  cv::line(dst, {r.x + radius, r.y + r.height - 1},
-           {r.x + r.width - radius - 1, r.y + r.height - 1}, border, width,
-           cv::LINE_AA);
-  cv::line(dst, {r.x, r.y + radius}, {r.x, r.y + r.height - radius - 1}, border,
-           width, cv::LINE_AA);
-  cv::line(dst, {r.x + r.width - 1, r.y + radius},
-           {r.x + r.width - 1, r.y + r.height - radius - 1}, border, width,
-           cv::LINE_AA);
-  for (int j = 0; j < 4; ++j) {
-    int x = (j == 0 || j == 3) ? r.x + radius : r.x + r.width - radius - 1;
-    int y = j < 2 ? r.y + radius : r.y + r.height - radius - 1;
-    cv::ellipse(dst, {x, y}, {radius, radius}, 0, 180 + 90 * j, 270 + 90 * j,
-                border, width, cv::LINE_AA);
+  rounded_border(dst,r,radius,border,width);
+}
+
+#ifdef STEREO_OPTIMIZED_OVERLAY
+// Each worker has a bounded cache. Per-pixel lookup preserves OpenCV's original
+// integer rounding, including overlapping antialiased border segments.
+struct RoundedTile {
+  cv::Mat mask, border_lut;
+  std::array<std::array<std::array<uint8_t,256>,3>,256> fill_lut;
+  std::vector<cv::Point> border_pixels;
+};
+void rounded(cv::Mat& dst,cv::Rect r,int radius,cv::Scalar fill,cv::Scalar border,int width,double alpha=1) {
+  PAINT_TIMER(0);
+  using Key=std::tuple<int,int,int,int,double,double,double,double,double,double,double>;
+  thread_local std::map<Key,std::unique_ptr<RoundedTile>> cache;
+  Key key{r.width,r.height,radius,width,fill[0],fill[1],fill[2],border[0],border[1],border[2],alpha};
+  auto found=cache.find(key);
+  if(found==cache.end()) {
+    if(cache.size()>=16) {rounded_uncached(dst,r,radius,fill,border,width,alpha);return;}
+    auto tile=std::make_unique<RoundedTile>();
+    tile->mask=cv::Mat(r.height,r.width,CV_8U,cv::Scalar(0));
+    cv::rectangle(tile->mask,{radius,0,r.width-2*radius,r.height},255,-1);
+    cv::rectangle(tile->mask,{0,radius,r.width,r.height-2*radius},255,-1);
+    for(int x:{radius,r.width-radius-1})for(int y:{radius,r.height-radius-1})
+      cv::circle(tile->mask,{x,y},radius,255,-1,cv::LINE_AA);
+    for(int m=0;m<256;++m)for(int c=0;c<3;++c)for(int value=0;value<256;++value) {
+      double a=m*alpha/255.;
+      tile->fill_lut[m][c][value]=cv::saturate_cast<uint8_t>(value*(1-a)+fill[c]*a);
+    }
+    int pad=width+2;
+    cv::Rect local(pad,pad,r.width,r.height);
+    cv::Mat black(r.height+2*pad,r.width+2*pad,CV_8UC3,cv::Scalar(0));
+    cv::Mat white(black.size(),CV_8UC3,cv::Scalar::all(255));
+    rounded_border(black,local,radius,border,width);rounded_border(white,local,radius,border,width);
+    for(int y=0;y<black.rows;++y)for(int x=0;x<black.cols;++x)
+      if(black.at<cv::Vec3b>(y,x)!=cv::Vec3b(0,0,0) || white.at<cv::Vec3b>(y,x)!=cv::Vec3b(255,255,255))
+        tile->border_pixels.push_back({x-pad,y-pad});
+    tile->border_lut=cv::Mat(tile->border_pixels.size(),256,CV_8UC3);
+    cv::Mat work(black.size(),CV_8UC3);
+    for(int value=0;value<256;++value) {
+      work.setTo(cv::Scalar::all(value));rounded_border(work,local,radius,border,width);
+      for(size_t j=0;j<tile->border_pixels.size();++j) {
+        auto pt=tile->border_pixels[j]+cv::Point(pad,pad);
+        tile->border_lut.at<cv::Vec3b>(j,value)=work.at<cv::Vec3b>(pt);
+      }
+    }
+    found=cache.emplace(key,std::move(tile)).first;
+  }
+  const auto& tile=*found->second;
+  cv::Rect clip=r&cv::Rect(0,0,dst.cols,dst.rows);
+  for(int y=clip.y;y<clip.y+clip.height;++y) {
+    auto* out=dst.ptr<cv::Vec3b>(y);auto* mask=tile.mask.ptr<uint8_t>(y-r.y);
+    for(int x=clip.x;x<clip.x+clip.width;++x) {
+      auto m=mask[x-r.x];
+      if(m)for(int c=0;c<3;++c)out[x][c]=tile.fill_lut[m][c][out[x][c]];
+    }
+  }
+  for(size_t j=0;j<tile.border_pixels.size();++j) {
+    auto pt=tile.border_pixels[j]+r.tl();
+    if(pt.x<0 || pt.y<0 || pt.x>=dst.cols || pt.y>=dst.rows)continue;
+    auto& value=dst.at<cv::Vec3b>(pt);auto* lut=tile.border_lut.ptr<cv::Vec3b>(j);
+    for(int c=0;c<3;++c)value[c]=lut[value[c]][c];
   }
 }
+class PaintWorker {
+  std::mutex mutex_;std::condition_variable condition_;std::function<void()> work_;
+  bool stop_=false;std::thread thread_;
+ public:
+  PaintWorker():thread_([this]{
+    for(;;) {
+      std::function<void()> work;
+      {std::unique_lock<std::mutex> lock(mutex_);condition_.wait(lock,[this]{return stop_ || bool(work_);});
+       if(stop_)return;work=std::move(work_);work_=nullptr;}
+      work();
+    }
+  }){}
+  ~PaintWorker() {{std::lock_guard<std::mutex> lock(mutex_);stop_=true;}condition_.notify_one();thread_.join();}
+  std::future<void> submit(std::function<void()> work) {
+    auto task=std::make_shared<std::packaged_task<void()>>(std::move(work));auto future=task->get_future();
+    {std::lock_guard<std::mutex> lock(mutex_);work_=[task]{(*task)();};}condition_.notify_one();return future;
+  }
+};
+#else
+void rounded(cv::Mat& dst,cv::Rect r,int radius,cv::Scalar fill,cv::Scalar border,int width,double alpha=1) {
+  rounded_uncached(dst,r,radius,fill,border,width,alpha);
+}
+#endif
+
 struct Overlay {
   bool vectors_only=false;
 #ifdef STEREO_PROFILE_RANGES
   std::array<double,5> timing{};
   std::array<double,3> paint_timing{};
+  std::array<std::array<double,3>,2> worker_paint_timing{};
 #endif
   int w, h;
   std::string shaft;
@@ -310,11 +407,22 @@ struct Overlay {
   std::array<Jaw, 2> jaws;
   std::array<Camera, 2> camera;
   std::array<Eye, 2> eyes;
+#ifdef STEREO_OPTIMIZED_OVERLAY
+  std::array<std::unique_ptr<Text>,2> texts;
+  std::array<PaintWorker,2> workers;
+#else
   Text text;
+#endif
   bool valid = false;
   std::string json;
   std::array<double, 17> values;
-  Overlay(const char *cfg, const char *font) : text(font) {
+  Overlay(const char *cfg, const char *font)
+#ifdef STEREO_OPTIMIZED_OVERLAY
+    :texts{std::make_unique<Text>(font),std::make_unique<Text>(font)}
+#else
+    :text(font)
+#endif
+  {
     cv::FileStorage fs(cfg, cv::FileStorage::READ | cv::FileStorage::MEMORY |
                                 cv::FileStorage::FORMAT_JSON);
     require(fs.isOpened(), "Cannot parse configuration");
@@ -467,6 +575,9 @@ struct Overlay {
     valid = true;
   }
   void vector_panel(cv::Mat im,int e) {
+#ifdef STEREO_OPTIMIZED_OVERLAY
+    auto& text=*texts[e];
+#endif
     const auto &g=eyes[e];
     arrow(im,g.main[2],{0,0},ORANGE,6,g.vis[1]!=1,21);
     arrow(im,g.main[1],{0,0},BLUE,3,g.vis[0]!=1,14);
@@ -492,6 +603,9 @@ struct Overlay {
   }
   void panel(cv::Mat im, int e, const std::string &fid, int64_t timestamp,
              bool replay) {
+#ifdef STEREO_OPTIMIZED_OVERLAY
+    auto& text=*texts[e];
+#endif
     if(vectors_only) { vector_panel(im,e); return; }
     auto &g = eyes[e];
     const auto &cam = camera[e];
@@ -660,12 +774,33 @@ struct Overlay {
     cv::Mat(h, w, CV_8UC3, const_cast<uint8_t *>(r), rs)
         .copyTo(canvas(cv::Rect(w, header, w, h)));
     SD_TICK(2);
+#ifdef STEREO_OPTIMIZED_OVERLAY
+    std::array<std::future<void>,2> pending;
+    for(int e=0;e<2;++e)pending[e]=workers[e].submit([&,e]{
+#ifdef STEREO_PROFILE_RANGES
+      auto paint_start=std::chrono::steady_clock::now();paint_time.fill(0);
+#endif
+      panel(canvas(cv::Rect(e*w,0,w,h+header)),e,fid,stamp,replay);
+#ifdef STEREO_PROFILE_RANGES
+      worker_paint_timing[e]=paint_time;
+      timing[3+e]=std::chrono::duration<double,std::milli>(std::chrono::steady_clock::now()-paint_start).count();
+#endif
+    });
+    std::exception_ptr failure;
+    for(auto& future:pending)try{future.get();}catch(...){if(!failure)failure=std::current_exception();}
+    if(failure) {valid=false;std::rethrow_exception(failure);}
+#else
     for (int e = 0; e < 2; ++e) {
       panel(canvas(cv::Rect(e * w, 0, w, h + header)), e, fid, stamp, replay);
       SD_TICK(3+e);
     }
+#endif
 #ifdef STEREO_PROFILE_RANGES
+#ifdef STEREO_OPTIMIZED_OVERLAY
+    for(int i=0;i<3;++i)paint_timing[i]=worker_paint_timing[0][i]+worker_paint_timing[1][i];
+#else
     paint_timing=paint_time;
+#endif
 #endif
   }
   static void vjson(std::ostream &s, const V3 &v) {
