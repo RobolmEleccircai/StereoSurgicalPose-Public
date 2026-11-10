@@ -210,3 +210,64 @@ latency because the workers overlap.
 The result supports retaining the cache/worker implementation for final testing.
 Machine-readable evidence: `evidence/runtime_optimization_C_4060_20261111.json`.
 
+## D — Two bounded TensorRT candidates
+
+### Why and exact candidate definitions
+
+The accepted engine uses builder optimization level 3 with 53 Conv/MatMul layers
+in FP16 and other floating arithmetic constrained to FP32. Two candidates are
+built, rather than sweeping arbitrary precision combinations:
+
+1. `candidate_level5`: builder level 5, otherwise identical precision constraints.
+2. `candidate_gelu`: level 5 plus FP16 for Conv-adjacent GELU arithmetic only.
+
+The second candidate checks ONNX dependencies: a GELU group must contain Erf and
+only Constant/Div/Erf/Add/Mul operations, with exactly one nonconstant external
+input produced by Conv. LayerNorm, GRN, reductions and geometric math are excluded.
+The builder fails if no eligible activation exists, rather than claiming an
+unchanged engine is a new precision experiment. FP32 output boundaries and disabled
+TF32 are retained. Requested precision per layer and TensorRT engine-inspector
+output are recorded next to each candidate; the original engine is not overwritten.
+
+```bash
+python tools/build_trt_visual.py --checkpoint inputs/best_val.pt --output native/libtorch/build/tensorrt/candidate_level5.engine --builder-level 5
+python tools/build_trt_visual.py --checkpoint inputs/best_val.pt --output native/libtorch/build/tensorrt/candidate_gelu.engine --builder-level 5 --activation-policy conv_gelu
+```
+
+Each candidate receives the same 56-pair truth comparison and complete 560-pair
+benchmark as C. Any truth-accuracy violation rejects the candidate; a speed change
+within repeat variability is not considered sufficient evidence to replace the
+accepted engine. Status: both candidates passed sample accuracy; level 5 with original precision constraints is selected for final repeated testing.
+
+### Final state-regression extension
+
+The final configuration additionally replays 128 consecutive calls using the
+existing eight images cyclically, with continuous frame identifiers/timestamps.
+This checks long-running state-buffer reuse; it is explicitly synthetic runtime
+input, not 128 additional accuracy samples. A deterministic capture rejection
+also verifies the warning, recorded fallback mode and correct first prediction.
+
+### D results and selection
+
+| Candidate | FP16 layers | Build time | Mean complete pair | P95 | Hz |
+|---|---:|---:|---:|---:|---:|
+| Level 5, existing constraints | 53 | 96.34 s | 15.3075 ms | 16.1567 ms | 65.3273 |
+| Level 5 + eligible GELU | 123 | 109.25 s | 15.6916 ms | 16.4194 ms | 63.7285 |
+
+Both passed the 56-pair conversion and per-category truth-accuracy checks. Neither
+is numerically identical to the previous TensorRT engine: maximum C disagreement
+is 0.006277 mm / 0.005205 mm respectively. Actual truth errors, not this numerical
+drift alone, determine acceptance; every per-class mean/P95 increase stays within
+the specified 0.005 mm/degree limits.
+
+The GELU candidate is slower and brings no reason to relax more precision, so it
+is **not selected**. The level-5 conservative engine is retained as
+`visual_level5.engine` (same bytes/hash, renamed from `candidate_level5.engine`).
+This result reflects builder tactic/fusion choices; no retraining or image-size
+change occurred. The final repeated benchmark will compare this complete runtime
+against the original TensorRT baseline, not against a different-resolution model.
+
+Layer requests and engine-inspector reports are retained with the build evidence;
+only the reference and selected engine binaries remain after final verification.
+Machine-readable evidence: `evidence/runtime_optimization_D_4060_20261111.json`.
+

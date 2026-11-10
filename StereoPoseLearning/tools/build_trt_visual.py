@@ -42,6 +42,8 @@ def main():
     p.add_argument('--checkpoint',type=Path,required=True)
     p.add_argument('--output',type=Path,required=True)
     p.add_argument('--precision',choices=('fp32','fp16'),default='fp16')
+    p.add_argument('--builder-level',type=int,choices=range(6),default=3)
+    p.add_argument('--activation-policy',choices=('conservative','conv_gelu'),default='conservative')
     a=p.parse_args()
     if a.output.exists():raise FileExistsError(a.output)
     a.output.parent.mkdir(parents=True,exist_ok=True)
@@ -68,12 +70,29 @@ def main():
         raise RuntimeError('\n'.join(str(parser.get_error(i)) for i in range(parser.num_errors)))
     config=builder.create_builder_config()
     config.set_memory_pool_limit(trt.MemoryPoolType.WORKSPACE,1<<30)
-    config.builder_optimization_level=3
+    config.builder_optimization_level=a.builder_level
+    config.profiling_verbosity=trt.ProfilingVerbosity.DETAILED
     config.clear_flag(trt.BuilderFlag.TF32)
     # Keep reduction, normalization and GRN arithmetic in FP32. Convolutions
     # and learned linear maps use FP16; boundaries stay FP32 for the unchanged
     # eager downstream model. No blanket FP16 conversion of sensitive math.
-    half_layers=[]
+    # Only GELU arithmetic whose nonconstant external input comes directly from
+    # one Conv is eligible. Never include LayerNorm/GRN/reduction subgraphs.
+    graph=onnx.load(str(onnx_path)).graph
+    producers={out:node for node in graph.node for out in node.output}
+    groups={}
+    for node in graph.node:
+        if '/act/' in node.name:
+            groups.setdefault(node.name.split('/act/')[0]+'/act/',[]).append(node)
+    approved=set()
+    for nodes in groups.values():
+        outputs={out for node in nodes for out in node.output}
+        external={inp for node in nodes for inp in node.input if inp not in outputs and inp in producers and producers[inp].op_type!='Constant'}
+        if (len(external)==1 and all(producers[x].op_type=='Conv' for x in external)
+                and any(n.op_type=='Erf' for n in nodes)
+                and all(n.op_type in ('Constant','Div','Erf','Add','Mul') for n in nodes)):
+            approved.update(n.name for n in nodes if n.op_type!='Constant')
+    half_layers=[];activation_layers=[];precision_layers=[]
     if a.precision=='fp16':
         config.set_flag(trt.BuilderFlag.FP16)
         config.set_flag(trt.BuilderFlag.OBEY_PRECISION_CONSTRAINTS)
@@ -81,9 +100,17 @@ def main():
             layer=network.get_layer(i)
             if layer.type in (trt.LayerType.CONVOLUTION,trt.LayerType.MATRIX_MULTIPLY):
                 layer.precision=trt.float16;half_layers.append(layer.name)
+            elif a.activation_policy=='conv_gelu' and layer.name in approved:
+                layer.precision=trt.float16;half_layers.append(layer.name);activation_layers.append(layer.name)
             elif layer.type not in (trt.LayerType.CONSTANT,trt.LayerType.SHAPE):
                 if any(layer.get_input(j) is not None and layer.get_input(j).dtype==trt.float32 for j in range(layer.num_inputs)):
                     layer.precision=trt.float32
+    for i in range(network.num_layers):
+        layer=network.get_layer(i)
+        precision_layers.append({'name':layer.name,'type':str(layer.type),
+                                'requested_precision':str(layer.precision) if layer.precision_is_set else 'builder'})
+    if a.activation_policy=='conv_gelu' and not activation_layers:
+        raise RuntimeError('No eligible Conv-adjacent GELU layers; candidate would be unchanged')
     for i in range(network.num_outputs):network.get_output(i).dtype=trt.float32
     print(json.dumps({'building':str(a.output),'precision':a.precision,'layers':network.num_layers,
                       'fp16_layers':len(half_layers),'trt':trt.__version__}),flush=True)
@@ -98,7 +125,13 @@ def main():
         'gpu':torch.cuda.get_device_name(0),'input_shape':[2,3,360,640],
         'outputs':{'spatial':[2,128,90,160],'mask':[2,1,90,160],'heat':[2,5,90,160]},
         'boundary_dtype':'float32','tf32':False,'fp16_layers':half_layers,
+        'builder_optimization_level':a.builder_level,'activation_policy':a.activation_policy,
+        'activation_fp16_layers':activation_layers,'layer_precision_requests':precision_layers,
         'source_sha256':sha(__file__),'workspace_limit_bytes':1<<30}
+    with trt.Runtime(logger) as runtime:
+        engine=runtime.deserialize_cuda_engine(blob)
+        inspector=engine.create_engine_inspector()
+        a.output.with_suffix('.layers.json').write_text(inspector.get_engine_information(trt.LayerInformationFormat.JSON)+'\n')
     a.output.with_suffix('.json').write_text(json.dumps(report,indent=2)+'\n')
     onnx_path.unlink()  # Rebuildable intermediate; retain hash, not duplicate weights.
     print(json.dumps(report,indent=2),flush=True)
