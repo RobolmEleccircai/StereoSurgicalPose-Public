@@ -16,6 +16,7 @@ import json
 from pathlib import Path
 import platform
 import resource
+from datetime import datetime, timezone
 import subprocess
 import sys
 import time
@@ -224,7 +225,7 @@ def main():
                      'tip_mm_mean': float(np.mean(tips)), 'tip_mm_max': max(tips),
                      'joint_deg_mean_pitch_yaw_half': np.mean(joints,0).tolist(),
                      'joint_deg_max_pitch_yaw_half': np.max(joints,0).tolist()}
-        result = {'completed': True, 'gpu': name, 'gpu_before': gpu_before, 'gpu_after': gpu_snapshot(),
+        result = {'completed': True, 'completed_utc':datetime.now(timezone.utc).isoformat(), 'gpu': name, 'gpu_before': gpu_before, 'gpu_after': gpu_snapshot(),
             'inference_backend': args.inference_backend,
             'execution_mode':getattr(predictor,'execution_mode','reference'),
             'actual_execution':getattr(predictor.model,'actual_execution','reference'),
@@ -255,7 +256,8 @@ def main():
             result['source_sha256'].update({str(p.relative_to(args.project)): digest(p) for p in
                 [args.project/'native/libtorch/model.cpp', args.project/'native/libtorch/model.h',
                  args.project/'native/libtorch/bindings.cpp', args.project/'native/libtorch/preprocess.cpp',
-                 args.project/'native/libtorch/preprocess.h', args.project/'stereo_pose/libtorch_predict.py']})
+                 args.project/'native/libtorch/preprocess.h', args.project/'native/libtorch/position_cuda.cu',
+                 args.project/'native/libtorch/trt_visual.cpp', args.project/'stereo_pose/libtorch_predict.py']})
         (args.output/'report.json').write_text(json.dumps(result, indent=2)+'\n')
         (args.output/'frames.jsonl').write_text(''.join(json.dumps(r)+'\n' for r in details))
         print(json.dumps(result, indent=2), flush=True)

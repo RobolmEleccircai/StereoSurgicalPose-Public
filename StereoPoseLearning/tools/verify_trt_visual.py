@@ -1,7 +1,7 @@
 """Compare the native TensorRT frontend to the preserved eager C++ model.
 
 Seven categories, all saved consecutive pairs, independent recurrent states.
-Metrics are numerical disagreement, not task error against ground truth.
+Numerical disagreement and optional hash-matched ground-truth error are separate.
 """
 import os
 os.environ.setdefault('OMP_NUM_THREADS','4')
@@ -138,7 +138,8 @@ def main():
         'baseline_engine':original.visual_engine,
         'actual_candidate_execution':getattr(accelerated.model,'actual_execution','reference'),
         'graph_error':getattr(accelerated.model,'graph_error',None),'summary':summary,'layers':layers,
-        'conversion_limits':limits,'scope':'Difference from original eager C++ FP32 model, not error against ground truth. Independent recurrent state within each sequence. Shared unchanged GPU preprocessing.',
+        'conversion_limits':limits,'scope':'Numerical difference from the configured baseline (see baseline_engine/execution), not error against ground truth. Separate independent recurrent state per sequence.',
+        'comparison_slots':{'original':'configured baseline','tensorrt':'configured candidate'},
         'preview_layout':'top: original; bottom: TensorRT; each row left/right stereo',
         'previews':previews,'per_category':{c:{k:stats([v for r in rows if r['category']==c for v in r[k]]) for k in
            ('C_mm','tip_mm','joint_deg','point_projection_px')} for c in previews}}

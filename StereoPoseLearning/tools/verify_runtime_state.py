@@ -42,8 +42,10 @@ def main():
         assert torch.allclose(base.hidden,candidate.hidden,atol=1e-5,rtol=1e-6)
         assert base.reset_count==candidate.reset_count
         records.append({'case':name,'values_max_abs':delta,'hidden_max_abs':hdelta,'reset_count':base.reset_count})
+    loaded=[]
     for i,row in enumerate(rows):
         images=[np.asarray(Image.open(args.inputs/row['images'][eye]).convert('RGB')) for eye in ('left','right')]
+        loaded.append(images)
         frame=StereoFrame(f"sequence/{i:06d}",round(i*1e9/60),*images)
         compare('continuous_'+str(i),frame,row['calibration'])
     base.reset();candidate.reset();compare('explicit_reset',frame,row['calibration'])
@@ -60,6 +62,26 @@ def main():
     compare('invalid_image',bad,changed,True)
     frame=StereoFrame('other/000012',bad.timestamp_ns+16666667,*images)
     compare('recovery',frame,changed)
+    base.reset();candidate.reset()
+    long_start=len(records)
+    for i in range(128):
+        compare('synthetic_continuous',StereoFrame(f'long/{i:06d}',round(i*1e9/60),*loaded[i%8]),row['calibration'])
+    long_cases=records[long_start:];del records[long_start:]
+    records.append({'case':'synthetic_continuous_128','frames':128,
+                    'values_max_abs':max(r['values_max_abs'] for r in long_cases),
+                    'hidden_max_abs':max(r['hidden_max_abs'] for r in long_cases),
+                    'purpose':'Repeated existing RGB tests runtime state, not extra accuracy samples'})
+    # Exercise the documented fallback using a deterministic capture rejection.
+    if candidate.execution_mode=='optimized_graph':
+        from unittest.mock import patch
+        fallback=build(args.candidate_config);base.reset()
+        frame=StereoFrame('fallback/000000',0,*loaded[0])
+        with patch('torch.cuda.CUDAGraph',side_effect=RuntimeError('intentional capture rejection for test')):
+            value=fallback(frame,row['calibration']).values17
+        expected=base(frame,row['calibration']).values17
+        assert fallback.model.actual_execution=='optimized_eager' and fallback.model.graph_error
+        assert np.allclose(value,expected,atol=1e-5,rtol=1e-6)
+        records.append({'case':'capture_failure','explicit_fallback':True})
     result={'passed':True,'cases':records,'candidate_execution':getattr(candidate.model,'actual_execution',candidate.execution_mode)}
     args.output.parent.mkdir(parents=True,exist_ok=True);args.output.write_text(json.dumps(result,indent=2)+'\n')
     print(json.dumps(result,indent=2))
