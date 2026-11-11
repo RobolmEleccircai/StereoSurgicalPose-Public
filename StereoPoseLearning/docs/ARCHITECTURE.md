@@ -2,6 +2,8 @@
 
 当前版本：`stereo_pose_unified_c_v1`。实际可执行参数以运行目录的 `config.json` 和 checkpoint 内嵌配置为准；仓库 `configs/default.json` 是新训练模板。
 
+[论文式框架图、两张详细结构图和模块尺寸说明](MODEL_DIAGRAMS.md) · [性能记录](PERFORMANCE_INDEX.md)
+
 ## 1. 网络数据流
 
 ```mermaid

@@ -1,0 +1,258 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="2560" height="2220" viewBox="0 0 2560 2220">
+<rect width="100%" height="100%" fill="white"/>
+<text x="46" y="62" font-family="Arial,Helvetica,sans-serif" font-size="43" font-weight="700" fill="#243343" text-anchor="start">StereoPoseNet: stereo-temporal articulated instrument pose</text>
+<text x="48" y="101" font-family="Arial,Helvetica,sans-serif" font-size="23" font-weight="400" fill="#596979" text-anchor="start">Current implementation: stereo_pose_unified_c_v1  |  17.945 M parameters  |  ConvNeXtV2 Nano backbone</text>
+<text x="48" y="137" font-family="Arial,Helvetica,sans-serif" font-size="22" font-weight="400" fill="#596979" text-anchor="start">Notation: N = 2BT; feature maps = [N, C, H, W].  B: batch, T: time, 2: left/right.  Train T=8; streaming T=1.</text>
+<rect x="45" y="172" width="2470" height="560" rx="14" fill="#f4f0fa" stroke="#72569c" stroke-width="2.2"/>
+<text x="69" y="212" font-family="Arial,Helvetica,sans-serif" font-size="28" font-weight="700" fill="#72569c" text-anchor="start">(a) Shared visual localization and per-camera calibration</text>
+<rect x="75" y="245" width="280" height="118" rx="10" fill="white" stroke="#72569c" stroke-width="1.8"/>
+<text x="215.0" y="279" font-family="Arial,Helvetica,sans-serif" font-size="26" font-weight="700" fill="#72569c" text-anchor="middle">Stereo RGB</text>
+<text x="215.0" y="310" font-family="Arial,Helvetica,sans-serif" font-size="20" font-weight="400" fill="#243343" text-anchor="middle">[N,3,720,1280]</text>
+<text x="215.0" y="337" font-family="Arial,Helvetica,sans-serif" font-size="20" font-weight="400" fill="#243343" text-anchor="middle">uint8; retain raw image R</text>
+<polyline points="215,363 215,401" fill="none" stroke="#72569c" stroke-width="2.6" stroke-linejoin="round"/>
+<polygon points="215,401 220.0,390.0 210.0,390.0" fill="#72569c"/>
+<rect x="75" y="402" width="280" height="106" rx="10" fill="white" stroke="#72569c" stroke-width="1.8"/>
+<text x="215.0" y="436" font-family="Arial,Helvetica,sans-serif" font-size="23" font-weight="700" fill="#72569c" text-anchor="middle">Resize + normalize</text>
+<text x="215.0" y="467" font-family="Arial,Helvetica,sans-serif" font-size="21" font-weight="400" fill="#243343" text-anchor="middle">[N,3,360,640]</text>
+<polyline points="355,451 385,451 385,379 407,379" fill="none" stroke="#72569c" stroke-width="2.6" stroke-linejoin="round"/>
+<polygon points="407,379 396.0,374.0 396.0,384.0" fill="#72569c"/>
+<text x="835" y="267" font-family="Arial,Helvetica,sans-serif" font-size="25" font-weight="700" fill="#72569c" text-anchor="middle">ConvNeXtV2 Nano: one shared backbone for both views</text>
+<rect x="410" y="310" width="192" height="144" rx="10" fill="white" stroke="#72569c" stroke-width="1.8"/>
+<text x="506.0" y="344" font-family="Arial,Helvetica,sans-serif" font-size="24" font-weight="700" fill="#72569c" text-anchor="middle">Stage 1</text>
+<text x="506.0" y="375" font-family="Arial,Helvetica,sans-serif" font-size="20" font-weight="400" fill="#243343" text-anchor="middle">2 blocks</text>
+<text x="506.0" y="402" font-family="Arial,Helvetica,sans-serif" font-size="20" font-weight="400" fill="#243343" text-anchor="middle">[N,80,90,160]</text>
+<polyline points="602,379 625,379" fill="none" stroke="#72569c" stroke-width="2.6" stroke-linejoin="round"/>
+<polygon points="625,379 614.0,374.0 614.0,384.0" fill="#72569c"/>
+<polyline points="506,454 506,505" fill="none" stroke="#72569c" stroke-width="2.6" stroke-linejoin="round"/>
+<rect x="625" y="310" width="192" height="144" rx="10" fill="white" stroke="#72569c" stroke-width="1.8"/>
+<text x="721.0" y="344" font-family="Arial,Helvetica,sans-serif" font-size="24" font-weight="700" fill="#72569c" text-anchor="middle">Stage 2</text>
+<text x="721.0" y="375" font-family="Arial,Helvetica,sans-serif" font-size="20" font-weight="400" fill="#243343" text-anchor="middle">2 blocks</text>
+<text x="721.0" y="402" font-family="Arial,Helvetica,sans-serif" font-size="20" font-weight="400" fill="#243343" text-anchor="middle">[N,160,45,80]</text>
+<polyline points="817,379 840,379" fill="none" stroke="#72569c" stroke-width="2.6" stroke-linejoin="round"/>
+<polygon points="840,379 829.0,374.0 829.0,384.0" fill="#72569c"/>
+<polyline points="721,454 721,505" fill="none" stroke="#72569c" stroke-width="2.6" stroke-linejoin="round"/>
+<rect x="840" y="310" width="192" height="144" rx="10" fill="white" stroke="#72569c" stroke-width="1.8"/>
+<text x="936.0" y="344" font-family="Arial,Helvetica,sans-serif" font-size="24" font-weight="700" fill="#72569c" text-anchor="middle">Stage 3</text>
+<text x="936.0" y="375" font-family="Arial,Helvetica,sans-serif" font-size="20" font-weight="400" fill="#243343" text-anchor="middle">8 blocks</text>
+<text x="936.0" y="402" font-family="Arial,Helvetica,sans-serif" font-size="20" font-weight="400" fill="#243343" text-anchor="middle">[N,320,22,40]</text>
+<polyline points="1032,379 1055,379" fill="none" stroke="#72569c" stroke-width="2.6" stroke-linejoin="round"/>
+<polygon points="1055,379 1044.0,374.0 1044.0,384.0" fill="#72569c"/>
+<polyline points="936,454 936,505" fill="none" stroke="#72569c" stroke-width="2.6" stroke-linejoin="round"/>
+<rect x="1055" y="310" width="192" height="144" rx="10" fill="white" stroke="#72569c" stroke-width="1.8"/>
+<text x="1151.0" y="344" font-family="Arial,Helvetica,sans-serif" font-size="24" font-weight="700" fill="#72569c" text-anchor="middle">Stage 4</text>
+<text x="1151.0" y="375" font-family="Arial,Helvetica,sans-serif" font-size="20" font-weight="400" fill="#243343" text-anchor="middle">2 blocks</text>
+<text x="1151.0" y="402" font-family="Arial,Helvetica,sans-serif" font-size="20" font-weight="400" fill="#243343" text-anchor="middle">[N,640,11,20]</text>
+<polyline points="1151,454 1151,505" fill="none" stroke="#72569c" stroke-width="2.6" stroke-linejoin="round"/>
+<polyline points="506,505 1280,505 1280,402 1310,402" fill="none" stroke="#72569c" stroke-width="2.6" stroke-linejoin="round"/>
+<polygon points="1310,402 1299.0,397.0 1299.0,407.0" fill="#72569c"/>
+<text x="864" y="537" font-family="Arial,Helvetica,sans-serif" font-size="20" font-weight="400" fill="#72569c" text-anchor="middle">Four-scale feature outputs</text>
+<rect x="1310" y="278" width="445" height="264" rx="10" fill="white" stroke="#72569c" stroke-width="1.8"/>
+<text x="1532.5" y="312" font-family="Arial,Helvetica,sans-serif" font-size="28" font-weight="700" fill="#72569c" text-anchor="middle">Top-down FPN</text>
+<text x="1532.5" y="343" font-family="Arial,Helvetica,sans-serif" font-size="22" font-weight="400" fill="#243343" text-anchor="middle">1x1 lateral projections: C -&gt; 128</text>
+<text x="1532.5" y="370" font-family="Arial,Helvetica,sans-serif" font-size="22" font-weight="400" fill="#243343" text-anchor="middle">Bilinear resize + sum: 4 scales</text>
+<text x="1532.5" y="397" font-family="Arial,Helvetica,sans-serif" font-size="22" font-weight="400" fill="#243343" text-anchor="middle">3x3 Conv 128 -&gt; 128</text>
+<text x="1532.5" y="424" font-family="Arial,Helvetica,sans-serif" font-size="22" font-weight="400" fill="#243343" text-anchor="middle">GroupNorm(8) + GELU</text>
+<text x="1532.5" y="451" font-family="Arial,Helvetica,sans-serif" font-size="22" font-weight="400" fill="#243343" text-anchor="middle">F: [N,128,90,160]</text>
+<polyline points="1755,402 1792,402 1792,298 1835,298" fill="none" stroke="#72569c" stroke-width="2.6" stroke-linejoin="round"/>
+<polygon points="1835,298 1824.0,293.0 1824.0,303.0" fill="#72569c"/>
+<polyline points="1792,402 1835,402" fill="none" stroke="#72569c" stroke-width="2.6" stroke-linejoin="round"/>
+<polygon points="1835,402 1824.0,397.0 1824.0,407.0" fill="#72569c"/>
+<rect x="1835" y="248" width="640" height="93" rx="10" fill="white" stroke="#72569c" stroke-width="1.8"/>
+<text x="2155.0" y="282" font-family="Arial,Helvetica,sans-serif" font-size="24" font-weight="700" fill="#72569c" text-anchor="middle">Foreground head: 1x1 Conv 128 -&gt; 1</text>
+<text x="2155.0" y="313" font-family="Arial,Helvetica,sans-serif" font-size="21" font-weight="400" fill="#243343" text-anchor="middle">Mask logits M: [N,1,90,160]</text>
+<rect x="1835" y="365" width="640" height="93" rx="10" fill="white" stroke="#72569c" stroke-width="1.8"/>
+<text x="2155.0" y="399" font-family="Arial,Helvetica,sans-serif" font-size="24" font-weight="700" fill="#72569c" text-anchor="middle">Landmark head: 1x1 Conv 128 -&gt; 5</text>
+<text x="2155.0" y="430" font-family="Arial,Helvetica,sans-serif" font-size="21" font-weight="400" fill="#243343" text-anchor="middle">Heatmaps: [N,5,90,160] for C, H1, H2, J1, J2</text>
+<polyline points="2155,458 2155,491" fill="none" stroke="#72569c" stroke-width="2.6" stroke-linejoin="round"/>
+<polygon points="2155,491 2160.0,480.0 2150.0,480.0" fill="#72569c"/>
+<rect x="1835" y="492" width="640" height="124" rx="10" fill="white" stroke="#72569c" stroke-width="1.8"/>
+<text x="2155.0" y="526" font-family="Arial,Helvetica,sans-serif" font-size="25" font-weight="700" fill="#72569c" text-anchor="middle">Heatmap coordinate decoding</text>
+<text x="2155.0" y="557" font-family="Arial,Helvetica,sans-serif" font-size="21" font-weight="400" fill="#243343" text-anchor="middle">Sharpened sigmoid expectation, power = 4</text>
+<text x="2155.0" y="584" font-family="Arial,Helvetica,sans-serif" font-size="21" font-weight="400" fill="#243343" text-anchor="middle">U: [N,5,2] pixels; confidence: [N,5]</text>
+<rect x="75" y="558" width="510" height="111" rx="10" fill="white" stroke="#72569c" stroke-width="1.8"/>
+<text x="330.0" y="592" font-family="Arial,Helvetica,sans-serif" font-size="25" font-weight="700" fill="#72569c" text-anchor="middle">Per-camera K and distortion D</text>
+<text x="330.0" y="623" font-family="Arial,Helvetica,sans-serif" font-size="21" font-weight="400" fill="#243343" text-anchor="middle">K: [B,T,2,3,3]; D: [B,T,2,5]</text>
+<text x="330.0" y="650" font-family="Arial,Helvetica,sans-serif" font-size="21" font-weight="400" fill="#243343" text-anchor="middle">Camera vector k: [BT,2,9]</text>
+<text x="635" y="588" font-family="Arial,Helvetica,sans-serif" font-size="22" font-weight="400" fill="#243343" text-anchor="start">k = [fx/W, fy/H, cx/W, cy/H, k1, k2, p1, p2, k3]</text>
+<text x="635" y="620" font-family="Arial,Helvetica,sans-serif" font-size="22" font-weight="400" fill="#243343" text-anchor="start">Known per-eye imaging parameters; no stereo baseline input.</text>
+<text x="635" y="655" font-family="Arial,Helvetica,sans-serif" font-size="21" font-weight="400" fill="#596979" text-anchor="start">Ports below reuse these tensors; the original RGB bypasses the backbone for local crops.</text>
+<rect x="340.0" y="693" width="200" height="38" rx="19" fill="white" stroke="#2863a1" stroke-width="1.8"/>
+<text x="440" y="719" font-family="Arial,Helvetica,sans-serif" font-size="21" font-weight="700" fill="#2863a1" text-anchor="middle">F + M + U</text>
+<rect x="1180.0" y="693" width="200" height="38" rx="19" fill="white" stroke="#27765d" stroke-width="1.8"/>
+<text x="1280" y="719" font-family="Arial,Helvetica,sans-serif" font-size="21" font-weight="700" fill="#27765d" text-anchor="middle">R + M + U</text>
+<rect x="2020.0" y="693" width="200" height="38" rx="19" fill="white" stroke="#b36b26" stroke-width="1.8"/>
+<text x="2120" y="719" font-family="Arial,Helvetica,sans-serif" font-size="21" font-weight="700" fill="#b36b26" text-anchor="middle">R + M + U</text>
+<polyline points="440,734 440,790" fill="none" stroke="#2863a1" stroke-width="2.6" stroke-linejoin="round"/>
+<polygon points="440,790 445.0,779.0 435.0,779.0" fill="#2863a1"/>
+<polyline points="1280,734 1280,790" fill="none" stroke="#27765d" stroke-width="2.6" stroke-linejoin="round"/>
+<polygon points="1280,790 1285.0,779.0 1275.0,779.0" fill="#27765d"/>
+<polyline points="2120,734 2120,790" fill="none" stroke="#b36b26" stroke-width="2.6" stroke-linejoin="round"/>
+<polygon points="2120,790 2125.0,779.0 2115.0,779.0" fill="#b36b26"/>
+<rect x="45" y="790" width="790" height="1015" rx="14" fill="#edf4fc" stroke="#2863a1" stroke-width="2.2"/>
+<text x="69" y="830" font-family="Arial,Helvetica,sans-serif" font-size="28" font-weight="700" fill="#2863a1" text-anchor="start">(b) Shaft / body branch</text>
+<rect x="80" y="865" width="720" height="128" rx="10" fill="white" stroke="#2863a1" stroke-width="1.8"/>
+<text x="440.0" y="899" font-family="Arial,Helvetica,sans-serif" font-size="26" font-weight="700" fill="#2863a1" text-anchor="middle">Foreground + five landmark tokens</text>
+<text x="440.0" y="930" font-family="Arial,Helvetica,sans-serif" font-size="21" font-weight="400" fill="#243343" text-anchor="middle">1 mask-pooled descriptor + C/H1/H2/J1/J2 patches</text>
+<text x="440.0" y="957" font-family="Arial,Helvetica,sans-serif" font-size="21" font-weight="400" fill="#243343" text-anchor="middle">8x8 sampling -&gt; local encoder -&gt; 4x4 pool</text>
+<text x="440.0" y="984" font-family="Arial,Helvetica,sans-serif" font-size="21" font-weight="400" fill="#243343" text-anchor="middle">Six ordered tokens: [N,6,128]</text>
+<polyline points="440,993 440,1018" fill="none" stroke="#2863a1" stroke-width="2.6" stroke-linejoin="round"/>
+<polygon points="440,1018 445.0,1007.0 435.0,1007.0" fill="#2863a1"/>
+<rect x="80" y="1018" width="720" height="88" rx="10" fill="white" stroke="#2863a1" stroke-width="1.8"/>
+<text x="440.0" y="1052" font-family="Arial,Helvetica,sans-serif" font-size="25" font-weight="700" fill="#2863a1" text-anchor="middle">Add camera and view embeddings</text>
+<text x="440.0" y="1083" font-family="Arial,Helvetica,sans-serif" font-size="21" font-weight="400" fill="#243343" text-anchor="middle">Camera MLP 9 -&gt; 128 -&gt; 128; reshape [BT,2,6,128]</text>
+<polyline points="440,1106 440,1130" fill="none" stroke="#2863a1" stroke-width="2.6" stroke-linejoin="round"/>
+<polygon points="440,1130 445.0,1119.0 435.0,1119.0" fill="#2863a1"/>
+<rect x="80" y="1130" width="720" height="99" rx="10" fill="white" stroke="#2863a1" stroke-width="1.8"/>
+<text x="440.0" y="1164" font-family="Arial,Helvetica,sans-serif" font-size="26" font-weight="700" fill="#2863a1" text-anchor="middle">Bidirectional cross-attention x 2</text>
+<text x="440.0" y="1195" font-family="Arial,Helvetica,sans-serif" font-size="21" font-weight="400" fill="#243343" text-anchor="middle">4 heads, 32 dimensions/head; FFN 128 -&gt; 256 -&gt; 128</text>
+<text x="440.0" y="1222" font-family="Arial,Helvetica,sans-serif" font-size="21" font-weight="400" fill="#243343" text-anchor="middle">Input / output: [BT,2,6,128]</text>
+<polyline points="440,1229 440,1254" fill="none" stroke="#2863a1" stroke-width="2.6" stroke-linejoin="round"/>
+<polygon points="440,1254 445.0,1243.0 435.0,1243.0" fill="#2863a1"/>
+<rect x="80" y="1254" width="720" height="78" rx="10" fill="white" stroke="#2863a1" stroke-width="1.8"/>
+<text x="440.0" y="1288" font-family="Arial,Helvetica,sans-serif" font-size="25" font-weight="700" fill="#2863a1" text-anchor="middle">Flatten six tokens; FC 768 -&gt; 128</text>
+<text x="440.0" y="1319" font-family="Arial,Helvetica,sans-serif" font-size="21" font-weight="400" fill="#243343" text-anchor="middle">Reshape: [2B,T,128]</text>
+<polyline points="440,1332 440,1357" fill="none" stroke="#2863a1" stroke-width="2.6" stroke-linejoin="round"/>
+<polygon points="440,1357 445.0,1346.0 435.0,1346.0" fill="#2863a1"/>
+<rect x="80" y="1357" width="720" height="95" rx="10" fill="white" stroke="#2863a1" stroke-width="1.8"/>
+<text x="440.0" y="1391" font-family="Arial,Helvetica,sans-serif" font-size="26" font-weight="700" fill="#2863a1" text-anchor="middle">Causal shaft GRU: 128 -&gt; 256</text>
+<text x="440.0" y="1422" font-family="Arial,Helvetica,sans-serif" font-size="20" font-weight="400" fill="#243343" text-anchor="middle">Output [2B,T,256]; h_shaft [1,2B,256]</text>
+<text x="440.0" y="1449" font-family="Arial,Helvetica,sans-serif" font-size="20" font-weight="400" fill="#243343" text-anchor="middle">Shared weights across eyes; separate L/R histories</text>
+<polyline points="440,1452 440,1472 260,1472 260,1491" fill="none" stroke="#2863a1" stroke-width="2.6" stroke-linejoin="round"/>
+<polygon points="260,1491 265.0,1480.0 255.0,1480.0" fill="#2863a1"/>
+<polyline points="440,1472 620,1472 620,1491" fill="none" stroke="#2863a1" stroke-width="2.6" stroke-linejoin="round"/>
+<polygon points="620,1491 625.0,1480.0 615.0,1480.0" fill="#2863a1"/>
+<rect x="80" y="1491" width="345" height="112" rx="10" fill="white" stroke="#2863a1" stroke-width="1.8"/>
+<text x="252.5" y="1525" font-family="Arial,Helvetica,sans-serif" font-size="25" font-weight="700" fill="#2863a1" text-anchor="middle">Rotation heads</text>
+<text x="252.5" y="1556" font-family="Arial,Helvetica,sans-serif" font-size="20" font-weight="400" fill="#243343" text-anchor="middle">Per eye: 256 -&gt; 256 -&gt; 6</text>
+<text x="252.5" y="1583" font-family="Arial,Helvetica,sans-serif" font-size="20" font-weight="400" fill="#243343" text-anchor="middle">6D -&gt; R: [B,T,2,3,3]</text>
+<rect x="455" y="1491" width="345" height="112" rx="10" fill="white" stroke="#2863a1" stroke-width="1.8"/>
+<text x="627.5" y="1525" font-family="Arial,Helvetica,sans-serif" font-size="25" font-weight="700" fill="#2863a1" text-anchor="middle">Depth heads</text>
+<text x="627.5" y="1556" font-family="Arial,Helvetica,sans-serif" font-size="19" font-weight="400" fill="#243343" text-anchor="middle">[h(256), C token(128)]</text>
+<text x="627.5" y="1583" font-family="Arial,Helvetica,sans-serif" font-size="19" font-weight="400" fill="#243343" text-anchor="middle">384 -&gt; 256 -&gt; 1; softplus</text>
+<polyline points="800,1182 817,1182 817,1478 628,1478 628,1491" fill="none" stroke="#2863a1" stroke-width="2.6" stroke-linejoin="round" stroke-dasharray="8 6"/>
+<polygon points="628,1491 633.0,1480.0 623.0,1480.0" fill="#2863a1"/>
+<text x="775" y="1467" font-family="Arial,Helvetica,sans-serif" font-size="17" font-weight="400" fill="#2863a1" text-anchor="end">C token</text>
+<polyline points="628,1603 628,1627" fill="none" stroke="#2863a1" stroke-width="2.6" stroke-linejoin="round"/>
+<polygon points="628,1627 633.0,1616.0 623.0,1616.0" fill="#2863a1"/>
+<rect x="455" y="1627" width="345" height="119" rx="10" fill="white" stroke="#2863a1" stroke-width="1.8"/>
+<text x="627.5" y="1661" font-family="Arial,Helvetica,sans-serif" font-size="24" font-weight="700" fill="#2863a1" text-anchor="middle">C = Z [xn, yn, 1]</text>
+<text x="627.5" y="1692" font-family="Arial,Helvetica,sans-serif" font-size="20" font-weight="400" fill="#243343" text-anchor="middle">C pixel from U + K,D</text>
+<text x="627.5" y="1719" font-family="Arial,Helvetica,sans-serif" font-size="20" font-weight="400" fill="#243343" text-anchor="middle">Brown inverse -&gt; ray</text>
+<text x="627.5" y="1746" font-family="Arial,Helvetica,sans-serif" font-size="20" font-weight="400" fill="#243343" text-anchor="middle">C: [B,T,2,3]</text>
+<polyline points="253,1603 253,1759 440,1759" fill="none" stroke="#2863a1" stroke-width="2.6" stroke-linejoin="round"/>
+<polyline points="628,1746 628,1759 440,1759" fill="none" stroke="#2863a1" stroke-width="2.6" stroke-linejoin="round"/>
+<rect x="257.5" y="1761" width="365" height="38" rx="19" fill="white" stroke="#2863a1" stroke-width="1.8"/>
+<text x="440" y="1787" font-family="Arial,Helvetica,sans-serif" font-size="21" font-weight="700" fill="#2863a1" text-anchor="middle">C_L, R_L | C_R, R_R</text>
+<rect x="885" y="790" width="790" height="1015" rx="14" fill="#edf7f1" stroke="#27765d" stroke-width="2.2"/>
+<text x="909" y="830" font-family="Arial,Helvetica,sans-serif" font-size="28" font-weight="700" fill="#27765d" text-anchor="start">(c) Wrist branch</text>
+<rect x="920" y="865" width="720" height="128" rx="10" fill="white" stroke="#27765d" stroke-width="1.8"/>
+<text x="1280.0" y="899" font-family="Arial,Helvetica,sans-serif" font-size="25" font-weight="700" fill="#27765d" text-anchor="middle">Predicted foreground crop from raw RGB</text>
+<text x="1280.0" y="930" font-family="Arial,Helvetica,sans-serif" font-size="20" font-weight="400" fill="#243343" text-anchor="middle">Detach mask and ROI coordinates; mask RGB before sampling</text>
+<text x="1280.0" y="957" font-family="Arial,Helvetica,sans-serif" font-size="20" font-weight="400" fill="#243343" text-anchor="middle">ROI uses C + hinge + both tips</text>
+<text x="1280.0" y="984" font-family="Arial,Helvetica,sans-serif" font-size="20" font-weight="400" fill="#243343" text-anchor="middle">RGB + mask: [N,4,160,160]</text>
+<polyline points="1280,993 1280,1018" fill="none" stroke="#27765d" stroke-width="2.6" stroke-linejoin="round"/>
+<polygon points="1280,1018 1285.0,1007.0 1275.0,1007.0" fill="#27765d"/>
+<rect x="920" y="1018" width="720" height="139" rx="10" fill="white" stroke="#27765d" stroke-width="1.8"/>
+<text x="1280.0" y="1052" font-family="Arial,Helvetica,sans-serif" font-size="26" font-weight="700" fill="#27765d" text-anchor="middle">Independent lightweight CNN</text>
+<text x="1280.0" y="1083" font-family="Arial,Helvetica,sans-serif" font-size="20" font-weight="400" fill="#243343" text-anchor="middle">4 -&gt; 32 -&gt; 48 -&gt; 64 channels; strides 2,2,1</text>
+<text x="1280.0" y="1110" font-family="Arial,Helvetica,sans-serif" font-size="20" font-weight="400" fill="#243343" text-anchor="middle">[N,32,80,80] -&gt; [N,48,40,40] -&gt; [N,64,40,40]</text>
+<text x="1280.0" y="1137" font-family="Arial,Helvetica,sans-serif" font-size="20" font-weight="400" fill="#243343" text-anchor="middle">Depthwise + pointwise residual refinement</text>
+<polyline points="1280,1157 1280,1182" fill="none" stroke="#27765d" stroke-width="2.6" stroke-linejoin="round"/>
+<polygon points="1280,1182 1285.0,1171.0 1275.0,1171.0" fill="#27765d"/>
+<rect x="920" y="1182" width="720" height="119" rx="10" fill="white" stroke="#27765d" stroke-width="1.8"/>
+<text x="1280.0" y="1216" font-family="Arial,Helvetica,sans-serif" font-size="25" font-weight="700" fill="#27765d" text-anchor="middle">Spatial descriptor + local metadata</text>
+<text x="1280.0" y="1247" font-family="Arial,Helvetica,sans-serif" font-size="21" font-weight="400" fill="#243343" text-anchor="middle">Pool 4x4 -&gt; 1024 -&gt; FC 128</text>
+<text x="1280.0" y="1274" font-family="Arial,Helvetica,sans-serif" font-size="21" font-weight="400" fill="#243343" text-anchor="middle">Add metadata MLP 15 -&gt; 128 -&gt; 128</text>
+<text x="1280.0" y="1301" font-family="Arial,Helvetica,sans-serif" font-size="21" font-weight="400" fill="#243343" text-anchor="middle">Paired descriptors: [BT,2,128]</text>
+<polyline points="1280,1301 1280,1326" fill="none" stroke="#27765d" stroke-width="2.6" stroke-linejoin="round"/>
+<polygon points="1280,1326 1285.0,1315.0 1275.0,1315.0" fill="#27765d"/>
+<rect x="920" y="1326" width="720" height="119" rx="10" fill="white" stroke="#27765d" stroke-width="1.8"/>
+<text x="1280.0" y="1360" font-family="Arial,Helvetica,sans-serif" font-size="25" font-weight="700" fill="#27765d" text-anchor="middle">Local stereo fusion: concatenate + MLP</text>
+<text x="1280.0" y="1391" font-family="Arial,Helvetica,sans-serif" font-size="21" font-weight="400" fill="#243343" text-anchor="middle">[own(128), other(128)] -&gt; 256 -&gt; 128 -&gt; 128</text>
+<text x="1280.0" y="1418" font-family="Arial,Helvetica,sans-serif" font-size="21" font-weight="400" fill="#243343" text-anchor="middle">Add own-view descriptor; [BT,2,128]</text>
+<text x="1280.0" y="1445" font-family="Arial,Helvetica,sans-serif" font-size="21" font-weight="400" fill="#243343" text-anchor="middle">Reshape to temporal sequences: [2B,T,128]</text>
+<polyline points="1280,1445 1280,1470" fill="none" stroke="#27765d" stroke-width="2.6" stroke-linejoin="round"/>
+<polygon points="1280,1470 1285.0,1459.0 1275.0,1459.0" fill="#27765d"/>
+<rect x="920" y="1470" width="720" height="95" rx="10" fill="white" stroke="#27765d" stroke-width="1.8"/>
+<text x="1280.0" y="1504" font-family="Arial,Helvetica,sans-serif" font-size="25" font-weight="700" fill="#27765d" text-anchor="middle">Causal wrist GRU: 128 -&gt; 256</text>
+<text x="1280.0" y="1535" font-family="Arial,Helvetica,sans-serif" font-size="20" font-weight="400" fill="#243343" text-anchor="middle">Output [2B,T,256]; hidden state [1,2B,256]</text>
+<text x="1280.0" y="1562" font-family="Arial,Helvetica,sans-serif" font-size="20" font-weight="400" fill="#243343" text-anchor="middle">Own parameters; shared across L/R, separate L/R histories</text>
+<polyline points="1280,1565 1280,1590" fill="none" stroke="#27765d" stroke-width="2.6" stroke-linejoin="round"/>
+<polygon points="1280,1590 1285.0,1579.0 1275.0,1579.0" fill="#27765d"/>
+<rect x="920" y="1590" width="720" height="139" rx="10" fill="white" stroke="#27765d" stroke-width="1.8"/>
+<text x="1280.0" y="1624" font-family="Arial,Helvetica,sans-serif" font-size="25" font-weight="700" fill="#27765d" text-anchor="middle">Concatenate L/R states -&gt; angle head</text>
+<text x="1280.0" y="1655" font-family="Arial,Helvetica,sans-serif" font-size="21" font-weight="400" fill="#243343" text-anchor="middle">256 + 256 = 512 per timestamp</text>
+<text x="1280.0" y="1682" font-family="Arial,Helvetica,sans-serif" font-size="21" font-weight="400" fill="#243343" text-anchor="middle">FC 512 -&gt; 256 -&gt; 2; sigmoid into physical joint limits</text>
+<text x="1280.0" y="1709" font-family="Arial,Helvetica,sans-serif" font-size="21" font-weight="400" fill="#243343" text-anchor="middle">pitch, yaw: [B,T,2]</text>
+<polyline points="1280,1729 1280,1760" fill="none" stroke="#27765d" stroke-width="2.6" stroke-linejoin="round"/>
+<polygon points="1280,1760 1285.0,1749.0 1275.0,1749.0" fill="#27765d"/>
+<rect x="1135.0" y="1761" width="290" height="38" rx="19" fill="white" stroke="#27765d" stroke-width="1.8"/>
+<text x="1280" y="1787" font-family="Arial,Helvetica,sans-serif" font-size="21" font-weight="700" fill="#27765d" text-anchor="middle">pitch, yaw</text>
+<rect x="1725" y="790" width="790" height="1015" rx="14" fill="#fff5e8" stroke="#b36b26" stroke-width="2.2"/>
+<text x="1749" y="830" font-family="Arial,Helvetica,sans-serif" font-size="28" font-weight="700" fill="#b36b26" text-anchor="start">(d) Paired-jaw branch</text>
+<rect x="1760" y="865" width="720" height="128" rx="10" fill="white" stroke="#b36b26" stroke-width="1.8"/>
+<text x="2120.0" y="899" font-family="Arial,Helvetica,sans-serif" font-size="25" font-weight="700" fill="#b36b26" text-anchor="middle">Predicted foreground crop from raw RGB</text>
+<text x="2120.0" y="930" font-family="Arial,Helvetica,sans-serif" font-size="20" font-weight="400" fill="#243343" text-anchor="middle">Detach mask and ROI coordinates; mask RGB before sampling</text>
+<text x="2120.0" y="957" font-family="Arial,Helvetica,sans-serif" font-size="20" font-weight="400" fill="#243343" text-anchor="middle">ROI uses hinge + both tips</text>
+<text x="2120.0" y="984" font-family="Arial,Helvetica,sans-serif" font-size="20" font-weight="400" fill="#243343" text-anchor="middle">RGB + mask: [N,4,160,160]</text>
+<polyline points="2120,993 2120,1018" fill="none" stroke="#b36b26" stroke-width="2.6" stroke-linejoin="round"/>
+<polygon points="2120,1018 2125.0,1007.0 2115.0,1007.0" fill="#b36b26"/>
+<rect x="1760" y="1018" width="720" height="139" rx="10" fill="white" stroke="#b36b26" stroke-width="1.8"/>
+<text x="2120.0" y="1052" font-family="Arial,Helvetica,sans-serif" font-size="26" font-weight="700" fill="#b36b26" text-anchor="middle">Independent lightweight CNN</text>
+<text x="2120.0" y="1083" font-family="Arial,Helvetica,sans-serif" font-size="20" font-weight="400" fill="#243343" text-anchor="middle">4 -&gt; 32 -&gt; 48 -&gt; 64 channels; strides 2,2,1</text>
+<text x="2120.0" y="1110" font-family="Arial,Helvetica,sans-serif" font-size="20" font-weight="400" fill="#243343" text-anchor="middle">[N,32,80,80] -&gt; [N,48,40,40] -&gt; [N,64,40,40]</text>
+<text x="2120.0" y="1137" font-family="Arial,Helvetica,sans-serif" font-size="20" font-weight="400" fill="#243343" text-anchor="middle">Depthwise + pointwise residual refinement</text>
+<polyline points="2120,1157 2120,1182" fill="none" stroke="#b36b26" stroke-width="2.6" stroke-linejoin="round"/>
+<polygon points="2120,1182 2125.0,1171.0 2115.0,1171.0" fill="#b36b26"/>
+<rect x="1760" y="1182" width="720" height="119" rx="10" fill="white" stroke="#b36b26" stroke-width="1.8"/>
+<text x="2120.0" y="1216" font-family="Arial,Helvetica,sans-serif" font-size="25" font-weight="700" fill="#b36b26" text-anchor="middle">Spatial descriptor + local metadata</text>
+<text x="2120.0" y="1247" font-family="Arial,Helvetica,sans-serif" font-size="21" font-weight="400" fill="#243343" text-anchor="middle">Pool 4x4 -&gt; 1024 -&gt; FC 128</text>
+<text x="2120.0" y="1274" font-family="Arial,Helvetica,sans-serif" font-size="21" font-weight="400" fill="#243343" text-anchor="middle">Add metadata MLP 15 -&gt; 128 -&gt; 128</text>
+<text x="2120.0" y="1301" font-family="Arial,Helvetica,sans-serif" font-size="21" font-weight="400" fill="#243343" text-anchor="middle">Paired descriptors: [BT,2,128]</text>
+<polyline points="2120,1301 2120,1326" fill="none" stroke="#b36b26" stroke-width="2.6" stroke-linejoin="round"/>
+<polygon points="2120,1326 2125.0,1315.0 2115.0,1315.0" fill="#b36b26"/>
+<rect x="1760" y="1326" width="720" height="119" rx="10" fill="white" stroke="#b36b26" stroke-width="1.8"/>
+<text x="2120.0" y="1360" font-family="Arial,Helvetica,sans-serif" font-size="25" font-weight="700" fill="#b36b26" text-anchor="middle">Local stereo fusion: concatenate + MLP</text>
+<text x="2120.0" y="1391" font-family="Arial,Helvetica,sans-serif" font-size="21" font-weight="400" fill="#243343" text-anchor="middle">[own(128), other(128)] -&gt; 256 -&gt; 128 -&gt; 128</text>
+<text x="2120.0" y="1418" font-family="Arial,Helvetica,sans-serif" font-size="21" font-weight="400" fill="#243343" text-anchor="middle">Add own-view descriptor; [BT,2,128]</text>
+<text x="2120.0" y="1445" font-family="Arial,Helvetica,sans-serif" font-size="21" font-weight="400" fill="#243343" text-anchor="middle">Reshape to temporal sequences: [2B,T,128]</text>
+<polyline points="2120,1445 2120,1470" fill="none" stroke="#b36b26" stroke-width="2.6" stroke-linejoin="round"/>
+<polygon points="2120,1470 2125.0,1459.0 2115.0,1459.0" fill="#b36b26"/>
+<rect x="1760" y="1470" width="720" height="95" rx="10" fill="white" stroke="#b36b26" stroke-width="1.8"/>
+<text x="2120.0" y="1504" font-family="Arial,Helvetica,sans-serif" font-size="25" font-weight="700" fill="#b36b26" text-anchor="middle">Causal jaw GRU: 128 -&gt; 256</text>
+<text x="2120.0" y="1535" font-family="Arial,Helvetica,sans-serif" font-size="20" font-weight="400" fill="#243343" text-anchor="middle">Output [2B,T,256]; hidden state [1,2B,256]</text>
+<text x="2120.0" y="1562" font-family="Arial,Helvetica,sans-serif" font-size="20" font-weight="400" fill="#243343" text-anchor="middle">Own parameters; shared across L/R, separate L/R histories</text>
+<polyline points="2120,1565 2120,1590" fill="none" stroke="#b36b26" stroke-width="2.6" stroke-linejoin="round"/>
+<polygon points="2120,1590 2125.0,1579.0 2115.0,1579.0" fill="#b36b26"/>
+<rect x="1760" y="1590" width="720" height="139" rx="10" fill="white" stroke="#b36b26" stroke-width="1.8"/>
+<text x="2120.0" y="1624" font-family="Arial,Helvetica,sans-serif" font-size="25" font-weight="700" fill="#b36b26" text-anchor="middle">Concatenate L/R states -&gt; angle head</text>
+<text x="2120.0" y="1655" font-family="Arial,Helvetica,sans-serif" font-size="21" font-weight="400" fill="#243343" text-anchor="middle">256 + 256 = 512 per timestamp</text>
+<text x="2120.0" y="1682" font-family="Arial,Helvetica,sans-serif" font-size="21" font-weight="400" fill="#243343" text-anchor="middle">FC 512 -&gt; 256 -&gt; 1; sigmoid into physical joint limits</text>
+<text x="2120.0" y="1709" font-family="Arial,Helvetica,sans-serif" font-size="21" font-weight="400" fill="#243343" text-anchor="middle">jaw half-angle: [B,T,1]</text>
+<polyline points="2120,1729 2120,1760" fill="none" stroke="#b36b26" stroke-width="2.6" stroke-linejoin="round"/>
+<polygon points="2120,1760 2125.0,1749.0 2115.0,1749.0" fill="#b36b26"/>
+<rect x="1975.0" y="1761" width="290" height="38" rx="19" fill="white" stroke="#b36b26" stroke-width="1.8"/>
+<text x="2120" y="1787" font-family="Arial,Helvetica,sans-serif" font-size="21" font-weight="700" fill="#b36b26" text-anchor="middle">jaw half-angle</text>
+<polyline points="440,1803 440,1848" fill="none" stroke="#2863a1" stroke-width="2.6" stroke-linejoin="round"/>
+<polyline points="1280,1803 1280,1848" fill="none" stroke="#27765d" stroke-width="2.6" stroke-linejoin="round"/>
+<polyline points="2120,1803 2120,1848" fill="none" stroke="#b36b26" stroke-width="2.6" stroke-linejoin="round"/>
+<polyline points="440,1848 2120,1848" fill="none" stroke="#586979" stroke-width="2.6" stroke-linejoin="round"/>
+<polyline points="1280,1848 1280,1880 715,1880 715,1910" fill="none" stroke="#586979" stroke-width="2.6" stroke-linejoin="round"/>
+<polygon points="715,1910 720.0,1899.0 710.0,1899.0" fill="#586979"/>
+<text x="46" y="1882" font-family="Arial,Helvetica,sans-serif" font-size="29" font-weight="700" fill="#243343" text-anchor="start">(e) Pose output and deterministic articulated geometry</text>
+<rect x="65" y="1910" width="1300" height="158" rx="10" fill="white" stroke="#2863a1" stroke-width="1.8"/>
+<text x="715.0" y="1944" font-family="Arial,Helvetica,sans-serif" font-size="29" font-weight="700" fill="#2863a1" text-anchor="middle">Exported articulated pose: [B,T,17]</text>
+<text x="715.0" y="1975" font-family="Arial,Helvetica,sans-serif" font-size="23" font-weight="400" fill="#243343" text-anchor="middle">C_L(3) + quaternion_L(4) + C_R(3) + quaternion_R(4)</text>
+<text x="715.0" y="2002" font-family="Arial,Helvetica,sans-serif" font-size="23" font-weight="400" fill="#243343" text-anchor="middle">+ wrist pitch(1) + wrist yaw(1) + jaw half-angle(1)</text>
+<text x="715.0" y="2029" font-family="Arial,Helvetica,sans-serif" font-size="23" font-weight="400" fill="#243343" text-anchor="middle">Quaternion order: xyzw; C: mm; joint angles: radians.</text>
+<polyline points="1365,1989 1410,1989" fill="none" stroke="#586979" stroke-width="2.6" stroke-linejoin="round"/>
+<polygon points="1410,1989 1399.0,1984.0 1399.0,1994.0" fill="#586979"/>
+<rect x="1410" y="1910" width="1080" height="158" rx="10" fill="white" stroke="#596979" stroke-width="1.8"/>
+<text x="1950.0" y="1944" font-family="Arial,Helvetica,sans-serif" font-size="28" font-weight="700" fill="#596979" text-anchor="middle">Known CAD / USD kinematic chain</text>
+<text x="1950.0" y="1975" font-family="Arial,Helvetica,sans-serif" font-size="23" font-weight="400" fill="#243343" text-anchor="middle">Derive d, H1/H2, J1/J2, T and three local XYZ frames</text>
+<text x="1950.0" y="2002" font-family="Arial,Helvetica,sans-serif" font-size="23" font-weight="400" fill="#243343" text-anchor="middle">Project each eye with its own K,D -&gt; arrows and panels</text>
+<text x="1950.0" y="2029" font-family="Arial,Helvetica,sans-serif" font-size="23" font-weight="400" fill="#243343" text-anchor="middle">Symmetric jaw joints: q1 = -half, q2 = +half</text>
+<text x="50" y="2120" font-family="Arial,Helvetica,sans-serif" font-size="23" font-weight="700" fill="#243343" text-anchor="start">Three independent temporal modules; state pack [3,2B,256] = [shaft, wrist, jaw]. No future frames are used.</text>
+<text x="50" y="2155" font-family="Arial,Helvetica,sans-serif" font-size="21" font-weight="400" fill="#596979" text-anchor="start">R = original RGB; F = FPN features; M = mask logits; U = predicted landmark pixels. Dashed route = reused C token.</text>
+<text x="50" y="2188" font-family="Arial,Helvetica,sans-serif" font-size="20" font-weight="400" fill="#596979" text-anchor="start">Tensor dimensions checked at B=1, T=1; the architecture supports causal streaming with three independent states.</text>
+</svg>

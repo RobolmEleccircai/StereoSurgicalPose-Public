@@ -1,0 +1,3 @@
+# Optional document-only environment; not a model runtime dependency.
+reportlab==4.4.9
+Pillow>=11.3,<14

@@ -1,0 +1,525 @@
+{
+  "backbone": {
+    "input": [
+      [
+        2,
+        3,
+        360,
+        640
+      ]
+    ],
+    "output": [
+      [
+        2,
+        80,
+        90,
+        160
+      ],
+      [
+        2,
+        160,
+        45,
+        80
+      ],
+      [
+        2,
+        320,
+        22,
+        40
+      ],
+      [
+        2,
+        640,
+        11,
+        20
+      ]
+    ]
+  },
+  "spatial": {
+    "input": [
+      [
+        2,
+        128,
+        90,
+        160
+      ]
+    ],
+    "output": [
+      2,
+      128,
+      90,
+      160
+    ]
+  },
+  "mask_head": {
+    "input": [
+      [
+        2,
+        128,
+        90,
+        160
+      ]
+    ],
+    "output": [
+      2,
+      1,
+      90,
+      160
+    ]
+  },
+  "heatmap_head": {
+    "input": [
+      [
+        2,
+        128,
+        90,
+        160
+      ]
+    ],
+    "output": [
+      2,
+      5,
+      90,
+      160
+    ]
+  },
+  "guided_regions": {
+    "input": [
+      [
+        2,
+        128,
+        90,
+        160
+      ],
+      [
+        2,
+        1,
+        90,
+        160
+      ],
+      [
+        2,
+        5,
+        90,
+        160
+      ],
+      [
+        "<class 'int'>",
+        "<class 'int'>"
+      ]
+    ],
+    "output": [
+      [
+        2,
+        6,
+        128
+      ],
+      [
+        2,
+        5,
+        2
+      ],
+      [
+        2,
+        5
+      ]
+    ]
+  },
+  "camera": {
+    "input": [
+      [
+        1,
+        2,
+        9
+      ]
+    ],
+    "output": [
+      1,
+      2,
+      128
+    ]
+  },
+  "fusion": {
+    "input": [
+      [
+        1,
+        2,
+        6,
+        128
+      ]
+    ],
+    "output": [
+      1,
+      2,
+      6,
+      128
+    ]
+  },
+  "guided_pose_pool": {
+    "input": [
+      [
+        1,
+        2,
+        768
+      ]
+    ],
+    "output": [
+      1,
+      2,
+      128
+    ]
+  },
+  "temporal": {
+    "input": [
+      [
+        2,
+        1,
+        128
+      ],
+      "<class 'NoneType'>"
+    ],
+    "output": [
+      [
+        2,
+        1,
+        256
+      ],
+      [
+        1,
+        2,
+        256
+      ]
+    ]
+  },
+  "rotation_heads.0": {
+    "input": [
+      [
+        1,
+        1,
+        256
+      ]
+    ],
+    "output": [
+      1,
+      1,
+      6
+    ]
+  },
+  "depth_heads.0": {
+    "input": [
+      [
+        1,
+        1,
+        384
+      ]
+    ],
+    "output": [
+      1,
+      1,
+      1
+    ]
+  },
+  "foreground_parts_net.wrist_branch.encoder.stem": {
+    "input": [
+      [
+        2,
+        4,
+        160,
+        160
+      ]
+    ],
+    "output": [
+      2,
+      64,
+      40,
+      40
+    ]
+  },
+  "foreground_parts_net.wrist_branch.encoder.refine": {
+    "input": [
+      [
+        2,
+        64,
+        40,
+        40
+      ]
+    ],
+    "output": [
+      2,
+      64,
+      40,
+      40
+    ]
+  },
+  "foreground_parts_net.wrist_branch.encoder.project": {
+    "input": [
+      [
+        2,
+        1024
+      ]
+    ],
+    "output": [
+      2,
+      128
+    ]
+  },
+  "foreground_parts_net.wrist_branch.metadata": {
+    "input": [
+      [
+        2,
+        15
+      ]
+    ],
+    "output": [
+      2,
+      128
+    ]
+  },
+  "foreground_parts_net.wrist_branch.cross_view": {
+    "input": [
+      [
+        1,
+        2,
+        256
+      ]
+    ],
+    "output": [
+      1,
+      2,
+      128
+    ]
+  },
+  "foreground_parts_net.wrist_branch.temporal": {
+    "input": [
+      [
+        2,
+        1,
+        128
+      ],
+      "<class 'NoneType'>"
+    ],
+    "output": [
+      [
+        2,
+        1,
+        256
+      ],
+      [
+        1,
+        2,
+        256
+      ]
+    ]
+  },
+  "foreground_parts_net.wrist_branch.head": {
+    "input": [
+      [
+        1,
+        1,
+        512
+      ]
+    ],
+    "output": [
+      1,
+      1,
+      2
+    ]
+  },
+  "foreground_parts_net.wrist_branch": {
+    "input": [
+      [
+        2,
+        4,
+        160,
+        160
+      ],
+      [
+        2,
+        15
+      ],
+      "<class 'int'>",
+      "<class 'int'>",
+      "<class 'NoneType'>"
+    ],
+    "output": [
+      [
+        1,
+        1,
+        2
+      ],
+      [
+        2,
+        3,
+        40,
+        40
+      ],
+      [
+        1,
+        2,
+        256
+      ]
+    ]
+  },
+  "foreground_parts_net.jaw_branch.head": {
+    "input": [
+      [
+        1,
+        1,
+        512
+      ]
+    ],
+    "output": [
+      1,
+      1,
+      1
+    ]
+  },
+  "outputs": {
+    "C": [
+      1,
+      1,
+      2,
+      3
+    ],
+    "R": [
+      1,
+      1,
+      2,
+      3,
+      3
+    ],
+    "joints": [
+      1,
+      1,
+      3
+    ],
+    "c_uv": [
+      1,
+      1,
+      2,
+      2
+    ],
+    "c_depth": [
+      1,
+      1,
+      2,
+      1
+    ],
+    "mask_logits": [
+      1,
+      1,
+      2,
+      1,
+      90,
+      160
+    ],
+    "heatmap_logits": [
+      1,
+      1,
+      2,
+      5,
+      90,
+      160
+    ],
+    "part_heatmap_logits": [
+      1,
+      1,
+      2,
+      2,
+      3,
+      40,
+      40
+    ],
+    "part_roi_centres": [
+      1,
+      1,
+      2,
+      2,
+      2
+    ],
+    "part_roi_half_extents": [
+      1,
+      1,
+      2,
+      2,
+      2
+    ],
+    "part_observed_fraction": [
+      1,
+      1,
+      2,
+      2
+    ],
+    "landmark_uv": [
+      1,
+      1,
+      2,
+      5,
+      2
+    ],
+    "landmark_confidence": [
+      1,
+      1,
+      2,
+      5
+    ]
+  },
+  "hidden": [
+    3,
+    2,
+    256
+  ],
+  "exported": [
+    1,
+    1,
+    17
+  ],
+  "parameters": 17945453,
+  "backbone_channels": [
+    80,
+    160,
+    320,
+    640
+  ],
+  "backbone_stage_blocks": {
+    "stages_0.blocks": 2,
+    "stages_1.blocks": 2,
+    "stages_2.blocks": 8,
+    "stages_3.blocks": 2
+  },
+  "config": {
+    "backbone": "convnextv2_nano.fcmae_ft_in22k_in1k",
+    "pretrained": true,
+    "feature_dim": 128,
+    "token_grid": [
+      6,
+      10
+    ],
+    "fusion_layers": 2,
+    "attention_heads": 4,
+    "hidden_dim": 256,
+    "depth_scale_mm": 100.0,
+    "channels_last": false,
+    "feature_guidance": true,
+    "roi_patch_size": 8,
+    "roi_radius_px": 24.0,
+    "landmark_power": 4.0,
+    "foreground_context_floor": 0.0,
+    "roi_pool_size": 4,
+    "roi_local_encoder": true,
+    "foreground_parts": true,
+    "part_crop_size": 160,
+    "part_mask_cutoff": 0.2,
+    "part_mask_dilation_px": 1,
+    "part_crop_chunk_size": 8,
+    "wrist_roi_min_half_px": 24.0,
+    "wrist_roi_max_half_px": 128.0,
+    "wrist_roi_margin_px": 10.0,
+    "jaw_roi_min_half_px": 20.0,
+    "jaw_roi_max_half_px": 96.0,
+    "jaw_roi_margin_px": 10.0,
+    "part_roi_jitter_center_px": 1.0,
+    "part_roi_jitter_scale_fraction": 0.03,
+    "c_translation_head": "landmark_ray_depth_v1"
+  }
+}

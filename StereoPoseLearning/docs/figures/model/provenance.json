@@ -1,0 +1,35 @@
+{
+  "schema": "model_figures_v1",
+  "model_version": "stereo_pose_unified_c_v1",
+  "checkpoint_sha256": "639fc8c7e56263f4ab889aa53cc5132e3610eea4c8b2d8b0db671c41d8a30325",
+  "parameters": 17945453,
+  "source_commit": "17b0ed813f622280eb0a484e104dae51d491c439",
+  "shape_audit": "../../evidence/model_shape_audit_20261112.json",
+  "detail_figures_unchanged": false,
+  "input_asset_description": "Actual seq_000 frame 0; predicted maps and foreground crops; saved model prediction overlay, not ground-truth visualization.",
+  "source_sha256": {
+    "stereo_pose/model.py": "c31443b7b447dcfe7eee4543bfcbc0e27cb2d44fdbef7c644a42d7b273ae8d1a",
+    "stereo_pose/guidance.py": "d98b7d496541935ef455681e16123f8b6113c838ca42043bf11280d62c70edc8",
+    "stereo_pose/parts.py": "3f6f01131aa0bc7744f68338f08918296b40dd92471de0d254781e6e6199fae2",
+    "stereo_pose/translation.py": "6dfa204c59a519c318b3f7e4b16fc640aee879a2a69d290c14db1ca97647d87a",
+    "stereo_pose/geometry.py": "56be045faa4f6ad95d3ea39d6223de5491f2ece01e2ee8dc45647fc5dbb61ee8",
+    "assets/instrument_model.json": "9dcf0df122e42ff6ad70d8118a590dd337f391816faec015257bf81734ebc9f9"
+  },
+  "artifact_sha256": {
+    "framework.svg": "064a5e2560e62df485c562cb4a959d46e2d8a6879cca7d51c80f75d5e67aa0c9",
+    "framework.pdf": "97f7b6f768bc8c0a844dced34d83573ad33bb210816cef3108aa84171b2fe023",
+    "framework.png": "1cb64f39ab00d4ca95083c7110aecf75c9a3c5a7a0ef13fd18fd38326c2ea9df",
+    "network_overview.svg": "632889197f315064be269553f2a28cc0ea7f9bdd1031c190b38c54b7823a6ed1",
+    "fusion_and_operator_details.svg": "f15076e732170369741347d455528adc27bbe15d463bc4af5cd5d4c8ef924776",
+    "detailed_structure.pdf": "b60a0b11c97dd3a64084776257baabbd4f521de8c6b432df459024bbeda0f5d3",
+    "network_overview.png": "cb6161103abab9a7a4a4dbff853d18aa087ea6ceacb55f11587879d7530de5ed",
+    "fusion_and_operator_details.png": "316ac297fb28b9a367784bc08340431c11a8a6033eea68af16c969fb12e14317"
+  },
+  "font_source": {
+    "distribution": "pdfjs-dist standard_fonts",
+    "license_file": "FONT_LICENSE.txt",
+    "copyright_metadata": "Copyright (c) 2007 Red Hat, Inc. All rights reserved. LIBERATION is a trademark of Red Hat, Inc.",
+    "name_table_license_url": "https://fedoraproject.org/wiki/Licensing/LiberationFontLicense"
+  },
+  "detail_revision": "Structure, tensor dimensions and layout unchanged; overview footer describes the dimension check without checkpoint progress."
+}

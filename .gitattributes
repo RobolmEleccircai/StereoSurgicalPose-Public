@@ -4,3 +4,6 @@ CameraImagingConfig/src/ShaftTipStereo_2026-11-07/render/native/scene/*.usda whi
 CameraImagingConfig/src/SingleInstrument_2026-11-07/*.usda whitespace=-blank-at-eof
 CameraImagingConfig/src/SingleInstrument_2026-11-07/preview/native/scene/*.usda whitespace=-blank-at-eof
 CameraImagingConfig/src/calibration/raw/DRENDS_ExVivo_calibration.json whitespace=-blank-at-eol
+
+# Vector PDFs must retain their exact binary representation.
+StereoPoseLearning/docs/figures/model/*.pdf binary

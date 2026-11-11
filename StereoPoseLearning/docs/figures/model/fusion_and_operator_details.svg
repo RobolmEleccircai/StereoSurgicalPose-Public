@@ -1,0 +1,212 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="2560" height="2220" viewBox="0 0 2560 2220">
+<rect width="100%" height="100%" fill="white"/>
+<text x="46" y="62" font-family="Arial,Helvetica,sans-serif" font-size="43" font-weight="700" fill="#243343" text-anchor="start">How stereo evidence and temporal history are fused</text>
+<text x="48" y="102" font-family="Arial,Helvetica,sans-serif" font-size="23" font-weight="400" fill="#596979" text-anchor="start">Operator-level details of the same model. Body attention and local-part MLP fusion are distinct implementations.</text>
+<text x="48" y="137" font-family="Arial,Helvetica,sans-serif" font-size="22" font-weight="400" fill="#596979" text-anchor="start">N = 2BT. Every branch shares weights across views but keeps the left and right recurrent states separate.</text>
+<rect x="45" y="172" width="1210" height="920" rx="14" fill="#edf4fc" stroke="#2863a1" stroke-width="2.2"/>
+<text x="69" y="212" font-family="Arial,Helvetica,sans-serif" font-size="28" font-weight="700" fill="#2863a1" text-anchor="start">(a) Shaft: bidirectional token attention</text>
+<rect x="80" y="246" width="510" height="92" rx="10" fill="white" stroke="#2863a1" stroke-width="1.8"/>
+<text x="335.0" y="280" font-family="Arial,Helvetica,sans-serif" font-size="27" font-weight="700" fill="#2863a1" text-anchor="middle">Left tokens L</text>
+<text x="335.0" y="311" font-family="Arial,Helvetica,sans-serif" font-size="21" font-weight="400" fill="#243343" text-anchor="middle">[BT,6,128]</text>
+<rect x="710" y="246" width="510" height="92" rx="10" fill="white" stroke="#2863a1" stroke-width="1.8"/>
+<text x="965.0" y="280" font-family="Arial,Helvetica,sans-serif" font-size="27" font-weight="700" fill="#2863a1" text-anchor="middle">Right tokens R</text>
+<text x="965.0" y="311" font-family="Arial,Helvetica,sans-serif" font-size="21" font-weight="400" fill="#243343" text-anchor="middle">[BT,6,128]</text>
+<polyline points="335,338 335,367" fill="none" stroke="#2863a1" stroke-width="2.6" stroke-linejoin="round"/>
+<polygon points="335,367 340.0,356.0 330.0,356.0" fill="#2863a1"/>
+<polyline points="965,338 965,367" fill="none" stroke="#2863a1" stroke-width="2.6" stroke-linejoin="round"/>
+<polygon points="965,367 970.0,356.0 960.0,356.0" fill="#2863a1"/>
+<rect x="80" y="367" width="510" height="77" rx="10" fill="white" stroke="#2863a1" stroke-width="1.8"/>
+<text x="335.0" y="401" font-family="Arial,Helvetica,sans-serif" font-size="25" font-weight="700" fill="#2863a1" text-anchor="middle">LayerNorm(128)</text>
+<text x="335.0" y="432" font-family="Arial,Helvetica,sans-serif" font-size="19" font-weight="400" fill="#243343" text-anchor="middle">Same normalization parameters for L/R</text>
+<rect x="710" y="367" width="510" height="77" rx="10" fill="white" stroke="#2863a1" stroke-width="1.8"/>
+<text x="965.0" y="401" font-family="Arial,Helvetica,sans-serif" font-size="25" font-weight="700" fill="#2863a1" text-anchor="middle">LayerNorm(128)</text>
+<text x="965.0" y="432" font-family="Arial,Helvetica,sans-serif" font-size="19" font-weight="400" fill="#243343" text-anchor="middle">Same normalization parameters for L/R</text>
+<polyline points="230,444 230,510" fill="none" stroke="#2863a1" stroke-width="2.6" stroke-linejoin="round"/>
+<polygon points="230,510 235.0,499.0 225.0,499.0" fill="#2863a1"/>
+<polyline points="1070,444 1070,510" fill="none" stroke="#2863a1" stroke-width="2.6" stroke-linejoin="round"/>
+<polygon points="1070,510 1075.0,499.0 1065.0,499.0" fill="#2863a1"/>
+<polyline points="445,444 445,467 845,467 845,510" fill="none" stroke="#2863a1" stroke-width="2.6" stroke-linejoin="round" stroke-dasharray="8 6"/>
+<polygon points="845,510 850.0,499.0 840.0,499.0" fill="#2863a1"/>
+<polyline points="850,444 850,487 455,487 455,510" fill="none" stroke="#2863a1" stroke-width="2.6" stroke-linejoin="round" stroke-dasharray="8 6"/>
+<polygon points="455,510 460.0,499.0 450.0,499.0" fill="#2863a1"/>
+<text x="140" y="487" font-family="Arial,Helvetica,sans-serif" font-size="18" font-weight="400" fill="#2863a1" text-anchor="start">Q = L</text>
+<text x="1100" y="487" font-family="Arial,Helvetica,sans-serif" font-size="18" font-weight="400" fill="#2863a1" text-anchor="start">Q = R</text>
+<rect x="80" y="510" width="510" height="130" rx="10" fill="white" stroke="#2863a1" stroke-width="1.8"/>
+<text x="335.0" y="544" font-family="Arial,Helvetica,sans-serif" font-size="25" font-weight="700" fill="#2863a1" text-anchor="middle">Left &lt;- right attention</text>
+<text x="335.0" y="575" font-family="Arial,Helvetica,sans-serif" font-size="22" font-weight="400" fill="#243343" text-anchor="middle">Q: L; K,V: R</text>
+<text x="335.0" y="602" font-family="Arial,Helvetica,sans-serif" font-size="22" font-weight="400" fill="#243343" text-anchor="middle">4 heads x 32; sequence length = 6</text>
+<text x="335.0" y="629" font-family="Arial,Helvetica,sans-serif" font-size="22" font-weight="400" fill="#243343" text-anchor="middle">Residual: L + attention output</text>
+<rect x="710" y="510" width="510" height="130" rx="10" fill="white" stroke="#2863a1" stroke-width="1.8"/>
+<text x="965.0" y="544" font-family="Arial,Helvetica,sans-serif" font-size="25" font-weight="700" fill="#2863a1" text-anchor="middle">Right &lt;- left attention</text>
+<text x="965.0" y="575" font-family="Arial,Helvetica,sans-serif" font-size="22" font-weight="400" fill="#243343" text-anchor="middle">Q: R; K,V: L</text>
+<text x="965.0" y="602" font-family="Arial,Helvetica,sans-serif" font-size="22" font-weight="400" fill="#243343" text-anchor="middle">4 heads x 32; sequence length = 6</text>
+<text x="965.0" y="629" font-family="Arial,Helvetica,sans-serif" font-size="22" font-weight="400" fill="#243343" text-anchor="middle">Residual: R + attention output</text>
+<polyline points="335,640 335,667" fill="none" stroke="#2863a1" stroke-width="2.6" stroke-linejoin="round"/>
+<polygon points="335,667 340.0,656.0 330.0,656.0" fill="#2863a1"/>
+<polyline points="965,640 965,667" fill="none" stroke="#2863a1" stroke-width="2.6" stroke-linejoin="round"/>
+<polygon points="965,667 970.0,656.0 960.0,656.0" fill="#2863a1"/>
+<rect x="80" y="667" width="510" height="112" rx="10" fill="white" stroke="#2863a1" stroke-width="1.8"/>
+<text x="335.0" y="701" font-family="Arial,Helvetica,sans-serif" font-size="23" font-weight="700" fill="#2863a1" text-anchor="middle">Residual feed-forward network</text>
+<text x="335.0" y="732" font-family="Arial,Helvetica,sans-serif" font-size="21" font-weight="400" fill="#243343" text-anchor="middle">LN128 -&gt; FC128:256 -&gt; GELU</text>
+<text x="335.0" y="759" font-family="Arial,Helvetica,sans-serif" font-size="21" font-weight="400" fill="#243343" text-anchor="middle">-&gt; FC256:128; add residual</text>
+<rect x="710" y="667" width="510" height="112" rx="10" fill="white" stroke="#2863a1" stroke-width="1.8"/>
+<text x="965.0" y="701" font-family="Arial,Helvetica,sans-serif" font-size="23" font-weight="700" fill="#2863a1" text-anchor="middle">Residual feed-forward network</text>
+<text x="965.0" y="732" font-family="Arial,Helvetica,sans-serif" font-size="21" font-weight="400" fill="#243343" text-anchor="middle">LN128 -&gt; FC128:256 -&gt; GELU</text>
+<text x="965.0" y="759" font-family="Arial,Helvetica,sans-serif" font-size="21" font-weight="400" fill="#243343" text-anchor="middle">-&gt; FC256:128; add residual</text>
+<text x="650" y="812" font-family="Arial,Helvetica,sans-serif" font-size="22" font-weight="700" fill="#2863a1" text-anchor="middle">Two independently parameterized blocks; output [BT,2,6,128]</text>
+<polyline points="335,779 335,834 650,834 650,860" fill="none" stroke="#2863a1" stroke-width="2.6" stroke-linejoin="round"/>
+<polygon points="650,860 655.0,849.0 645.0,849.0" fill="#2863a1"/>
+<polyline points="965,779 965,834 650,834" fill="none" stroke="#2863a1" stroke-width="2.6" stroke-linejoin="round"/>
+<rect x="80" y="860" width="1140" height="100" rx="10" fill="white" stroke="#2863a1" stroke-width="1.8"/>
+<text x="650.0" y="894" font-family="Arial,Helvetica,sans-serif" font-size="26" font-weight="700" fill="#2863a1" text-anchor="middle">Six-token pooling -&gt; causal shaft GRU</text>
+<text x="650.0" y="925" font-family="Arial,Helvetica,sans-serif" font-size="22" font-weight="400" fill="#243343" text-anchor="middle">Flatten 768 -&gt; FC128 -&gt; LN128 -&gt; GELU -&gt; [2B,T,128]</text>
+<text x="650.0" y="952" font-family="Arial,Helvetica,sans-serif" font-size="22" font-weight="400" fill="#243343" text-anchor="middle">GRU128:256 -&gt; per-eye rotation heads; state + C token -&gt; depth heads</text>
+<text x="85" y="1000" font-family="Arial,Helvetica,sans-serif" font-size="22" font-weight="400" fill="#243343" text-anchor="start">Both attention directions read the original pair inside each block.</text>
+<text x="85" y="1031" font-family="Arial,Helvetica,sans-serif" font-size="22" font-weight="400" fill="#243343" text-anchor="start">Token order: foreground, C, H1, H2, J1, J2. C token is also routed to Z.</text>
+<rect x="1305" y="172" width="1210" height="920" rx="14" fill="#edf7f1" stroke="#27765d" stroke-width="2.2"/>
+<text x="1329" y="212" font-family="Arial,Helvetica,sans-serif" font-size="28" font-weight="700" fill="#27765d" text-anchor="start">(b) Wrist and jaw: two independent local branches</text>
+<rect x="1340" y="246" width="510" height="119" rx="10" fill="white" stroke="#27765d" stroke-width="1.8"/>
+<text x="1595.0" y="280" font-family="Arial,Helvetica,sans-serif" font-size="25" font-weight="700" fill="#27765d" text-anchor="middle">Local left descriptor fL</text>
+<text x="1595.0" y="311" font-family="Arial,Helvetica,sans-serif" font-size="21" font-weight="400" fill="#243343" text-anchor="middle">CNN descriptor(128) + metadata(128)</text>
+<text x="1595.0" y="338" font-family="Arial,Helvetica,sans-serif" font-size="21" font-weight="400" fill="#243343" text-anchor="middle">[BT,128]</text>
+<rect x="1970" y="246" width="510" height="119" rx="10" fill="white" stroke="#27765d" stroke-width="1.8"/>
+<text x="2225.0" y="280" font-family="Arial,Helvetica,sans-serif" font-size="25" font-weight="700" fill="#27765d" text-anchor="middle">Local right descriptor fR</text>
+<text x="2225.0" y="311" font-family="Arial,Helvetica,sans-serif" font-size="21" font-weight="400" fill="#243343" text-anchor="middle">CNN descriptor(128) + metadata(128)</text>
+<text x="2225.0" y="338" font-family="Arial,Helvetica,sans-serif" font-size="21" font-weight="400" fill="#243343" text-anchor="middle">[BT,128]</text>
+<polyline points="1495,365 1495,422" fill="none" stroke="#27765d" stroke-width="2.6" stroke-linejoin="round"/>
+<polygon points="1495,422 1500.0,411.0 1490.0,411.0" fill="#27765d"/>
+<polyline points="2325,365 2325,422" fill="none" stroke="#27765d" stroke-width="2.6" stroke-linejoin="round"/>
+<polygon points="2325,422 2330.0,411.0 2320.0,411.0" fill="#27765d"/>
+<polyline points="1740,365 1740,389 2110,389 2110,422" fill="none" stroke="#27765d" stroke-width="2.6" stroke-linejoin="round" stroke-dasharray="8 6"/>
+<polygon points="2110,422 2115.0,411.0 2105.0,411.0" fill="#27765d"/>
+<polyline points="2110,365 2110,405 1740,405 1740,422" fill="none" stroke="#27765d" stroke-width="2.6" stroke-linejoin="round" stroke-dasharray="8 6"/>
+<polygon points="1740,422 1745.0,411.0 1735.0,411.0" fill="#27765d"/>
+<rect x="1340" y="422" width="510" height="128" rx="10" fill="white" stroke="#27765d" stroke-width="1.8"/>
+<text x="1595.0" y="456" font-family="Arial,Helvetica,sans-serif" font-size="26" font-weight="700" fill="#27765d" text-anchor="middle">[fL || fR] : 256</text>
+<text x="1595.0" y="487" font-family="Arial,Helvetica,sans-serif" font-size="21" font-weight="400" fill="#243343" text-anchor="middle">LN256 -&gt; FC256:128 -&gt; GELU</text>
+<text x="1595.0" y="514" font-family="Arial,Helvetica,sans-serif" font-size="21" font-weight="400" fill="#243343" text-anchor="middle">-&gt; FC128:128; add fL</text>
+<text x="1595.0" y="541" font-family="Arial,Helvetica,sans-serif" font-size="21" font-weight="400" fill="#243343" text-anchor="middle">Fused left descriptor: [BT,128]</text>
+<rect x="1970" y="422" width="510" height="128" rx="10" fill="white" stroke="#27765d" stroke-width="1.8"/>
+<text x="2225.0" y="456" font-family="Arial,Helvetica,sans-serif" font-size="26" font-weight="700" fill="#27765d" text-anchor="middle">[fR || fL] : 256</text>
+<text x="2225.0" y="487" font-family="Arial,Helvetica,sans-serif" font-size="21" font-weight="400" fill="#243343" text-anchor="middle">LN256 -&gt; FC256:128 -&gt; GELU</text>
+<text x="2225.0" y="514" font-family="Arial,Helvetica,sans-serif" font-size="21" font-weight="400" fill="#243343" text-anchor="middle">-&gt; FC128:128; add fR</text>
+<text x="2225.0" y="541" font-family="Arial,Helvetica,sans-serif" font-size="21" font-weight="400" fill="#243343" text-anchor="middle">Fused right descriptor: [BT,128]</text>
+<polyline points="1595,550 1595,589" fill="none" stroke="#27765d" stroke-width="2.6" stroke-linejoin="round"/>
+<polygon points="1595,589 1600.0,578.0 1590.0,578.0" fill="#27765d"/>
+<polyline points="2225,550 2225,589" fill="none" stroke="#27765d" stroke-width="2.6" stroke-linejoin="round"/>
+<polygon points="2225,589 2230.0,578.0 2220.0,578.0" fill="#27765d"/>
+<rect x="1340" y="589" width="510" height="118" rx="10" fill="white" stroke="#27765d" stroke-width="1.8"/>
+<text x="1595.0" y="623" font-family="Arial,Helvetica,sans-serif" font-size="25" font-weight="700" fill="#27765d" text-anchor="middle">Left causal GRU state</text>
+<text x="1595.0" y="654" font-family="Arial,Helvetica,sans-serif" font-size="21" font-weight="400" fill="#243343" text-anchor="middle">Input [B,T,128] -&gt; [B,T,256]</text>
+<text x="1595.0" y="681" font-family="Arial,Helvetica,sans-serif" font-size="21" font-weight="400" fill="#243343" text-anchor="middle">hL(t) = GRU(xL(t), hL(t-1))</text>
+<rect x="1970" y="589" width="510" height="118" rx="10" fill="white" stroke="#27765d" stroke-width="1.8"/>
+<text x="2225.0" y="623" font-family="Arial,Helvetica,sans-serif" font-size="25" font-weight="700" fill="#27765d" text-anchor="middle">Right causal GRU state</text>
+<text x="2225.0" y="654" font-family="Arial,Helvetica,sans-serif" font-size="21" font-weight="400" fill="#243343" text-anchor="middle">Input [B,T,128] -&gt; [B,T,256]</text>
+<text x="2225.0" y="681" font-family="Arial,Helvetica,sans-serif" font-size="21" font-weight="400" fill="#243343" text-anchor="middle">hR(t) = GRU(xR(t), hR(t-1))</text>
+<text x="1910" y="747" font-family="Arial,Helvetica,sans-serif" font-size="21" font-weight="700" fill="#27765d" text-anchor="middle">Same GRU weights within a branch; no sharing between wrist and jaw</text>
+<polyline points="1595,707 1595,769 1910,769 1910,794" fill="none" stroke="#27765d" stroke-width="2.6" stroke-linejoin="round"/>
+<polygon points="1910,794 1915.0,783.0 1905.0,783.0" fill="#27765d"/>
+<polyline points="2225,707 2225,769 1910,769" fill="none" stroke="#27765d" stroke-width="2.6" stroke-linejoin="round"/>
+<rect x="1340" y="794" width="1140" height="115" rx="10" fill="white" stroke="#27765d" stroke-width="1.8"/>
+<text x="1910.0" y="828" font-family="Arial,Helvetica,sans-serif" font-size="27" font-weight="700" fill="#27765d" text-anchor="middle">Late stereo-state concatenation</text>
+<text x="1910.0" y="859" font-family="Arial,Helvetica,sans-serif" font-size="23" font-weight="400" fill="#243343" text-anchor="middle">[hL(t) || hR(t)] -&gt; [B,T,512]</text>
+<text x="1910.0" y="886" font-family="Arial,Helvetica,sans-serif" font-size="23" font-weight="400" fill="#243343" text-anchor="middle">FC512:256 -&gt; GELU -&gt; FC256:k -&gt; sigmoid joint bounds</text>
+<polyline points="1910,909 1910,930 1605,930 1605,950" fill="none" stroke="#27765d" stroke-width="2.6" stroke-linejoin="round"/>
+<polygon points="1605,950 1610.0,939.0 1600.0,939.0" fill="#27765d"/>
+<polyline points="1910,930 2215,930 2215,950" fill="none" stroke="#b36b26" stroke-width="2.6" stroke-linejoin="round"/>
+<polygon points="2215,950 2220.0,939.0 2210.0,939.0" fill="#b36b26"/>
+<rect x="1340" y="950" width="530" height="97" rx="10" fill="white" stroke="#27765d" stroke-width="1.8"/>
+<text x="1605.0" y="984" font-family="Arial,Helvetica,sans-serif" font-size="26" font-weight="700" fill="#27765d" text-anchor="middle">Wrist: k = 2</text>
+<text x="1605.0" y="1015" font-family="Arial,Helvetica,sans-serif" font-size="22" font-weight="400" fill="#243343" text-anchor="middle">pitch / yaw: [B,T,2]</text>
+<rect x="1950" y="950" width="530" height="97" rx="10" fill="#fff5e8" stroke="#b36b26" stroke-width="1.8"/>
+<text x="2215.0" y="984" font-family="Arial,Helvetica,sans-serif" font-size="26" font-weight="700" fill="#b36b26" text-anchor="middle">Paired jaw: k = 1</text>
+<text x="2215.0" y="1015" font-family="Arial,Helvetica,sans-serif" font-size="22" font-weight="400" fill="#243343" text-anchor="middle">half-opening: [B,T,1]</text>
+<rect x="45" y="1140" width="1210" height="804" rx="14" fill="#edf4fc" stroke="#2863a1" stroke-width="2.2"/>
+<text x="69" y="1180" font-family="Arial,Helvetica,sans-serif" font-size="28" font-weight="700" fill="#2863a1" text-anchor="start">(c) Building the six body tokens</text>
+<rect x="80" y="1214" width="1140" height="88" rx="10" fill="white" stroke="#2863a1" stroke-width="1.8"/>
+<text x="650.0" y="1248" font-family="Arial,Helvetica,sans-serif" font-size="23" font-weight="700" fill="#2863a1" text-anchor="middle">F: [N,128,90,160]  |  M: [N,1,90,160]  |  U: [N,5,2]</text>
+<text x="650.0" y="1279" font-family="Arial,Helvetica,sans-serif" font-size="20" font-weight="400" fill="#243343" text-anchor="middle">U from sigmoid(heat)^4 weighted coordinate expectation; confidence = max sigmoid(heat)</text>
+<polyline points="650,1302 650,1322 300,1322 300,1347" fill="none" stroke="#2863a1" stroke-width="2.6" stroke-linejoin="round"/>
+<polygon points="300,1347 305.0,1336.0 295.0,1336.0" fill="#2863a1"/>
+<polyline points="650,1322 880,1322 880,1347" fill="none" stroke="#2863a1" stroke-width="2.6" stroke-linejoin="round"/>
+<polygon points="880,1347 885.0,1336.0 875.0,1336.0" fill="#2863a1"/>
+<rect x="80" y="1347" width="440" height="143" rx="10" fill="white" stroke="#2863a1" stroke-width="1.8"/>
+<text x="300.0" y="1381" font-family="Arial,Helvetica,sans-serif" font-size="24" font-weight="700" fill="#2863a1" text-anchor="middle">Whole-instrument token</text>
+<text x="300.0" y="1412" font-family="Arial,Helvetica,sans-serif" font-size="22" font-weight="400" fill="#243343" text-anchor="middle">w = sigmoid(M)^2 / sum</text>
+<text x="300.0" y="1439" font-family="Arial,Helvetica,sans-serif" font-size="22" font-weight="400" fill="#243343" text-anchor="middle">Weighted spatial pooling of F</text>
+<text x="300.0" y="1466" font-family="Arial,Helvetica,sans-serif" font-size="22" font-weight="400" fill="#243343" text-anchor="middle">[N,1,128]</text>
+<rect x="560" y="1347" width="660" height="143" rx="10" fill="white" stroke="#2863a1" stroke-width="1.8"/>
+<text x="890.0" y="1381" font-family="Arial,Helvetica,sans-serif" font-size="23" font-weight="700" fill="#2863a1" text-anchor="middle">Five landmark-centered feature patches</text>
+<text x="890.0" y="1412" font-family="Arial,Helvetica,sans-serif" font-size="22" font-weight="400" fill="#243343" text-anchor="middle">Radius 24 network pixels; sample 8x8</text>
+<text x="890.0" y="1439" font-family="Arial,Helvetica,sans-serif" font-size="22" font-weight="400" fill="#243343" text-anchor="middle">grid_sample -&gt; [5N,128,8,8]</text>
+<text x="890.0" y="1466" font-family="Arial,Helvetica,sans-serif" font-size="22" font-weight="400" fill="#243343" text-anchor="middle">align_corners=False; border padding</text>
+<polyline points="890,1490 890,1518" fill="none" stroke="#2863a1" stroke-width="2.6" stroke-linejoin="round"/>
+<polygon points="890,1518 895.0,1507.0 885.0,1507.0" fill="#2863a1"/>
+<rect x="560" y="1518" width="660" height="151" rx="10" fill="white" stroke="#2863a1" stroke-width="1.8"/>
+<text x="890.0" y="1552" font-family="Arial,Helvetica,sans-serif" font-size="24" font-weight="700" fill="#2863a1" text-anchor="middle">Lightweight local residual encoder</text>
+<text x="890.0" y="1583" font-family="Arial,Helvetica,sans-serif" font-size="20" font-weight="400" fill="#243343" text-anchor="middle">DWConv3x3(128) -&gt; GN8 -&gt; GELU -&gt; PWConv1x1</text>
+<text x="890.0" y="1610" font-family="Arial,Helvetica,sans-serif" font-size="20" font-weight="400" fill="#243343" text-anchor="middle">Add sampled patch; pool to [5N,128,4,4]</text>
+<text x="890.0" y="1637" font-family="Arial,Helvetica,sans-serif" font-size="20" font-weight="400" fill="#243343" text-anchor="middle">Flatten 2048 -&gt; FC128 -&gt; LN128 -&gt; GELU</text>
+<text x="890.0" y="1664" font-family="Arial,Helvetica,sans-serif" font-size="20" font-weight="400" fill="#243343" text-anchor="middle">Local tokens: [N,5,128]</text>
+<polyline points="300,1490 300,1700 650,1700 650,1730" fill="none" stroke="#2863a1" stroke-width="2.6" stroke-linejoin="round"/>
+<polygon points="650,1730 655.0,1719.0 645.0,1719.0" fill="#2863a1"/>
+<polyline points="890,1669 890,1700 650,1700" fill="none" stroke="#2863a1" stroke-width="2.6" stroke-linejoin="round"/>
+<rect x="80" y="1730" width="1140" height="133" rx="10" fill="white" stroke="#2863a1" stroke-width="1.8"/>
+<text x="650.0" y="1764" font-family="Arial,Helvetica,sans-serif" font-size="26" font-weight="700" fill="#2863a1" text-anchor="middle">Concatenate + positional / camera embeddings</text>
+<text x="650.0" y="1795" font-family="Arial,Helvetica,sans-serif" font-size="22" font-weight="400" fill="#243343" text-anchor="middle">Whole(1) + local(5) -&gt; [N,6,128]; add region embedding [6,128]</text>
+<text x="650.0" y="1822" font-family="Arial,Helvetica,sans-serif" font-size="22" font-weight="400" fill="#243343" text-anchor="middle">Per-token metadata: 5 -&gt; 128 -&gt; 128; add camera: 9 -&gt; 128 -&gt; 128</text>
+<text x="650.0" y="1849" font-family="Arial,Helvetica,sans-serif" font-size="22" font-weight="400" fill="#243343" text-anchor="middle">Add learned view embedding [2,128]; reshape [BT,2,6,128]</text>
+<text x="85" y="1902" font-family="Arial,Helvetica,sans-serif" font-size="18" font-weight="400" fill="#596979" text-anchor="start">Whole metadata: center(2), spread(2), mean mask(1). Local metadata: uv(2), radius(2), confidence(1).</text>
+<rect x="1305" y="1140" width="1210" height="804" rx="14" fill="#fff5e8" stroke="#b36b26" stroke-width="2.2"/>
+<text x="1329" y="1180" font-family="Arial,Helvetica,sans-serif" font-size="28" font-weight="700" fill="#b36b26" text-anchor="start">(d) Native-resolution crop and local CNN</text>
+<rect x="1340" y="1214" width="1140" height="112" rx="10" fill="white" stroke="#b36b26" stroke-width="1.8"/>
+<text x="1910.0" y="1248" font-family="Arial,Helvetica,sans-serif" font-size="24" font-weight="700" fill="#b36b26" text-anchor="middle">Predicted foreground routing: stop gradients through mask and ROI</text>
+<text x="1910.0" y="1279" font-family="Arial,Helvetica,sans-serif" font-size="21" font-weight="400" fill="#243343" text-anchor="middle">sigmoid(M) -&gt; resize 720x1280 -&gt; clamp((p-0.2)/0.8,0,1) -&gt; max-pool3x3</text>
+<text x="1910.0" y="1306" font-family="Arial,Helvetica,sans-serif" font-size="21" font-weight="400" fill="#243343" text-anchor="middle">Normalize source RGB; multiply by gated mask BEFORE bilinear ROI sampling</text>
+<polyline points="1910,1326 1910,1351" fill="none" stroke="#b36b26" stroke-width="2.6" stroke-linejoin="round"/>
+<polygon points="1910,1351 1915.0,1340.0 1905.0,1340.0" fill="#b36b26"/>
+<rect x="1340" y="1351" width="1140" height="109" rx="10" fill="white" stroke="#b36b26" stroke-width="1.8"/>
+<text x="1910.0" y="1385" font-family="Arial,Helvetica,sans-serif" font-size="23" font-weight="700" fill="#b36b26" text-anchor="middle">Wrist ROI: C,H,J1,J2  |  Jaw ROI: H,J1,J2  |  H=(H1+H2)/2</text>
+<text x="1910.0" y="1416" font-family="Arial,Helvetica,sans-serif" font-size="21" font-weight="400" fill="#243343" text-anchor="middle">Concatenate foreground RGB + mask; sample [N,4,160,160] for each branch</text>
+<text x="1910.0" y="1443" font-family="Arial,Helvetica,sans-serif" font-size="21" font-weight="400" fill="#243343" text-anchor="middle">align_corners=False; zero padding; crop coordinates derived from predicted U</text>
+<polyline points="1910,1460 1910,1480 1520,1480 1520,1505" fill="none" stroke="#b36b26" stroke-width="2.6" stroke-linejoin="round"/>
+<polygon points="1520,1505 1525.0,1494.0 1515.0,1494.0" fill="#b36b26"/>
+<rect x="1340" y="1505" width="360" height="118" rx="10" fill="white" stroke="#b36b26" stroke-width="1.8"/>
+<text x="1520.0" y="1539" font-family="Arial,Helvetica,sans-serif" font-size="22" font-weight="700" fill="#b36b26" text-anchor="middle">Conv3x3 / stride 2</text>
+<text x="1520.0" y="1570" font-family="Arial,Helvetica,sans-serif" font-size="21" font-weight="400" fill="#243343" text-anchor="middle">4 -&gt; 32; GN8 + GELU</text>
+<text x="1520.0" y="1597" font-family="Arial,Helvetica,sans-serif" font-size="21" font-weight="400" fill="#243343" text-anchor="middle">[N,32,80,80]</text>
+<polyline points="1700,1564 1730,1564" fill="none" stroke="#b36b26" stroke-width="2.6" stroke-linejoin="round"/>
+<polygon points="1730,1564 1719.0,1559.0 1719.0,1569.0" fill="#b36b26"/>
+<rect x="1730" y="1505" width="360" height="118" rx="10" fill="white" stroke="#b36b26" stroke-width="1.8"/>
+<text x="1910.0" y="1539" font-family="Arial,Helvetica,sans-serif" font-size="22" font-weight="700" fill="#b36b26" text-anchor="middle">Conv3x3 / stride 2</text>
+<text x="1910.0" y="1570" font-family="Arial,Helvetica,sans-serif" font-size="21" font-weight="400" fill="#243343" text-anchor="middle">32 -&gt; 48; GN8 + GELU</text>
+<text x="1910.0" y="1597" font-family="Arial,Helvetica,sans-serif" font-size="21" font-weight="400" fill="#243343" text-anchor="middle">[N,48,40,40]</text>
+<polyline points="2090,1564 2120,1564" fill="none" stroke="#b36b26" stroke-width="2.6" stroke-linejoin="round"/>
+<polygon points="2120,1564 2109.0,1559.0 2109.0,1569.0" fill="#b36b26"/>
+<rect x="2120" y="1505" width="360" height="118" rx="10" fill="white" stroke="#b36b26" stroke-width="1.8"/>
+<text x="2300.0" y="1539" font-family="Arial,Helvetica,sans-serif" font-size="22" font-weight="700" fill="#b36b26" text-anchor="middle">Conv3x3 / stride 1</text>
+<text x="2300.0" y="1570" font-family="Arial,Helvetica,sans-serif" font-size="21" font-weight="400" fill="#243343" text-anchor="middle">48 -&gt; 64; GN8 + GELU</text>
+<text x="2300.0" y="1597" font-family="Arial,Helvetica,sans-serif" font-size="21" font-weight="400" fill="#243343" text-anchor="middle">[N,64,40,40]</text>
+<polyline points="2300,1623 2300,1648 1910,1648 1910,1673" fill="none" stroke="#b36b26" stroke-width="2.6" stroke-linejoin="round"/>
+<polygon points="1910,1673 1915.0,1662.0 1905.0,1662.0" fill="#b36b26"/>
+<rect x="1340" y="1673" width="1140" height="109" rx="10" fill="white" stroke="#b36b26" stroke-width="1.8"/>
+<text x="1910.0" y="1707" font-family="Arial,Helvetica,sans-serif" font-size="22" font-weight="700" fill="#b36b26" text-anchor="middle">Residual refinement: DWConv3x3(64) -&gt; GN8 -&gt; GELU -&gt; PWConv1x1</text>
+<text x="1910.0" y="1738" font-family="Arial,Helvetica,sans-serif" font-size="22" font-weight="400" fill="#243343" text-anchor="middle">Feature remains [N,64,40,40]; adaptive pool4x4 -&gt; [N,1024]</text>
+<text x="1910.0" y="1765" font-family="Arial,Helvetica,sans-serif" font-size="22" font-weight="400" fill="#243343" text-anchor="middle">FC1024:128 -&gt; LN128 -&gt; GELU -&gt; local descriptor [N,128]</text>
+<polyline points="1630,1782 1630,1810" fill="none" stroke="#b36b26" stroke-width="2.6" stroke-linejoin="round"/>
+<polygon points="1630,1810 1635.0,1799.0 1625.0,1799.0" fill="#b36b26"/>
+<polyline points="2225,1782 2225,1810" fill="none" stroke="#596979" stroke-width="2.6" stroke-linejoin="round" stroke-dasharray="8 6"/>
+<polygon points="2225,1810 2230.0,1799.0 2220.0,1799.0" fill="#596979"/>
+<rect x="1340" y="1810" width="565" height="96" rx="10" fill="white" stroke="#b36b26" stroke-width="1.8"/>
+<text x="1622.5" y="1844" font-family="Arial,Helvetica,sans-serif" font-size="22" font-weight="700" fill="#b36b26" text-anchor="middle">Add local metadata MLP 15:128:128</text>
+<text x="1622.5" y="1875" font-family="Arial,Helvetica,sans-serif" font-size="19" font-weight="400" fill="#243343" text-anchor="middle">K/D(9) + box(4) + visibility(1) + conf(1)</text>
+<rect x="1945" y="1810" width="535" height="96" rx="10" fill="#f6f8fa" stroke="#596979" stroke-width="1.8"/>
+<text x="2212.5" y="1844" font-family="Arial,Helvetica,sans-serif" font-size="21" font-weight="700" fill="#596979" text-anchor="middle">Auxiliary heatmap: Conv1x1 64 -&gt; 3</text>
+<text x="2212.5" y="1875" font-family="Arial,Helvetica,sans-serif" font-size="20" font-weight="400" fill="#243343" text-anchor="middle">[N,3,40,40]; training/debug output</text>
+<rect x="45" y="1980" width="2470" height="160" rx="10" fill="#f6f8fa" stroke="#ccd5df" stroke-width="1.8"/>
+<text x="70" y="2020" font-family="Arial,Helvetica,sans-serif" font-size="28" font-weight="700" fill="#243343" text-anchor="start">Temporal state contract</text>
+<text x="70" y="2056" font-family="Arial,Helvetica,sans-serif" font-size="25" font-weight="700" fill="#2863a1" text-anchor="start">h_shaft [1,2B,256]   +   h_wrist [1,2B,256]   +   h_jaw [1,2B,256]   -&gt;   [3,2B,256]</text>
+<text x="70" y="2092" font-family="Arial,Helvetica,sans-serif" font-size="22" font-weight="400" fill="#243343" text-anchor="start">Each frame advances all three modules once. Reset on sequence / timestamp / calibration discontinuity; preserve state within a sequence.</text>
+<text x="70" y="2124" font-family="Arial,Helvetica,sans-serif" font-size="21" font-weight="400" fill="#596979" text-anchor="start">Training uses 8-frame windows. Streaming supplies one image pair at a time, with history retained in the three states.</text>
+<text x="50" y="2182" font-family="Arial,Helvetica,sans-serif" font-size="21" font-weight="400" fill="#596979" text-anchor="start">Solid arrows: feature flow. Dashed stereo arrows: other-view input. Auxiliary local heatmaps are skipped by the normal optimized runtime.</text>
+</svg>

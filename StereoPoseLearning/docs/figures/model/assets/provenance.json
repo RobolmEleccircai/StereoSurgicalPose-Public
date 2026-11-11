@@ -1,0 +1,8 @@
+{
+  "sequence": "seq_000",
+  "frame": 0,
+  "mask_and_heatmap": "actual current-model CPU forward, original frame and K/D",
+  "crops": "foreground_crops from predicted ROI/mask; denormalized for illustration",
+  "output_overlay": "saved fixed-checkpoint video predictions for same source frame",
+  "simulation_rendered": false
+}
