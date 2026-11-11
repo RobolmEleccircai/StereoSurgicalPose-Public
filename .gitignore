@@ -1,59 +1,36 @@
-# Local configuration and credentials
+# Local environment, machine configuration and secrets
 .env
 .env.*
-!.env.example
 *.pem
 *.key
-
-# Python and editor files
-__pycache__/
-*.py[cod]
-.venv/
-venv/
-.pytest_cache/
-.ipynb_checkpoints/
+**/*.local.json
+.python-path
 .DS_Store
-.idea/
-.vscode/
-
-# Datasets, generated runs and model weights
-**/datasets/**
-!**/datasets/.gitkeep
-**/results/**
-!**/results/.gitkeep
-**/models/**
-!**/models/.gitkeep
-*.bag
-*.mcap
-*.npy
-*.npz
+.venv/
+__pycache__/
+.pytest_cache/
+*.py[cod]
+# Large external artifacts and generated output
+data/
+datasets/
+runs/
+outputs/
+weights/
+**/build/
+**/.deps/
 *.pt
 *.pth
 *.ckpt
+*.safetensors
 *.onnx
-*.zip
-*.tar
-*.tar.gz
+*.engine
+*.so
+*.bag
+*.mcap
 *.usd
 *.usda
 *.usdc
 *.usdz
-
-# Small authored scene overlays are part of the tested source snapshot.
-!CameraImagingConfig/src/ShaftTipStereo_2026-11-07/*.usda
-!CameraImagingConfig/src/ShaftTipStereo_2026-11-07/render/native/scene/*.usda
-!CameraImagingConfig/src/SingleInstrument_2026-11-07/*.usda
-!CameraImagingConfig/src/SingleInstrument_2026-11-07/preview/native/scene/*.usda
-
+*.mp4
+*.zip
 *.log
-
-# Rebuild native display binaries on the target machine.
-/StereoPoseLearning/reference/pose_display/native/build/
-/StereoPoseLearning/native/libtorch/build/
-
-# Machine-specific distributed capture configuration and runtime output
-/CameraImagingConfig/src/TemporalStereo_v2/*.local.json
-/CameraImagingConfig/src/TemporalStereo_v2/runs/
-/CameraImagingConfig/src/TemporalStereo_v2/checks/
-/CameraImagingConfig/src/TemporalStereo_v2/dispatch_*/
-/CameraImagingConfig/src/TemporalStereo_v2/.deps/

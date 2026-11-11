@@ -100,7 +100,8 @@ T_camera_child = T_camera_parent × T_parent_child(q)
 | position / rotation | 1 / 1 | C 与完整杆体旋转 |
 | joints | 0.1 | 腕 pitch、yaw、jaw_half |
 | geometry / part_rotation | 1 / 0.25 | 运动学关键点与部件姿态 |
-| projection / depth | 0.2 / 0.1 | 二维投影与深度 |
+| projection | 0.2 | 二维投影 |
+| depth | 0.1 | 过小/非正深度安全惩罚，不是稠密深度图监督 |
 | mask / heatmap | 0.1 / 1 | 器械分割与全局关键点热图 |
 | local_heatmap / landmark_uv | 1 / 1 | 局部关键点和直接像素监督 |
 | landmark_consistency | 0 | 关闭早期预测热图一致性项 |

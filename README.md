@@ -1,56 +1,48 @@
 # StereoSurgicalPose
 
-Stereo vision for surgical instrument localization and pose estimation, with reproducible camera configurations and simulation experiment records.
+Foreground-guided stereo temporal estimation of an articulated surgical instrument, with camera-frame pose outputs, fixed instrument kinematics and real-time projection overlays.
 
-## Model implementation — 2026-11-11
+This repository contains the simulator pipeline, model, training/evaluation tools, three architecture diagrams and inference optimization records.
 
-[StereoPoseLearning](StereoPoseLearning/README.md) contains the current stereo temporal estimator, separate wrist/jaw foreground branches, the landmark-ray/depth C head, and training/evaluation/prediction tools. [Architecture exploration](StereoPoseLearning/docs/ARCHITECTURE_EXPLORATION.md) documents each change and its diagnostic evidence. [Reproduction instructions](StereoPoseLearning/docs/REPRODUCING.md) cover the environment, data manifests, checkpoint relocation and overlays. Five historical architecture stages are preserved for comparison. Dataset files and learned weights are external artifacts.
+![Model framework](StereoPoseLearning/docs/figures/model/framework.png)
 
-## Versioned generator baseline — 2026-11-09
+## Start here
 
-The current scene contains **one active surgical instrument** (`PSM_Right`), organs, the ECM and two cameras. `PSM_Left` is explicitly inactive. Its name can still appear in the referenced source asset; it is not a second active instrument in this capture.
+- [Project route and reproducibility scope](docs/PROJECT_ROUTE.md)
+- [Model, tensor dimensions and three branches](StereoPoseLearning/docs/MODEL_DIAGRAMS.md)
+- [Architecture exploration: design rationale and evaluation methods](StereoPoseLearning/docs/ARCHITECTURE_EXPLORATION.md)
+- [Environment, data and inference interfaces](StereoPoseLearning/docs/REPRODUCING.md)
+- [Dataset split contract](docs/DATA_PROTOCOL.md)
+- [Performance statistics and optimization process](StereoPoseLearning/docs/PERFORMANCE_INDEX.md)
+- [Simulation and parameter sources](CameraImagingConfig/README.md)
+- [Release contents and Git history scope](docs/PUBLIC_RELEASE.md)
 
-The current entry point is [TemporalStereo_v2](CameraImagingConfig/src/TemporalStereo_v2/README.md). It generates **2,100 synchronized stereo pairs** from 21 independent temporal trajectories, at **1280 × 720 per eye** and **60 Hz sampling timestamps**. PathTracing rendering speed is separate from the sampling rate.
+## Components
 
-| Split | Stereo pairs |
-|---|---:|
-| Training | 1,400 |
-| Validation | 350 |
-| Test | 350 |
-
-Self-occlusion and tissue occlusion are intended dataset states. Their images, complete 3D truth and visibility labels are retained. A fixed endpoint does **not** have to be directly visible; the 0/128 direct-visibility count in the bounded run is a recorded observation, not a reason to discard data or change the planned paths.
-
-The laptop validation checked all 21 paths and rendered 32 diagnostic pairs. Calculation checks covered all 2,100 planned states. These counts and checks describe the versioned generator baseline. Subsequent capture and model runs use their own recorded manifests; this historical table does not override a model run’s actual configuration.
-
-![Existing 720p stereo sample with articulated pose overlays](CameraImagingConfig/src/TemporalStereo_v2/validation_evidence/balanced_2100/examples/seq_000_validation_029.jpg)
-
-[Dataset configuration](CameraImagingConfig/src/TemporalStereo_v2/DATASET_SPLITS.md) · [Server migration and commands](CameraImagingConfig/src/TemporalStereo_v2/SERVER_MIGRATION.md) · [Validation evidence](CameraImagingConfig/src/TemporalStereo_v2/validation_evidence/balanced_2100/README.md)
-
-## Modules
-
-| Directory | Contents |
+| Directory | Purpose |
 |---|---|
-| `CameraImagingConfig/` | Current temporal generator, portable deployment, camera configuration and sources; earlier captures retained |
-| `StereoCalibration/` | Historical endpoint and relative-pose diagnostics, with recorded failures |
-| `SurgicalPoseEstimation/` | Pose-interface navigation and historical static examples |
-| `StereoPoseLearning/` | Current estimator, training, inference, architecture history and reproducibility tools |
+| `CameraImagingConfig` | Recorded camera parameters; continuous stereo generation, geometry checks and labels |
+| `StereoPoseLearning/stereo_pose` | Network, dataset reader, losses, training and inference |
+| `StereoPoseLearning/assets` | Fixed instrument dimensions and kinematic chain |
+| `StereoPoseLearning/reference/pose_display` | Independent decoding, camera projection and C++ overlays |
+| `StereoPoseLearning/native/libtorch` | C++ model execution, GPU preprocessing, TensorRT and CUDA fusions |
 
-Each new pair saves RGB, masks, C/d/H1/H2/J1/J2/T, full part frames, joints, timestamps and visibility/contact labels. The [model interface](CameraImagingConfig/src/TemporalStereo_v2/MODEL_INPUT_OUTPUT.md) describes the 17 prediction values and the fixed instrument geometry used to decode them. [Shared calculation and display code](CameraImagingConfig/src/TemporalStereo_v2/pose_display/README.md) supplies the approved arrows/XYZ overlays and video callback. The estimator implementation is in `StereoPoseLearning`; trained checkpoint files are supplied separately. Relative camera transforms and baseline remain separate evaluation truth, not mandatory model inputs.
+Inputs are synchronized left/right RGB and each camera's K/D. Outputs are C and a shaft quaternion for each camera, plus shared wrist pitch/yaw and jaw half-opening: 17 values. The network does not require the left-to-right extrinsic transform or baseline as an input.
 
-The portable generator uses machine configuration files. Large USD/texture assets, render caches, recordings and model weights remain outside Git and are supplied separately in the transfer bundle. The [historical source inventory](docs/source_snapshot.json) preserves the earlier 2026-11-07 snapshots; `python3 scripts/verify_snapshot.py` checks their hashes and repository syntax without launching Isaac Sim.
+## Dataset inventory
 
-## Confirmed imaging baseline
+The generated dataset contains **2,520 stereo pairs / 5,040 RGB images / 23 trajectories**, sampled at **60 Hz** and **1280×720 per eye**. It consists of the base 2,100 pairs plus 420 pairs from two additional training trajectories. The original whole-trajectory assignments are:
 
-Accepted on **2026-11-07**:
+| Split | Stereo pairs | Trajectories |
+|---|---:|---:|
+| Training | 1,820 | 9 |
+| Validation | 350 | 7 |
+| Test | 350 | 7 |
+| Total | 2,520 | 23 |
 
-- Minimum vignette gain: **3.5%** in linear RGB.
-- Global brightness multiplier: **0.75** (25% reduction in linear RGB).
-- At 720p, ellipse center: **(639.5, 359.5) px**; semiaxes: **(560, 313.333333) px**.
-- Smoothstep transition: **0.30–1.10** in normalized elliptical radius.
-- Original appearance-reference resolution: **1920 × 1080 per eye**; the current generator preserves the normalized ellipse at 720p.
+The seven categories cover position and orientation, lighting, imaging quality, occlusion, ECM motion, stereo geometry and combined variation. See the [dataset description](docs/DATA_PROTOCOL.md) for the per-category counts and data fields.
 
-[Parameter record](CameraImagingConfig/docs/IMAGING_BASELINE.md) · [Machine-readable baseline](CameraImagingConfig/config/confirmed_baseline.json) · [Sources](CameraImagingConfig/docs/SOURCES.md)
+## Inference performance
 
-Intrinsics and distortion use the documented DRENDS reference profile and the recorded resize convention. Visual acceptance is recorded; a calibrated photometric match to the target physical camera has not been established.
+Historical RTX 4060 Laptop measurements report approximately **12.98 ms per stereo pair / 77.04 Hz**, from in-memory RGB through preprocessing, inference, kinematics and drawing. Camera capture, decoding, video encoding and display refresh are excluded. These are execution measurements on a fixed internal checkpoint, not pose-accuracy or generalization results. See the benchmark records for hardware, precision and timing scope.
 
-The [three earlier static stereo examples](SurgicalPoseEstimation/examples/shaft_tip_stereo/details.jpg) remain unchanged at 1920 × 1080. Their C/d/T labels and [historical runtime notes](docs/RUNNING.md#historical-2026-11-07-snapshot) describe that older capture, not the current generator.

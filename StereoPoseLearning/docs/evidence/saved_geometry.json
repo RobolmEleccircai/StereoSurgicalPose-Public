@@ -1,8 +1,0 @@
-{
-  "frames_checked": 52,
-  "max_point_component_error_mm": 9.194537797796443e-07,
-  "max_rotation_component_error": 6.730863039150492e-08,
-  "independent_projection_error_px": 2.2737367544323206e-13,
-  "scope": "Saved truth conversion and numerical consistency, not image-based prediction accuracy",
-  "passed": true
-}

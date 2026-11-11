@@ -1,0 +1,30 @@
+{
+  "scope": "Original generated-trajectory assignment and archive inventory; not the training provenance of a checkpoint.",
+  "base_pairs": 2100,
+  "supplement_pairs": 420,
+  "total_pairs": 2520,
+  "raw_rgb_images": 5040,
+  "trajectories": 23,
+  "original_assignment": {
+    "train": {
+      "pairs": 1820,
+      "trajectories": 9
+    },
+    "validation": {
+      "pairs": 350,
+      "trajectories": 7
+    },
+    "test": {
+      "pairs": 350,
+      "trajectories": 7
+    }
+  },
+  "categories": 7,
+  "sampling_hz": 60,
+  "per_eye_resolution": [
+    1280,
+    720
+  ],
+  "images_distributed": false,
+  "trained_weights_distributed": false
+}
