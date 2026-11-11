@@ -1,275 +1,279 @@
 {
-  "checkpoint_sha256": "639fc8c7e56263f4ab889aa53cc5132e3610eea4c8b2d8b0db671c41d8a30325",
-  "gpu": "NVIDIA GeForce RTX 4060 Laptop GPU",
-  "runtime": {
-    "python": "3.11.18",
-    "torch": "2.9.1+cu128",
-    "cuda": "12.8",
-    "cpu_threads": 4,
-    "cudnn_benchmark": false,
-    "matmul_tf32": false,
-    "cudnn_tf32": true
-  },
-  "verification": {
-    "passed": true,
-    "pairs": 56,
-    "categories": 7,
-    "layer_max_abs_differences": {
-      "C": 0,
-      "R": 0,
-      "backbone_0": 0,
-      "backbone_1": 0,
-      "backbone_2": 0,
-      "backbone_3": 0,
-      "heatmap_logits": 0,
-      "joints": 0,
-      "landmark_confidence": 0,
-      "landmark_uv": 0,
-      "mask_logits": 0,
-      "part_heatmap_logits": 0,
-      "part_roi_centres": 0,
-      "part_roi_half_extents": 0,
-      "spatial": 0,
-      "tokens": 0,
-      "values17": 0,
-      "hidden": 0,
-      "stream_values17": 0
+  "publication_scope": "Historical execution benchmark and implementation numerical equivalence only; not an independent pose-accuracy result. No checkpoint or image dataset is included.",
+  "source_report_sha256": "3c9c9d7b5378f732f4f3b7154abcda2fa383b573fa4b857a9f4a00b5279e17ea",
+  "report": {
+    "checkpoint_sha256": "639fc8c7e56263f4ab889aa53cc5132e3610eea4c8b2d8b0db671c41d8a30325",
+    "gpu": "NVIDIA GeForce RTX 4060 Laptop GPU",
+    "runtime": {
+      "python": "3.11.18",
+      "torch": "2.9.1+cu128",
+      "cuda": "12.8",
+      "cpu_threads": 4,
+      "cudnn_benchmark": false,
+      "matmul_tf32": false,
+      "cudnn_tf32": true
     },
-    "point_mm_max": 0.0,
-    "joint_deg_max": 0.0,
-    "rendered_rgb_max_channel_difference": 0,
-    "stream_reset_checked": true,
-    "scope": "Same checkpoint, FP32, original preprocessing, eager C++ LibTorch, no graph export or operator optimization."
-  },
-  "results": {
-    "python": {
-      "predictor_including_preprocess_transfer_export_ms": {
-        "mean_ms": 44.23956658333333,
-        "median_ms": 44.022767,
-        "p95_ms": 45.82171005,
-        "p99_ms": 46.56380186,
-        "min_ms": 42.995096,
-        "max_ms": 51.651594
+    "verification": {
+      "passed": true,
+      "pairs": 56,
+      "categories": 7,
+      "layer_max_abs_differences": {
+        "C": 0,
+        "R": 0,
+        "backbone_0": 0,
+        "backbone_1": 0,
+        "backbone_2": 0,
+        "backbone_3": 0,
+        "heatmap_logits": 0,
+        "joints": 0,
+        "landmark_confidence": 0,
+        "landmark_uv": 0,
+        "mask_logits": 0,
+        "part_heatmap_logits": 0,
+        "part_roi_centres": 0,
+        "part_roi_half_extents": 0,
+        "spatial": 0,
+        "tokens": 0,
+        "values17": 0,
+        "hidden": 0,
+        "stream_values17": 0
       },
-      "cpp_projection_and_draw_ms": {
-        "mean_ms": 6.3969654940476195,
-        "median_ms": 6.3585565,
-        "p95_ms": 6.73500485,
-        "p99_ms": 6.83095482,
-        "min_ms": 6.136721,
-        "max_ms": 7.029209
-      },
-      "end_to_end_ms": {
-        "mean_ms": 50.63653207738095,
-        "median_ms": 50.3832715,
-        "p95_ms": 52.3749149,
-        "p99_ms": 53.21488489,
-        "min_ms": 49.210303,
-        "max_ms": 57.999649
-      },
-      "network_cuda_interval_ms": {
-        "mean_ms": 25.811843633651733,
-        "median_ms": 25.61473560333252,
-        "p95_ms": 27.185923385620118,
-        "p99_ms": 27.674810047149666,
-        "min_ms": 25.088703155517578,
-        "max_ms": 28.123615264892578
-      },
-      "localization_preprocess_and_upload_ms": {
-        "mean_ms": 14.186018541666666,
-        "median_ms": 14.021730999999999,
-        "p95_ms": 14.943723700000001,
-        "p99_ms": 15.641079080000003,
-        "min_ms": 13.661828,
-        "max_ms": 21.034902
-      },
-      "measured_pairs": 168,
-      "warmup_pairs": 56,
-      "first_warmup_pair_ms": 1432.635209,
-      "hz": 19.748587807550397,
-      "inverse_p95_hz": 19.093109781835654,
-      "fraction_within_33_33_ms": 0.0,
-      "peak_cuda_allocated_mib": 227.7333984375,
-      "peak_cuda_reserved_mib": 292.0,
-      "per_category": {
-        "combined_pose_jaw": {
-          "mean_ms": 50.67504854166666,
-          "median_ms": 50.492795,
-          "p95_ms": 52.266355250000004,
-          "p99_ms": 52.715564979999996,
+      "point_mm_max": 0.0,
+      "joint_deg_max": 0.0,
+      "rendered_rgb_max_channel_difference": 0,
+      "stream_reset_checked": true,
+      "scope": "Same checkpoint, FP32, original preprocessing, eager C++ LibTorch, no graph export or operator optimization."
+    },
+    "results": {
+      "python": {
+        "predictor_including_preprocess_transfer_export_ms": {
+          "mean_ms": 44.23956658333333,
+          "median_ms": 44.022767,
+          "p95_ms": 45.82171005,
+          "p99_ms": 46.56380186,
+          "min_ms": 42.995096,
+          "max_ms": 51.651594
+        },
+        "cpp_projection_and_draw_ms": {
+          "mean_ms": 6.3969654940476195,
+          "median_ms": 6.3585565,
+          "p95_ms": 6.73500485,
+          "p99_ms": 6.83095482,
+          "min_ms": 6.136721,
+          "max_ms": 7.029209
+        },
+        "end_to_end_ms": {
+          "mean_ms": 50.63653207738095,
+          "median_ms": 50.3832715,
+          "p95_ms": 52.3749149,
+          "p99_ms": 53.21488489,
           "min_ms": 49.210303,
-          "max_ms": 52.842726
-        },
-        "ecm_motion": {
-          "mean_ms": 50.58715379166667,
-          "median_ms": 50.615148500000004,
-          "p95_ms": 51.50571225,
-          "p99_ms": 51.61564992,
-          "min_ms": 49.59052,
-          "max_ms": 51.634095
-        },
-        "lighting": {
-          "mean_ms": 50.994588666666665,
-          "median_ms": 50.3808795,
-          "p95_ms": 53.0650756,
-          "p99_ms": 56.886520989999994,
-          "min_ms": 49.671789,
           "max_ms": 57.999649
         },
-        "occlusion": {
-          "mean_ms": 50.52987395833333,
-          "median_ms": 50.339527000000004,
-          "p95_ms": 52.4726971,
-          "p99_ms": 53.18449811,
-          "min_ms": 49.492252,
-          "max_ms": 53.326395
+        "network_cuda_interval_ms": {
+          "mean_ms": 25.811843633651733,
+          "median_ms": 25.61473560333252,
+          "p95_ms": 27.185923385620118,
+          "p99_ms": 27.674810047149666,
+          "min_ms": 25.088703155517578,
+          "max_ms": 28.123615264892578
         },
-        "pose_motion": {
-          "mean_ms": 50.526918875,
-          "median_ms": 50.258658,
-          "p95_ms": 52.07058315,
-          "p99_ms": 52.24587296,
-          "min_ms": 49.410257,
-          "max_ms": 52.275922
+        "localization_preprocess_and_upload_ms": {
+          "mean_ms": 14.186018541666666,
+          "median_ms": 14.021730999999999,
+          "p95_ms": 14.943723700000001,
+          "p99_ms": 15.641079080000003,
+          "min_ms": 13.661828,
+          "max_ms": 21.034902
         },
-        "sensor_quality": {
-          "mean_ms": 50.40993654166667,
-          "median_ms": 50.19512,
-          "p95_ms": 51.2748904,
-          "p99_ms": 51.654065339999995,
-          "min_ms": 49.583566,
-          "max_ms": 51.764981
+        "measured_pairs": 168,
+        "warmup_pairs": 56,
+        "first_warmup_pair_ms": 1432.635209,
+        "hz": 19.748587807550397,
+        "inverse_p95_hz": 19.093109781835654,
+        "fraction_within_33_33_ms": 0.0,
+        "peak_cuda_allocated_mib": 227.7333984375,
+        "peak_cuda_reserved_mib": 292.0,
+        "per_category": {
+          "combined_pose_jaw": {
+            "mean_ms": 50.67504854166666,
+            "median_ms": 50.492795,
+            "p95_ms": 52.266355250000004,
+            "p99_ms": 52.715564979999996,
+            "min_ms": 49.210303,
+            "max_ms": 52.842726
+          },
+          "ecm_motion": {
+            "mean_ms": 50.58715379166667,
+            "median_ms": 50.615148500000004,
+            "p95_ms": 51.50571225,
+            "p99_ms": 51.61564992,
+            "min_ms": 49.59052,
+            "max_ms": 51.634095
+          },
+          "lighting": {
+            "mean_ms": 50.994588666666665,
+            "median_ms": 50.3808795,
+            "p95_ms": 53.0650756,
+            "p99_ms": 56.886520989999994,
+            "min_ms": 49.671789,
+            "max_ms": 57.999649
+          },
+          "occlusion": {
+            "mean_ms": 50.52987395833333,
+            "median_ms": 50.339527000000004,
+            "p95_ms": 52.4726971,
+            "p99_ms": 53.18449811,
+            "min_ms": 49.492252,
+            "max_ms": 53.326395
+          },
+          "pose_motion": {
+            "mean_ms": 50.526918875,
+            "median_ms": 50.258658,
+            "p95_ms": 52.07058315,
+            "p99_ms": 52.24587296,
+            "min_ms": 49.410257,
+            "max_ms": 52.275922
+          },
+          "sensor_quality": {
+            "mean_ms": 50.40993654166667,
+            "median_ms": 50.19512,
+            "p95_ms": 51.2748904,
+            "p99_ms": 51.654065339999995,
+            "min_ms": 49.583566,
+            "max_ms": 51.764981
+          },
+          "stereo_rig": {
+            "mean_ms": 50.73220416666667,
+            "median_ms": 50.367832,
+            "p95_ms": 52.56936175,
+            "p99_ms": 52.942471839999996,
+            "min_ms": 49.457202,
+            "max_ms": 53.046085
+          }
+        }
+      },
+      "libtorch": {
+        "predictor_including_preprocess_transfer_export_ms": {
+          "mean_ms": 41.41362536309524,
+          "median_ms": 41.249583,
+          "p95_ms": 42.73522165,
+          "p99_ms": 43.554886120000006,
+          "min_ms": 40.324789,
+          "max_ms": 43.97616
         },
-        "stereo_rig": {
-          "mean_ms": 50.73220416666667,
-          "median_ms": 50.367832,
-          "p95_ms": 52.56936175,
-          "p99_ms": 52.942471839999996,
-          "min_ms": 49.457202,
-          "max_ms": 53.046085
+        "cpp_projection_and_draw_ms": {
+          "mean_ms": 6.423531458333333,
+          "median_ms": 6.379487,
+          "p95_ms": 6.7486019,
+          "p99_ms": 6.97422817,
+          "min_ms": 6.122632,
+          "max_ms": 7.093699
+        },
+        "end_to_end_ms": {
+          "mean_ms": 47.83715682142857,
+          "median_ms": 47.6394875,
+          "p95_ms": 49.40645405,
+          "p99_ms": 50.46520969,
+          "min_ms": 46.574358,
+          "max_ms": 50.773918
+        },
+        "network_cuda_interval_ms": {
+          "mean_ms": 23.25133450826009,
+          "median_ms": 23.12172794342041,
+          "p95_ms": 24.156458568572997,
+          "p99_ms": 24.584108104705813,
+          "min_ms": 22.673599243164062,
+          "max_ms": 25.059040069580078
+        },
+        "localization_preprocess_and_upload_ms": {
+          "mean_ms": 14.300124630952382,
+          "median_ms": 14.2197985,
+          "p95_ms": 14.894187500000001,
+          "p99_ms": 15.422136040000002,
+          "min_ms": 13.907501,
+          "max_ms": 16.610998
+        },
+        "measured_pairs": 168,
+        "warmup_pairs": 56,
+        "first_warmup_pair_ms": 1414.507413,
+        "hz": 20.904252393864088,
+        "inverse_p95_hz": 20.240270612984823,
+        "fraction_within_33_33_ms": 0.0,
+        "peak_cuda_allocated_mib": 245.80029296875,
+        "peak_cuda_reserved_mib": 314.0,
+        "per_category": {
+          "combined_pose_jaw": {
+            "mean_ms": 47.76227804166666,
+            "median_ms": 47.64472,
+            "p95_ms": 49.2167266,
+            "p99_ms": 49.40014939,
+            "min_ms": 46.897597,
+            "max_ms": 49.40758
+          },
+          "ecm_motion": {
+            "mean_ms": 47.60260604166666,
+            "median_ms": 47.403935000000004,
+            "p95_ms": 48.5661797,
+            "p99_ms": 49.23390334,
+            "min_ms": 46.627238,
+            "max_ms": 49.424031
+          },
+          "lighting": {
+            "mean_ms": 48.122254541666656,
+            "median_ms": 47.813511500000004,
+            "p95_ms": 49.46373825,
+            "p99_ms": 50.24014172,
+            "min_ms": 46.885529,
+            "max_ms": 50.462077
+          },
+          "occlusion": {
+            "mean_ms": 47.825823791666664,
+            "median_ms": 47.799659,
+            "p95_ms": 48.67434615,
+            "p99_ms": 49.239562709999994,
+            "min_ms": 46.71545,
+            "max_ms": 49.404363
+          },
+          "pose_motion": {
+            "mean_ms": 47.947871875,
+            "median_ms": 47.639511999999996,
+            "p95_ms": 49.785074349999995,
+            "p99_ms": 50.56173058,
+            "min_ms": 47.040962,
+            "max_ms": 50.773918
+          },
+          "sensor_quality": {
+            "mean_ms": 47.888762791666664,
+            "median_ms": 47.733535,
+            "p95_ms": 49.19314824999999,
+            "p99_ms": 50.19546903,
+            "min_ms": 46.851437,
+            "max_ms": 50.47157
+          },
+          "stereo_rig": {
+            "mean_ms": 47.71050066666667,
+            "median_ms": 47.4974265,
+            "p95_ms": 49.28439665,
+            "p99_ms": 49.56750126,
+            "min_ms": 46.574358,
+            "max_ms": 49.647274
+          }
         }
       }
     },
-    "libtorch": {
-      "predictor_including_preprocess_transfer_export_ms": {
-        "mean_ms": 41.41362536309524,
-        "median_ms": 41.249583,
-        "p95_ms": 42.73522165,
-        "p99_ms": 43.554886120000006,
-        "min_ms": 40.324789,
-        "max_ms": 43.97616
-      },
-      "cpp_projection_and_draw_ms": {
-        "mean_ms": 6.423531458333333,
-        "median_ms": 6.379487,
-        "p95_ms": 6.7486019,
-        "p99_ms": 6.97422817,
-        "min_ms": 6.122632,
-        "max_ms": 7.093699
-      },
-      "end_to_end_ms": {
-        "mean_ms": 47.83715682142857,
-        "median_ms": 47.6394875,
-        "p95_ms": 49.40645405,
-        "p99_ms": 50.46520969,
-        "min_ms": 46.574358,
-        "max_ms": 50.773918
-      },
-      "network_cuda_interval_ms": {
-        "mean_ms": 23.25133450826009,
-        "median_ms": 23.12172794342041,
-        "p95_ms": 24.156458568572997,
-        "p99_ms": 24.584108104705813,
-        "min_ms": 22.673599243164062,
-        "max_ms": 25.059040069580078
-      },
-      "localization_preprocess_and_upload_ms": {
-        "mean_ms": 14.300124630952382,
-        "median_ms": 14.2197985,
-        "p95_ms": 14.894187500000001,
-        "p99_ms": 15.422136040000002,
-        "min_ms": 13.907501,
-        "max_ms": 16.610998
-      },
-      "measured_pairs": 168,
-      "warmup_pairs": 56,
-      "first_warmup_pair_ms": 1414.507413,
-      "hz": 20.904252393864088,
-      "inverse_p95_hz": 20.240270612984823,
-      "fraction_within_33_33_ms": 0.0,
-      "peak_cuda_allocated_mib": 245.80029296875,
-      "peak_cuda_reserved_mib": 314.0,
-      "per_category": {
-        "combined_pose_jaw": {
-          "mean_ms": 47.76227804166666,
-          "median_ms": 47.64472,
-          "p95_ms": 49.2167266,
-          "p99_ms": 49.40014939,
-          "min_ms": 46.897597,
-          "max_ms": 49.40758
-        },
-        "ecm_motion": {
-          "mean_ms": 47.60260604166666,
-          "median_ms": 47.403935000000004,
-          "p95_ms": 48.5661797,
-          "p99_ms": 49.23390334,
-          "min_ms": 46.627238,
-          "max_ms": 49.424031
-        },
-        "lighting": {
-          "mean_ms": 48.122254541666656,
-          "median_ms": 47.813511500000004,
-          "p95_ms": 49.46373825,
-          "p99_ms": 50.24014172,
-          "min_ms": 46.885529,
-          "max_ms": 50.462077
-        },
-        "occlusion": {
-          "mean_ms": 47.825823791666664,
-          "median_ms": 47.799659,
-          "p95_ms": 48.67434615,
-          "p99_ms": 49.239562709999994,
-          "min_ms": 46.71545,
-          "max_ms": 49.404363
-        },
-        "pose_motion": {
-          "mean_ms": 47.947871875,
-          "median_ms": 47.639511999999996,
-          "p95_ms": 49.785074349999995,
-          "p99_ms": 50.56173058,
-          "min_ms": 47.040962,
-          "max_ms": 50.773918
-        },
-        "sensor_quality": {
-          "mean_ms": 47.888762791666664,
-          "median_ms": 47.733535,
-          "p95_ms": 49.19314824999999,
-          "p99_ms": 50.19546903,
-          "min_ms": 46.851437,
-          "max_ms": 50.47157
-        },
-        "stereo_rig": {
-          "mean_ms": 47.71050066666667,
-          "median_ms": 47.4974265,
-          "p95_ms": 49.28439665,
-          "p99_ms": 49.56750126,
-          "min_ms": 46.574358,
-          "max_ms": 49.647274
-        }
-      }
-    }
-  },
-  "source_sha256": {
-    "stereo_pose/predict.py": "a872cb4d4b285589dedbdd6ace3ab36bde465551d94d886abba87c8f972b1346",
-    "stereo_pose/model.py": "c31443b7b447dcfe7eee4543bfcbc0e27cb2d44fdbef7c644a42d7b273ae8d1a",
-    "reference/pose_display/native/overlay.cpp": "9fc89809e3eba89ce5a8fea132960b7f6dbb0f2daa04b84ed60a1fb60fe8c4c7",
-    "tools/benchmark_realtime.py": "5b0782117160ec2c51d0464961cd337290bc0568266529b4e93a706c76c65531",
-    "native/libtorch/model.cpp": "c6460246c8ba12a1357b9234f963ada386262e9159c913bbb91c2f27d29f93d4",
-    "native/libtorch/model.h": "a67c8bca887f6b0a748f84f7351a09e1679f9c1ce4896a073b501fc9fc026863",
-    "native/libtorch/bindings.cpp": "5deba5adb62a9f93e1b96720b2fe176e80442599731e712f8cd0471575f951ec",
-    "stereo_pose/libtorch_predict.py": "87a307a95b11940023362eb43adfa25ba03fd53f57f97c6a6d9e04b67eef2550"
-  },
-  "scope": "RAM RGB -> resize/normalize -> all H2D transfers -> real model -> 17 values D2H -> C++ FK/distortion projection/Chinese arrows and XYZ panels -> completed RGB canvas. No disk/image decoding, capture latency, video encoding, imshow or refresh.",
-  "model_exported": false,
-  "operator_optimization": false
+    "source_sha256": {
+      "stereo_pose/predict.py": "a872cb4d4b285589dedbdd6ace3ab36bde465551d94d886abba87c8f972b1346",
+      "stereo_pose/model.py": "c31443b7b447dcfe7eee4543bfcbc0e27cb2d44fdbef7c644a42d7b273ae8d1a",
+      "reference/pose_display/native/overlay.cpp": "9fc89809e3eba89ce5a8fea132960b7f6dbb0f2daa04b84ed60a1fb60fe8c4c7",
+      "tools/benchmark_realtime.py": "5b0782117160ec2c51d0464961cd337290bc0568266529b4e93a706c76c65531",
+      "native/libtorch/model.cpp": "c6460246c8ba12a1357b9234f963ada386262e9159c913bbb91c2f27d29f93d4",
+      "native/libtorch/model.h": "a67c8bca887f6b0a748f84f7351a09e1679f9c1ce4896a073b501fc9fc026863",
+      "native/libtorch/bindings.cpp": "5deba5adb62a9f93e1b96720b2fe176e80442599731e712f8cd0471575f951ec",
+      "stereo_pose/libtorch_predict.py": "87a307a95b11940023362eb43adfa25ba03fd53f57f97c6a6d9e04b67eef2550"
+    },
+    "scope": "RAM RGB -> resize/normalize -> all H2D transfers -> real model -> 17 values D2H -> C++ FK/distortion projection/Chinese arrows and XYZ panels -> completed RGB canvas. No disk/image decoding, capture latency, video encoding, imshow or refresh.",
+    "model_exported": false,
+    "operator_optimization": false
+  }
 }

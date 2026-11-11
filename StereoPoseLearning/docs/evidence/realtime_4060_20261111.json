@@ -1,272 +1,276 @@
 {
-  "completed": true,
-  "gpu": "NVIDIA GeForce RTX 4060 Laptop GPU",
-  "gpu_before": "name, driver_version, memory.total [MiB], memory.used [MiB], utilization.gpu [%], power.draw [W], temperature.gpu, clocks.current.sm [MHz], clocks.current.memory [MHz]\nNVIDIA GeForce RTX 4060 Laptop GPU, 580.95.05, 8188 MiB, 128 MiB, 0 %, 1.40 W, 44, 210 MHz, 405 MHz",
-  "gpu_after": "name, driver_version, memory.total [MiB], memory.used [MiB], utilization.gpu [%], power.draw [W], temperature.gpu, clocks.current.sm [MHz], clocks.current.memory [MHz]\nNVIDIA GeForce RTX 4060 Laptop GPU, 580.95.05, 8188 MiB, 579 MiB, 40 %, 27.39 W, 49, 2190 MHz, 8001 MHz",
-  "checkpoint_sha256": "639fc8c7e56263f4ab889aa53cc5132e3610eea4c8b2d8b0db671c41d8a30325",
-  "raw_resolution_per_eye": [
-    1280,
-    720
-  ],
-  "network_resolution_hw": [
-    360,
-    640
-  ],
-  "batch_size": 1,
-  "time_steps_per_call": 1,
-  "causal_states": "body/wrist/jaw, retained within each eight-frame sequence",
-  "input_pairs": 56,
-  "sequences": 7,
-  "results": {
-    "fp32": {
-      "predictor_including_preprocess_transfer_export_ms": {
-        "mean_ms": 44.22524255357143,
-        "median_ms": 43.962230000000005,
-        "p95_ms": 45.7215,
-        "p99_ms": 47.21942425000002,
-        "min_ms": 43.249796,
-        "max_ms": 56.918264
-      },
-      "cpp_projection_and_draw_ms": {
-        "mean_ms": 6.457366779761904,
-        "median_ms": 6.418827,
-        "p95_ms": 6.7832849,
-        "p99_ms": 6.98363466,
-        "min_ms": 6.14295,
-        "max_ms": 7.097985
-      },
-      "end_to_end_ms": {
-        "mean_ms": 50.68260933333334,
-        "median_ms": 50.431726999999995,
-        "p95_ms": 52.1944452,
-        "p99_ms": 53.98528499000001,
-        "min_ms": 49.529637,
-        "max_ms": 63.631562
-      },
-      "network_cuda_interval_ms": {
-        "mean_ms": 25.75990590595064,
-        "median_ms": 25.54420757293701,
-        "p95_ms": 26.964611434936526,
-        "p99_ms": 27.465437450408935,
-        "min_ms": 24.994495391845703,
-        "max_ms": 38.43769454956055
-      },
-      "localization_preprocess_and_upload_ms": {
-        "mean_ms": 14.235466678571429,
-        "median_ms": 14.1190055,
-        "p95_ms": 14.82536585,
-        "p99_ms": 15.756411390000006,
-        "min_ms": 13.815507,
-        "max_ms": 16.137409
-      },
-      "measured_pairs": 168,
-      "warmup_pairs": 56,
-      "first_warmup_pair_ms": 1454.151895,
-      "hz": 19.730633705599526,
-      "inverse_p95_hz": 19.159126917973257,
-      "fraction_within_33_33_ms": 0.0,
-      "peak_cuda_allocated_mib": 227.7333984375,
-      "peak_cuda_reserved_mib": 292.0,
-      "per_category": {
-        "combined_pose_jaw": {
-          "mean_ms": 50.68417433333334,
-          "median_ms": 50.40464,
-          "p95_ms": 51.733180899999994,
-          "p99_ms": 53.30613543,
-          "min_ms": 49.664518,
-          "max_ms": 53.764217
+  "publication_scope": "Historical execution benchmark and implementation numerical equivalence only; not an independent pose-accuracy result. No checkpoint or image dataset is included.",
+  "source_report_sha256": "f86811c85670337dffb853f9eb950a1bdee8d336679986d748d3ac7d203310b0",
+  "report": {
+    "completed": true,
+    "gpu": "NVIDIA GeForce RTX 4060 Laptop GPU",
+    "gpu_before": "name, driver_version, memory.total [MiB], memory.used [MiB], utilization.gpu [%], power.draw [W], temperature.gpu, clocks.current.sm [MHz], clocks.current.memory [MHz]\nNVIDIA GeForce RTX 4060 Laptop GPU, 580.95.05, 8188 MiB, 128 MiB, 0 %, 1.40 W, 44, 210 MHz, 405 MHz",
+    "gpu_after": "name, driver_version, memory.total [MiB], memory.used [MiB], utilization.gpu [%], power.draw [W], temperature.gpu, clocks.current.sm [MHz], clocks.current.memory [MHz]\nNVIDIA GeForce RTX 4060 Laptop GPU, 580.95.05, 8188 MiB, 579 MiB, 40 %, 27.39 W, 49, 2190 MHz, 8001 MHz",
+    "checkpoint_sha256": "639fc8c7e56263f4ab889aa53cc5132e3610eea4c8b2d8b0db671c41d8a30325",
+    "raw_resolution_per_eye": [
+      1280,
+      720
+    ],
+    "network_resolution_hw": [
+      360,
+      640
+    ],
+    "batch_size": 1,
+    "time_steps_per_call": 1,
+    "causal_states": "body/wrist/jaw, retained within each eight-frame sequence",
+    "input_pairs": 56,
+    "sequences": 7,
+    "results": {
+      "fp32": {
+        "predictor_including_preprocess_transfer_export_ms": {
+          "mean_ms": 44.22524255357143,
+          "median_ms": 43.962230000000005,
+          "p95_ms": 45.7215,
+          "p99_ms": 47.21942425000002,
+          "min_ms": 43.249796,
+          "max_ms": 56.918264
         },
-        "ecm_motion": {
-          "mean_ms": 50.49406891666666,
-          "median_ms": 50.317639,
-          "p95_ms": 52.0641545,
-          "p99_ms": 52.17049246,
+        "cpp_projection_and_draw_ms": {
+          "mean_ms": 6.457366779761904,
+          "median_ms": 6.418827,
+          "p95_ms": 6.7832849,
+          "p99_ms": 6.98363466,
+          "min_ms": 6.14295,
+          "max_ms": 7.097985
+        },
+        "end_to_end_ms": {
+          "mean_ms": 50.68260933333334,
+          "median_ms": 50.431726999999995,
+          "p95_ms": 52.1944452,
+          "p99_ms": 53.98528499000001,
           "min_ms": 49.529637,
-          "max_ms": 52.197402
-        },
-        "lighting": {
-          "mean_ms": 50.804265375,
-          "median_ms": 50.748779,
-          "p95_ms": 52.36590635,
-          "p99_ms": 52.47966048,
-          "min_ms": 49.663204,
-          "max_ms": 52.485439
-        },
-        "occlusion": {
-          "mean_ms": 50.55343825,
-          "median_ms": 50.340197,
-          "p95_ms": 52.1007893,
-          "p99_ms": 52.7189392,
-          "min_ms": 49.620399,
-          "max_ms": 52.867326
-        },
-        "pose_motion": {
-          "mean_ms": 50.53645591666666,
-          "median_ms": 50.5750905,
-          "p95_ms": 51.657358099999996,
-          "p99_ms": 52.07903746,
-          "min_ms": 49.608928,
-          "max_ms": 52.188954
-        },
-        "sensor_quality": {
-          "mean_ms": 50.706145333333325,
-          "median_ms": 50.369797,
-          "p95_ms": 52.4068819,
-          "p99_ms": 53.99091897,
-          "min_ms": 49.62843,
-          "max_ms": 54.43412
-        },
-        "stereo_rig": {
-          "mean_ms": 50.99971720833333,
-          "median_ms": 50.597843999999995,
-          "p95_ms": 51.217827,
-          "p99_ms": 60.780480159999996,
-          "min_ms": 49.553441,
           "max_ms": 63.631562
+        },
+        "network_cuda_interval_ms": {
+          "mean_ms": 25.75990590595064,
+          "median_ms": 25.54420757293701,
+          "p95_ms": 26.964611434936526,
+          "p99_ms": 27.465437450408935,
+          "min_ms": 24.994495391845703,
+          "max_ms": 38.43769454956055
+        },
+        "localization_preprocess_and_upload_ms": {
+          "mean_ms": 14.235466678571429,
+          "median_ms": 14.1190055,
+          "p95_ms": 14.82536585,
+          "p99_ms": 15.756411390000006,
+          "min_ms": 13.815507,
+          "max_ms": 16.137409
+        },
+        "measured_pairs": 168,
+        "warmup_pairs": 56,
+        "first_warmup_pair_ms": 1454.151895,
+        "hz": 19.730633705599526,
+        "inverse_p95_hz": 19.159126917973257,
+        "fraction_within_33_33_ms": 0.0,
+        "peak_cuda_allocated_mib": 227.7333984375,
+        "peak_cuda_reserved_mib": 292.0,
+        "per_category": {
+          "combined_pose_jaw": {
+            "mean_ms": 50.68417433333334,
+            "median_ms": 50.40464,
+            "p95_ms": 51.733180899999994,
+            "p99_ms": 53.30613543,
+            "min_ms": 49.664518,
+            "max_ms": 53.764217
+          },
+          "ecm_motion": {
+            "mean_ms": 50.49406891666666,
+            "median_ms": 50.317639,
+            "p95_ms": 52.0641545,
+            "p99_ms": 52.17049246,
+            "min_ms": 49.529637,
+            "max_ms": 52.197402
+          },
+          "lighting": {
+            "mean_ms": 50.804265375,
+            "median_ms": 50.748779,
+            "p95_ms": 52.36590635,
+            "p99_ms": 52.47966048,
+            "min_ms": 49.663204,
+            "max_ms": 52.485439
+          },
+          "occlusion": {
+            "mean_ms": 50.55343825,
+            "median_ms": 50.340197,
+            "p95_ms": 52.1007893,
+            "p99_ms": 52.7189392,
+            "min_ms": 49.620399,
+            "max_ms": 52.867326
+          },
+          "pose_motion": {
+            "mean_ms": 50.53645591666666,
+            "median_ms": 50.5750905,
+            "p95_ms": 51.657358099999996,
+            "p99_ms": 52.07903746,
+            "min_ms": 49.608928,
+            "max_ms": 52.188954
+          },
+          "sensor_quality": {
+            "mean_ms": 50.706145333333325,
+            "median_ms": 50.369797,
+            "p95_ms": 52.4068819,
+            "p99_ms": 53.99091897,
+            "min_ms": 49.62843,
+            "max_ms": 54.43412
+          },
+          "stereo_rig": {
+            "mean_ms": 50.99971720833333,
+            "median_ms": 50.597843999999995,
+            "p95_ms": 51.217827,
+            "p99_ms": 60.780480159999996,
+            "min_ms": 49.553441,
+            "max_ms": 63.631562
+          }
+        }
+      },
+      "bf16": {
+        "predictor_including_preprocess_transfer_export_ms": {
+          "mean_ms": 45.18501773214285,
+          "median_ms": 44.961362,
+          "p95_ms": 46.814058100000004,
+          "p99_ms": 48.50625535000001,
+          "min_ms": 44.024223,
+          "max_ms": 49.677596
+        },
+        "cpp_projection_and_draw_ms": {
+          "mean_ms": 6.4183647142857145,
+          "median_ms": 6.3759809999999995,
+          "p95_ms": 6.7399636,
+          "p99_ms": 6.930769840000001,
+          "min_ms": 6.113112,
+          "max_ms": 7.005428
+        },
+        "end_to_end_ms": {
+          "mean_ms": 51.60338244642857,
+          "median_ms": 51.350055,
+          "p95_ms": 53.3367936,
+          "p99_ms": 55.35955309000001,
+          "min_ms": 50.364159,
+          "max_ms": 56.00324
+        },
+        "network_cuda_interval_ms": {
+          "mean_ms": 26.362486521402996,
+          "median_ms": 26.168208122253418,
+          "p95_ms": 27.466926670074464,
+          "p99_ms": 28.315119247436524,
+          "min_ms": 25.832672119140625,
+          "max_ms": 29.8319034576416
+        },
+        "localization_preprocess_and_upload_ms": {
+          "mean_ms": 14.47888213095238,
+          "median_ms": 14.3482935,
+          "p95_ms": 15.16275805,
+          "p99_ms": 15.892428030000001,
+          "min_ms": 14.015613,
+          "max_ms": 17.298003
+        },
+        "measured_pairs": 168,
+        "warmup_pairs": 56,
+        "first_warmup_pair_ms": 1298.785977,
+        "hz": 19.378574670723143,
+        "inverse_p95_hz": 18.7487835789214,
+        "fraction_within_33_33_ms": 0.0,
+        "peak_cuda_allocated_mib": 241.5576171875,
+        "peak_cuda_reserved_mib": 312.0,
+        "per_category": {
+          "combined_pose_jaw": {
+            "mean_ms": 51.886972875,
+            "median_ms": 51.614162,
+            "p95_ms": 53.5925724,
+            "p99_ms": 55.35034498,
+            "min_ms": 50.389904,
+            "max_ms": 55.858685
+          },
+          "ecm_motion": {
+            "mean_ms": 51.58067975,
+            "median_ms": 51.561584999999994,
+            "p95_ms": 52.9155835,
+            "p99_ms": 53.28506063,
+            "min_ms": 50.440627,
+            "max_ms": 53.369751
+          },
+          "lighting": {
+            "mean_ms": 51.56222966666667,
+            "median_ms": 51.491939,
+            "p95_ms": 52.62817715,
+            "p99_ms": 52.702756539999996,
+            "min_ms": 50.65219,
+            "max_ms": 52.71957
+          },
+          "occlusion": {
+            "mean_ms": 51.46046008333334,
+            "median_ms": 51.272669,
+            "p95_ms": 52.44802575,
+            "p99_ms": 53.2083765,
+            "min_ms": 50.664731,
+            "max_ms": 53.431488
+          },
+          "pose_motion": {
+            "mean_ms": 51.463169041666674,
+            "median_ms": 51.2702915,
+            "p95_ms": 54.2905622,
+            "p99_ms": 54.85051041,
+            "min_ms": 50.364159,
+            "max_ms": 54.915148
+          },
+          "sensor_quality": {
+            "mean_ms": 51.66173266666666,
+            "median_ms": 51.220361999999994,
+            "p95_ms": 54.415701999999996,
+            "p99_ms": 55.01864104,
+            "min_ms": 50.620291,
+            "max_ms": 55.113712
+          },
+          "stereo_rig": {
+            "mean_ms": 51.60843304166667,
+            "median_ms": 51.293203500000004,
+            "p95_ms": 52.723972450000005,
+            "p99_ms": 55.25824332,
+            "min_ms": 50.508885,
+            "max_ms": 56.00324
+          }
         }
       }
     },
-    "bf16": {
-      "predictor_including_preprocess_transfer_export_ms": {
-        "mean_ms": 45.18501773214285,
-        "median_ms": 44.961362,
-        "p95_ms": 46.814058100000004,
-        "p99_ms": 48.50625535000001,
-        "min_ms": 44.024223,
-        "max_ms": 49.677596
-      },
-      "cpp_projection_and_draw_ms": {
-        "mean_ms": 6.4183647142857145,
-        "median_ms": 6.3759809999999995,
-        "p95_ms": 6.7399636,
-        "p99_ms": 6.930769840000001,
-        "min_ms": 6.113112,
-        "max_ms": 7.005428
-      },
-      "end_to_end_ms": {
-        "mean_ms": 51.60338244642857,
-        "median_ms": 51.350055,
-        "p95_ms": 53.3367936,
-        "p99_ms": 55.35955309000001,
-        "min_ms": 50.364159,
-        "max_ms": 56.00324
-      },
-      "network_cuda_interval_ms": {
-        "mean_ms": 26.362486521402996,
-        "median_ms": 26.168208122253418,
-        "p95_ms": 27.466926670074464,
-        "p99_ms": 28.315119247436524,
-        "min_ms": 25.832672119140625,
-        "max_ms": 29.8319034576416
-      },
-      "localization_preprocess_and_upload_ms": {
-        "mean_ms": 14.47888213095238,
-        "median_ms": 14.3482935,
-        "p95_ms": 15.16275805,
-        "p99_ms": 15.892428030000001,
-        "min_ms": 14.015613,
-        "max_ms": 17.298003
-      },
-      "measured_pairs": 168,
-      "warmup_pairs": 56,
-      "first_warmup_pair_ms": 1298.785977,
-      "hz": 19.378574670723143,
-      "inverse_p95_hz": 18.7487835789214,
-      "fraction_within_33_33_ms": 0.0,
-      "peak_cuda_allocated_mib": 241.5576171875,
-      "peak_cuda_reserved_mib": 312.0,
-      "per_category": {
-        "combined_pose_jaw": {
-          "mean_ms": 51.886972875,
-          "median_ms": 51.614162,
-          "p95_ms": 53.5925724,
-          "p99_ms": 55.35034498,
-          "min_ms": 50.389904,
-          "max_ms": 55.858685
-        },
-        "ecm_motion": {
-          "mean_ms": 51.58067975,
-          "median_ms": 51.561584999999994,
-          "p95_ms": 52.9155835,
-          "p99_ms": 53.28506063,
-          "min_ms": 50.440627,
-          "max_ms": 53.369751
-        },
-        "lighting": {
-          "mean_ms": 51.56222966666667,
-          "median_ms": 51.491939,
-          "p95_ms": 52.62817715,
-          "p99_ms": 52.702756539999996,
-          "min_ms": 50.65219,
-          "max_ms": 52.71957
-        },
-        "occlusion": {
-          "mean_ms": 51.46046008333334,
-          "median_ms": 51.272669,
-          "p95_ms": 52.44802575,
-          "p99_ms": 53.2083765,
-          "min_ms": 50.664731,
-          "max_ms": 53.431488
-        },
-        "pose_motion": {
-          "mean_ms": 51.463169041666674,
-          "median_ms": 51.2702915,
-          "p95_ms": 54.2905622,
-          "p99_ms": 54.85051041,
-          "min_ms": 50.364159,
-          "max_ms": 54.915148
-        },
-        "sensor_quality": {
-          "mean_ms": 51.66173266666666,
-          "median_ms": 51.220361999999994,
-          "p95_ms": 54.415701999999996,
-          "p99_ms": 55.01864104,
-          "min_ms": 50.620291,
-          "max_ms": 55.113712
-        },
-        "stereo_rig": {
-          "mean_ms": 51.60843304166667,
-          "median_ms": 51.293203500000004,
-          "p95_ms": 52.723972450000005,
-          "p99_ms": 55.25824332,
-          "min_ms": 50.508885,
-          "max_ms": 56.00324
-        }
-      }
+    "mixed_precision_drift": {
+      "meaning": "BF16 disagreement with FP32, not error against ground truth",
+      "C_mm_mean": 0.07276930248500382,
+      "C_mm_max": 0.22100897908345346,
+      "tip_mm_mean": 0.07849490566517645,
+      "tip_mm_max": 0.22709208042706072,
+      "joint_deg_mean_pitch_yaw_half": [
+        0.01841663010418415,
+        0.013348172418773174,
+        0.009470674209296703
+      ],
+      "joint_deg_max_pitch_yaw_half": [
+        0.1552809327840805,
+        0.039690226316452026,
+        0.03329631686210632
+      ]
+    },
+    "timing_scope": "RAM RGB -> resize/normalize -> all H2D transfers -> real model -> 17 values D2H -> C++ FK/distortion projection/Chinese arrows and XYZ panels -> completed RGB canvas. No disk/image decoding, capture latency, video encoding, imshow or refresh.",
+    "cuda_timing_note": "Network CUDA interval excludes preprocessing and CPU drawing; end-to-end wall time is the primary result. Records and metrics are written after timing.",
+    "runtime": {
+      "python": "3.11.18",
+      "torch": "2.9.1+cu128",
+      "cuda": "12.8",
+      "cpu_threads": 4,
+      "cudnn_benchmark": false,
+      "matmul_tf32": false,
+      "cudnn_tf32": true
+    },
+    "source_sha256": {
+      "stereo_pose/predict.py": "a872cb4d4b285589dedbdd6ace3ab36bde465551d94d886abba87c8f972b1346",
+      "stereo_pose/model.py": "c31443b7b447dcfe7eee4543bfcbc0e27cb2d44fdbef7c644a42d7b273ae8d1a",
+      "reference/pose_display/native/overlay.cpp": "9fc89809e3eba89ce5a8fea132960b7f6dbb0f2daa04b84ed60a1fb60fe8c4c7",
+      "tools/benchmark_realtime.py": "3b00b3d9bb06445a93a85fa4b1c8112f653bfb6a87f37e39d92c5aa2a732359a"
     }
-  },
-  "mixed_precision_drift": {
-    "meaning": "BF16 disagreement with FP32, not error against ground truth",
-    "C_mm_mean": 0.07276930248500382,
-    "C_mm_max": 0.22100897908345346,
-    "tip_mm_mean": 0.07849490566517645,
-    "tip_mm_max": 0.22709208042706072,
-    "joint_deg_mean_pitch_yaw_half": [
-      0.01841663010418415,
-      0.013348172418773174,
-      0.009470674209296703
-    ],
-    "joint_deg_max_pitch_yaw_half": [
-      0.1552809327840805,
-      0.039690226316452026,
-      0.03329631686210632
-    ]
-  },
-  "timing_scope": "RAM RGB -> resize/normalize -> all H2D transfers -> real model -> 17 values D2H -> C++ FK/distortion projection/Chinese arrows and XYZ panels -> completed RGB canvas. No disk/image decoding, capture latency, video encoding, imshow or refresh.",
-  "cuda_timing_note": "Network CUDA interval excludes preprocessing and CPU drawing; end-to-end wall time is the primary result. Records and metrics are written after timing.",
-  "runtime": {
-    "python": "3.11.18",
-    "torch": "2.9.1+cu128",
-    "cuda": "12.8",
-    "cpu_threads": 4,
-    "cudnn_benchmark": false,
-    "matmul_tf32": false,
-    "cudnn_tf32": true
-  },
-  "source_sha256": {
-    "stereo_pose/predict.py": "a872cb4d4b285589dedbdd6ace3ab36bde465551d94d886abba87c8f972b1346",
-    "stereo_pose/model.py": "c31443b7b447dcfe7eee4543bfcbc0e27cb2d44fdbef7c644a42d7b273ae8d1a",
-    "reference/pose_display/native/overlay.cpp": "9fc89809e3eba89ce5a8fea132960b7f6dbb0f2daa04b84ed60a1fb60fe8c4c7",
-    "tools/benchmark_realtime.py": "3b00b3d9bb06445a93a85fa4b1c8112f653bfb6a87f37e39d92c5aa2a732359a"
   }
 }

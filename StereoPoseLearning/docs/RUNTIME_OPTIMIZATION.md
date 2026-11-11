@@ -1,5 +1,7 @@
 # 4060 双目推理优化：逐步实现、验证与结果
 
+> 公开版范围：保留历史执行性能、实现步骤及数值等价性记录，不发布该权重的独立预测精度结论。固定权重和图像未随源码分发；以下是历史实测，整理时没有重新测速。JSON 报告的原字段位于 `report` 中。
+
 ## 固定条件与测量口径
 
 本记录按 A → B → C → D 的顺序展开。每步先完成实现、正确性检查和独立测速，再进入下一步；每步单独提交，保留机器可读证据。只在4060笔记本运行，没有改动服务器训练，也没有重新渲染或训练模型。
@@ -166,4 +168,3 @@ python tools/benchmark_comparison.py --inputs inputs --baseline-config inputs/pr
 - 未采用的GELU引擎已删除，释放34,831,132字节；构建参数、逐层精度与结果仍保留。Git不包含权重、引擎、原始图片或构建缓存。
 
 最终证据：[完整验收JSON](evidence/runtime_optimization_final_4060_20261111.json)。4060运行记录位于 `runs/runtime_optimization_20261111/`，七类绘图对照位于其中 `final_pixels/`；当前TensorRT与最终预测对照位于 `D_level5_accuracy/`。本地完整报告和预览同步到工作区的 `outputs/runtime_optimization_4060_20261111/`。
-

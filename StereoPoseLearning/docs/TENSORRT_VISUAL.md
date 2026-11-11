@@ -1,5 +1,7 @@
 # TensorRT视觉前端：4060实测
 
+> 公开版范围：保留历史执行性能、实现步骤及数值等价性记录，不发布该权重的独立预测精度结论。固定权重和图像未随源码分发；以下是历史实测，整理时没有重新测速。JSON 报告的原字段位于 `report` 中。
+
 本页保留首次TensorRT接入的基线结果。后续逐步优化、当前配置和最终复测见[运行时优化记录](RUNTIME_OPTIMIZATION.md)。
 
 2026-11-11，在4060笔记本实现并验证。只替换ConvNeXt V2 Nano、FPN、整器械分割头与五关键点热图头。后续局部特征、双目融合、三组GRU、C点FP64去畸变、腕部/钳口分支及C++绘图保留原实现。未重新训练，未改变输入尺寸或17值接口。
@@ -37,7 +39,7 @@ PyTorch显存峰值不含TensorRT直接分配的显存；不能仅凭PyTorch分�
 
 ## 实现数值一致性
 
-仅对应这56对测试图片，不代表完整测试集。
+下列差异只比较两个执行实现，使用固定的 56 对回归图片，不表示模型相对真实标签的误差。
 
 两种实现之间：C位置最大差0.00558mm，尖端最大差0.00729mm，杆体旋转最大差0.01614°，关节角最大差0.01087°，C/H/J投影最大差0.05576像素，分割二值掩码平均IoU为0.999869。两种实现各自维护独立GRU状态；不是只比较单帧特征。
 
@@ -115,4 +117,3 @@ python tools/benchmark_realtime.py --inputs inputs --output runs/new_trt_benchma
 结果见[对照证据](evidence/tensorrt_visual_4060_20261111.json)。4060详细结果在`runs/tensorrt_visual_20261111/`，预览上排原版、下排TensorRT，各排左右目。
 
 技术来源：[NVIDIA C++推理接口](https://docs.nvidia.com/deeplearning/tensorrt/latest/inference-library/c-api-docs.html)、[精度注意事项](https://docs.nvidia.com/deeplearning/tensorrt/latest/inference-library/accuracy-considerations.html)。本实现固定使用10.13.3接口，不混用最新主版本的构建API。
-

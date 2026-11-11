@@ -1,16 +1,20 @@
-[
-  {
-    "workers": 0,
-    "first_batch_seconds": 1.448738324106671,
-    "steady_mean_batch_seconds": 0.49918617855291814,
-    "same_tensors": true,
-    "pinned": true
-  },
-  {
-    "workers": 4,
-    "first_batch_seconds": 0.6312122630188242,
-    "steady_mean_batch_seconds": 0.16347969874041154,
-    "same_tensors": true,
-    "pinned": true
-  }
-]
+{
+  "publication_scope": "Historical execution benchmark and implementation numerical equivalence only; not an independent pose-accuracy result. No checkpoint or image dataset is included.",
+  "source_report_sha256": "f5932047bd30c8e33475fab82ef06ba3a4ba0854c98ed9fd828ea0c97510e95e",
+  "report": [
+    {
+      "workers": 0,
+      "first_batch_seconds": 1.448738324106671,
+      "steady_mean_batch_seconds": 0.49918617855291814,
+      "same_tensors": true,
+      "pinned": true
+    },
+    {
+      "workers": 4,
+      "first_batch_seconds": 0.6312122630188242,
+      "steady_mean_batch_seconds": 0.16347969874041154,
+      "same_tensors": true,
+      "pinned": true
+    }
+  ]
+}

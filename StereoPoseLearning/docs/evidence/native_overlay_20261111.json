@@ -1,56 +1,60 @@
 {
-  "passed": true,
-  "max_errors": {
-    "pose_mm_or_rotation": 2.842170943040401e-14,
-    "projection_px": 4.547473508864641e-13,
-    "display_length_mm": 4.440892098500626e-15
-  },
-  "checks": [
-    "140 saved/random pose and distorted XYZ geometry comparisons",
-    "rejected_nan",
-    "rejected_quaternion",
-    "rejected_limit",
-    "rejected_behind",
-    "rejected_stale_frame",
-    "independent output ownership",
-    "reusable output matches",
-    "visibility semantics",
-    "original RGB unchanged",
-    "standalone C++ executable",
-    "four-frame native video callback and encode",
-    "stale video frame displays error and reports failure"
-  ],
-  "runtime": {
-    "python": "3.11.18",
-    "platform": "Linux-5.15.0-78-generic-x86_64-with-glibc2.35",
-    "numpy": "1.26.4",
-    "cpp_abi": 1
-  },
-  "source_sha256": {
-    "pose_display/native/overlay.cpp": "9fc89809e3eba89ce5a8fea132960b7f6dbb0f2daa04b84ed60a1fb60fe8c4c7",
-    "pose_display/native/overlay.h": "1eaa0c4576f058035181117eef3c9a67fbd37d7bbcb419d4a769ff9efc7e9b98",
-    "pose_display/cpp_backend.py": "3e2641658da207412bfae3f54e2bd6f91b274c6ab17a7b2777d70418bde7c43d",
-    "pose_display/video.py": "bd72f825c05f6fefa1f3f681359d77f13af71b509538410839900d5e905fb0cc"
-  },
-  "samples": 7,
-  "iterations_per_backend": 140,
-  "scope": "1280x720 per eye; paired CPU FK, distorted projection and compact drawing; warm cache, changing timestamps. No inference, I/O, video encoding or display. GPU training continues.",
-  "rendering_difference": "OpenCV antialiasing, FreeType glyph rasterization and label text bounds differ from Pillow; geometric projections and panel dimensions are preserved.",
-  "timings": {
-    "cpp_reused_buffer": {
-      "mean_ms": 8.182275753019244,
-      "median_ms": 8.034864469664171,
-      "p95_ms": 8.498894202057258
+  "publication_scope": "Historical execution benchmark and implementation numerical equivalence only; not an independent pose-accuracy result. No checkpoint or image dataset is included.",
+  "source_report_sha256": "f9d6ece79c0e25064f8ad587c7d7eaaf6fa96539d77178fe4e4742d25beb12bd",
+  "report": {
+    "passed": true,
+    "max_errors": {
+      "pose_mm_or_rotation": 2.842170943040401e-14,
+      "projection_px": 4.547473508864641e-13,
+      "display_length_mm": 4.440892098500626e-15
     },
-    "python_compact": {
-      "mean_ms": 26.051811823604762,
-      "median_ms": 26.222086511552334,
-      "p95_ms": 32.855141267646104
+    "checks": [
+      "140 saved/random pose and distorted XYZ geometry comparisons",
+      "rejected_nan",
+      "rejected_quaternion",
+      "rejected_limit",
+      "rejected_behind",
+      "rejected_stale_frame",
+      "independent output ownership",
+      "reusable output matches",
+      "visibility semantics",
+      "original RGB unchanged",
+      "standalone C++ executable",
+      "four-frame native video callback and encode",
+      "stale video frame displays error and reports failure"
+    ],
+    "runtime": {
+      "python": "3.11.18",
+      "platform": "Linux-5.15.0-78-generic-x86_64-with-glibc2.35",
+      "numpy": "1.26.4",
+      "cpp_abi": 1
     },
-    "cpp_owned_output": {
-      "mean_ms": 8.677725558767893,
-      "median_ms": 8.047066978178918,
-      "p95_ms": 10.56342012598179
+    "source_sha256": {
+      "pose_display/native/overlay.cpp": "9fc89809e3eba89ce5a8fea132960b7f6dbb0f2daa04b84ed60a1fb60fe8c4c7",
+      "pose_display/native/overlay.h": "1eaa0c4576f058035181117eef3c9a67fbd37d7bbcb419d4a769ff9efc7e9b98",
+      "pose_display/cpp_backend.py": "3e2641658da207412bfae3f54e2bd6f91b274c6ab17a7b2777d70418bde7c43d",
+      "pose_display/video.py": "bd72f825c05f6fefa1f3f681359d77f13af71b509538410839900d5e905fb0cc"
+    },
+    "samples": 7,
+    "iterations_per_backend": 140,
+    "scope": "1280x720 per eye; paired CPU FK, distorted projection and compact drawing; warm cache, changing timestamps. No inference, I/O, video encoding or display. GPU training continues.",
+    "rendering_difference": "OpenCV antialiasing, FreeType glyph rasterization and label text bounds differ from Pillow; geometric projections and panel dimensions are preserved.",
+    "timings": {
+      "cpp_reused_buffer": {
+        "mean_ms": 8.182275753019244,
+        "median_ms": 8.034864469664171,
+        "p95_ms": 8.498894202057258
+      },
+      "python_compact": {
+        "mean_ms": 26.051811823604762,
+        "median_ms": 26.222086511552334,
+        "p95_ms": 32.855141267646104
+      },
+      "cpp_owned_output": {
+        "mean_ms": 8.677725558767893,
+        "median_ms": 8.047066978178918,
+        "p95_ms": 10.56342012598179
+      }
     }
   }
 }

@@ -1,3 +1,5 @@
+> 本页保留连续绘图工具的使用方法。历史视频和对应权重不随公开源码分发，画面示例不作为独立测试精度结果。
+
 # Continuous stereo prediction video on the 4060
 
 ## Purpose and actual inputs

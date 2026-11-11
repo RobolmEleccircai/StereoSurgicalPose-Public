@@ -1,637 +1,641 @@
 {
-  "level5": {
-    "build": {
-      "checkpoint_sha256": "639fc8c7e56263f4ab889aa53cc5132e3610eea4c8b2d8b0db671c41d8a30325",
-      "engine_sha256": "c2d18c32e4b8053d84f523bf69dd670125ad7c3f6980d545b6acb6b12d745dba",
-      "build_seconds": 96.34324024299895,
-      "builder_optimization_level": 5,
-      "activation_policy": "conservative",
-      "fp16_layers": [
-        "/backbone/stem_0/Conv",
-        "/backbone/stages_0/blocks/blocks.0/conv_dw/Conv",
-        "/backbone/stages_0/blocks/blocks.0/mlp/fc1/Conv",
-        "/backbone/stages_0/blocks/blocks.0/mlp/fc2/Conv",
-        "/backbone/stages_0/blocks/blocks.1/conv_dw/Conv",
-        "/backbone/stages_0/blocks/blocks.1/mlp/fc1/Conv",
-        "/backbone/stages_0/blocks/blocks.1/mlp/fc2/Conv",
-        "/backbone/stages_1/downsample/downsample.1/Conv",
-        "/backbone/stages_1/blocks/blocks.0/conv_dw/Conv",
-        "/backbone/stages_1/blocks/blocks.0/mlp/fc1/Conv",
-        "/backbone/stages_1/blocks/blocks.0/mlp/fc2/Conv",
-        "/backbone/stages_1/blocks/blocks.1/conv_dw/Conv",
-        "/backbone/stages_1/blocks/blocks.1/mlp/fc1/Conv",
-        "/backbone/stages_1/blocks/blocks.1/mlp/fc2/Conv",
-        "/backbone/stages_2/downsample/downsample.1/Conv",
-        "/backbone/stages_2/blocks/blocks.0/conv_dw/Conv",
-        "/backbone/stages_2/blocks/blocks.0/mlp/fc1/Conv",
-        "/backbone/stages_2/blocks/blocks.0/mlp/fc2/Conv",
-        "/backbone/stages_2/blocks/blocks.1/conv_dw/Conv",
-        "/backbone/stages_2/blocks/blocks.1/mlp/fc1/Conv",
-        "/backbone/stages_2/blocks/blocks.1/mlp/fc2/Conv",
-        "/backbone/stages_2/blocks/blocks.2/conv_dw/Conv",
-        "/backbone/stages_2/blocks/blocks.2/mlp/fc1/Conv",
-        "/backbone/stages_2/blocks/blocks.2/mlp/fc2/Conv",
-        "/backbone/stages_2/blocks/blocks.3/conv_dw/Conv",
-        "/backbone/stages_2/blocks/blocks.3/mlp/fc1/Conv",
-        "/backbone/stages_2/blocks/blocks.3/mlp/fc2/Conv",
-        "/backbone/stages_2/blocks/blocks.4/conv_dw/Conv",
-        "/backbone/stages_2/blocks/blocks.4/mlp/fc1/Conv",
-        "/backbone/stages_2/blocks/blocks.4/mlp/fc2/Conv",
-        "/backbone/stages_2/blocks/blocks.5/conv_dw/Conv",
-        "/backbone/stages_2/blocks/blocks.5/mlp/fc1/Conv",
-        "/backbone/stages_2/blocks/blocks.5/mlp/fc2/Conv",
-        "/backbone/stages_2/blocks/blocks.6/conv_dw/Conv",
-        "/backbone/stages_2/blocks/blocks.6/mlp/fc1/Conv",
-        "/backbone/stages_2/blocks/blocks.6/mlp/fc2/Conv",
-        "/backbone/stages_2/blocks/blocks.7/conv_dw/Conv",
-        "/backbone/stages_2/blocks/blocks.7/mlp/fc1/Conv",
-        "/backbone/stages_2/blocks/blocks.7/mlp/fc2/Conv",
-        "/backbone/stages_3/downsample/downsample.1/Conv",
-        "/backbone/stages_3/blocks/blocks.0/conv_dw/Conv",
-        "/backbone/stages_3/blocks/blocks.0/mlp/fc1/Conv",
-        "/backbone/stages_3/blocks/blocks.0/mlp/fc2/Conv",
-        "/backbone/stages_3/blocks/blocks.1/conv_dw/Conv",
-        "/backbone/stages_3/blocks/blocks.1/mlp/fc1/Conv",
-        "/backbone/stages_3/blocks/blocks.1/mlp/fc2/Conv",
-        "/laterals.3/Conv",
-        "/laterals.2/Conv",
-        "/laterals.1/Conv",
-        "/laterals.0/Conv",
-        "/spatial/spatial.0/Conv",
-        "/mask_head/Conv",
-        "/heatmap_head/Conv"
-      ],
-      "activation_fp16_layers": [],
-      "tensorrt": "10.13.3.9",
-      "source_sha256": "80a24e6de6f9a7f204fe539f263630fc28d54e25966fb0c9b7261706ac878717"
-    },
-    "accuracy": {
-      "passed_numerical_tolerances": true,
-      "summary": {
-        "C_mm": {
-          "mean": 0.0021831026430885804,
-          "p95": 0.003851429778002399,
-          "max": 0.006277426611781317
-        },
-        "tip_mm": {
-          "mean": 0.0026317547653677375,
-          "p95": 0.005252493773749614,
-          "max": 0.007844552669165034
-        },
-        "hinge_mm": {
-          "mean": 0.0022968836281118863,
-          "p95": 0.004532501164426454,
-          "max": 0.00649824538752668
-        },
-        "rotation_deg": {
-          "mean": 0.005704530404523127,
-          "p95": 0.010200689310466676,
-          "max": 0.013670002405523999
-        },
-        "point_projection_px": {
-          "mean": 0.016984745295472132,
-          "p95": 0.03683027182709907,
-          "max": 0.055412835884899696
-        },
-        "joint_deg": {
-          "pitch": {
-            "mean": 0.0018284781108377501,
-            "p95": 0.005394141538999975,
-            "max": 0.00896803755313158
+  "publication_scope": "Historical execution benchmark and implementation numerical equivalence only; not an independent pose-accuracy result. No checkpoint or image dataset is included.",
+  "source_report_sha256": "54dff5af165698f5b30c7d28a8c9df1c036f3e49629273895092ffd613c728fd",
+  "report": {
+    "level5": {
+      "build": {
+        "checkpoint_sha256": "639fc8c7e56263f4ab889aa53cc5132e3610eea4c8b2d8b0db671c41d8a30325",
+        "engine_sha256": "c2d18c32e4b8053d84f523bf69dd670125ad7c3f6980d545b6acb6b12d745dba",
+        "build_seconds": 96.34324024299895,
+        "builder_optimization_level": 5,
+        "activation_policy": "conservative",
+        "fp16_layers": [
+          "/backbone/stem_0/Conv",
+          "/backbone/stages_0/blocks/blocks.0/conv_dw/Conv",
+          "/backbone/stages_0/blocks/blocks.0/mlp/fc1/Conv",
+          "/backbone/stages_0/blocks/blocks.0/mlp/fc2/Conv",
+          "/backbone/stages_0/blocks/blocks.1/conv_dw/Conv",
+          "/backbone/stages_0/blocks/blocks.1/mlp/fc1/Conv",
+          "/backbone/stages_0/blocks/blocks.1/mlp/fc2/Conv",
+          "/backbone/stages_1/downsample/downsample.1/Conv",
+          "/backbone/stages_1/blocks/blocks.0/conv_dw/Conv",
+          "/backbone/stages_1/blocks/blocks.0/mlp/fc1/Conv",
+          "/backbone/stages_1/blocks/blocks.0/mlp/fc2/Conv",
+          "/backbone/stages_1/blocks/blocks.1/conv_dw/Conv",
+          "/backbone/stages_1/blocks/blocks.1/mlp/fc1/Conv",
+          "/backbone/stages_1/blocks/blocks.1/mlp/fc2/Conv",
+          "/backbone/stages_2/downsample/downsample.1/Conv",
+          "/backbone/stages_2/blocks/blocks.0/conv_dw/Conv",
+          "/backbone/stages_2/blocks/blocks.0/mlp/fc1/Conv",
+          "/backbone/stages_2/blocks/blocks.0/mlp/fc2/Conv",
+          "/backbone/stages_2/blocks/blocks.1/conv_dw/Conv",
+          "/backbone/stages_2/blocks/blocks.1/mlp/fc1/Conv",
+          "/backbone/stages_2/blocks/blocks.1/mlp/fc2/Conv",
+          "/backbone/stages_2/blocks/blocks.2/conv_dw/Conv",
+          "/backbone/stages_2/blocks/blocks.2/mlp/fc1/Conv",
+          "/backbone/stages_2/blocks/blocks.2/mlp/fc2/Conv",
+          "/backbone/stages_2/blocks/blocks.3/conv_dw/Conv",
+          "/backbone/stages_2/blocks/blocks.3/mlp/fc1/Conv",
+          "/backbone/stages_2/blocks/blocks.3/mlp/fc2/Conv",
+          "/backbone/stages_2/blocks/blocks.4/conv_dw/Conv",
+          "/backbone/stages_2/blocks/blocks.4/mlp/fc1/Conv",
+          "/backbone/stages_2/blocks/blocks.4/mlp/fc2/Conv",
+          "/backbone/stages_2/blocks/blocks.5/conv_dw/Conv",
+          "/backbone/stages_2/blocks/blocks.5/mlp/fc1/Conv",
+          "/backbone/stages_2/blocks/blocks.5/mlp/fc2/Conv",
+          "/backbone/stages_2/blocks/blocks.6/conv_dw/Conv",
+          "/backbone/stages_2/blocks/blocks.6/mlp/fc1/Conv",
+          "/backbone/stages_2/blocks/blocks.6/mlp/fc2/Conv",
+          "/backbone/stages_2/blocks/blocks.7/conv_dw/Conv",
+          "/backbone/stages_2/blocks/blocks.7/mlp/fc1/Conv",
+          "/backbone/stages_2/blocks/blocks.7/mlp/fc2/Conv",
+          "/backbone/stages_3/downsample/downsample.1/Conv",
+          "/backbone/stages_3/blocks/blocks.0/conv_dw/Conv",
+          "/backbone/stages_3/blocks/blocks.0/mlp/fc1/Conv",
+          "/backbone/stages_3/blocks/blocks.0/mlp/fc2/Conv",
+          "/backbone/stages_3/blocks/blocks.1/conv_dw/Conv",
+          "/backbone/stages_3/blocks/blocks.1/mlp/fc1/Conv",
+          "/backbone/stages_3/blocks/blocks.1/mlp/fc2/Conv",
+          "/laterals.3/Conv",
+          "/laterals.2/Conv",
+          "/laterals.1/Conv",
+          "/laterals.0/Conv",
+          "/spatial/spatial.0/Conv",
+          "/mask_head/Conv",
+          "/heatmap_head/Conv"
+        ],
+        "activation_fp16_layers": [],
+        "tensorrt": "10.13.3.9",
+        "source_sha256": "80a24e6de6f9a7f204fe539f263630fc28d54e25966fb0c9b7261706ac878717"
+      },
+      "accuracy": {
+        "passed_numerical_tolerances": true,
+        "summary": {
+          "C_mm": {
+            "mean": 0.0021831026430885804,
+            "p95": 0.003851429778002399,
+            "max": 0.006277426611781317
           },
-          "yaw": {
-            "mean": 0.0013735387751694361,
-            "p95": 0.003607193473726511,
-            "max": 0.005990075413137674
+          "tip_mm": {
+            "mean": 0.0026317547653677375,
+            "p95": 0.005252493773749614,
+            "max": 0.007844552669165034
           },
-          "jaw_half": {
-            "mean": 0.0009340785868273217,
-            "p95": 0.0026881062076427042,
-            "max": 0.00575784919783473
-          }
-        },
-        "mask_iou": {
-          "mean": 0.9998899112854686,
-          "p95": 1.0,
-          "max": 1.0
-        }
-      }
-    },
-    "performance": {
-      "results": {
-        "fp32": {
-          "predictor_including_preprocess_transfer_export_ms": {
-            "mean_ms": 11.76314562142857,
-            "median_ms": 11.7956455,
-            "p95_ms": 12.15330485,
-            "p99_ms": 12.52232782,
-            "min_ms": 11.218325,
-            "max_ms": 13.205002
+          "hinge_mm": {
+            "mean": 0.0022968836281118863,
+            "p95": 0.004532501164426454,
+            "max": 0.00649824538752668
           },
-          "cpp_projection_and_draw_ms": {
-            "mean_ms": 3.5443884767857146,
-            "median_ms": 3.4582420000000003,
-            "p95_ms": 3.9852935999999985,
-            "p99_ms": 4.9819160099999955,
-            "min_ms": 3.076194,
-            "max_ms": 7.074462
+          "rotation_deg": {
+            "mean": 0.005704530404523127,
+            "p95": 0.010200689310466676,
+            "max": 0.013670002405523999
           },
-          "end_to_end_ms": {
-            "mean_ms": 15.307534098214287,
-            "median_ms": 15.2442765,
-            "p95_ms": 16.15674215,
-            "p99_ms": 17.007466139999988,
-            "min_ms": 14.553109,
-            "max_ms": 19.010697
+          "point_projection_px": {
+            "mean": 0.016984745295472132,
+            "p95": 0.03683027182709907,
+            "max": 0.055412835884899696
           },
-          "network_cuda_interval_ms": {
-            "mean_ms": 8.74714332818985,
-            "median_ms": 8.788991928100586,
-            "p95_ms": 9.058355045318603,
-            "p99_ms": 9.160570678710938,
-            "min_ms": 8.286208152770996,
-            "max_ms": 9.267200469970703
-          },
-          "input_preparation_host_wall_ms": {
-            "mean_ms": 1.0003010125,
-            "median_ms": 0.9915565,
-            "p95_ms": 1.2877326,
-            "p99_ms": 1.705204909999999,
-            "min_ms": 0.802104,
-            "max_ms": 2.855051
-          },
-          "process_cpu_seconds": 9.925979665,
-          "process_cpu_percent": 115.29982320730888,
-          "process_peak_rss_mib": 2162.00390625,
-          "measured_pairs": 560,
-          "warmup_pairs": 56,
-          "first_warmup_pair_ms": 444.974564,
-          "hz": 65.32730834267133,
-          "inverse_p95_hz": 61.89366585886871,
-          "fraction_within_33_33_ms": 1.0,
-          "peak_cuda_allocated_mib": 153.708984375,
-          "peak_cuda_reserved_mib": 360.0,
-          "per_category": {
-            "combined_pose_jaw": {
-              "mean_ms": 15.407553475,
-              "median_ms": 15.3333895,
-              "p95_ms": 16.1499563,
-              "p99_ms": 17.2849417,
-              "min_ms": 14.722474,
-              "max_ms": 17.293924
+          "joint_deg": {
+            "pitch": {
+              "mean": 0.0018284781108377501,
+              "p95": 0.005394141538999975,
+              "max": 0.00896803755313158
             },
-            "ecm_motion": {
-              "mean_ms": 15.243572337500002,
-              "median_ms": 15.2059325,
-              "p95_ms": 15.943122749999999,
-              "p99_ms": 16.992529029999986,
-              "min_ms": 14.594127,
+            "yaw": {
+              "mean": 0.0013735387751694361,
+              "p95": 0.003607193473726511,
+              "max": 0.005990075413137674
+            },
+            "jaw_half": {
+              "mean": 0.0009340785868273217,
+              "p95": 0.0026881062076427042,
+              "max": 0.00575784919783473
+            }
+          },
+          "mask_iou": {
+            "mean": 0.9998899112854686,
+            "p95": 1.0,
+            "max": 1.0
+          }
+        }
+      },
+      "performance": {
+        "results": {
+          "fp32": {
+            "predictor_including_preprocess_transfer_export_ms": {
+              "mean_ms": 11.76314562142857,
+              "median_ms": 11.7956455,
+              "p95_ms": 12.15330485,
+              "p99_ms": 12.52232782,
+              "min_ms": 11.218325,
+              "max_ms": 13.205002
+            },
+            "cpp_projection_and_draw_ms": {
+              "mean_ms": 3.5443884767857146,
+              "median_ms": 3.4582420000000003,
+              "p95_ms": 3.9852935999999985,
+              "p99_ms": 4.9819160099999955,
+              "min_ms": 3.076194,
+              "max_ms": 7.074462
+            },
+            "end_to_end_ms": {
+              "mean_ms": 15.307534098214287,
+              "median_ms": 15.2442765,
+              "p95_ms": 16.15674215,
+              "p99_ms": 17.007466139999988,
+              "min_ms": 14.553109,
               "max_ms": 19.010697
             },
-            "lighting": {
-              "mean_ms": 15.3560354,
-              "median_ms": 15.277006,
-              "p95_ms": 16.28913295,
-              "p99_ms": 16.441550409999998,
-              "min_ms": 14.664747,
-              "max_ms": 16.829457
+            "network_cuda_interval_ms": {
+              "mean_ms": 8.74714332818985,
+              "median_ms": 8.788991928100586,
+              "p95_ms": 9.058355045318603,
+              "p99_ms": 9.160570678710938,
+              "min_ms": 8.286208152770996,
+              "max_ms": 9.267200469970703
             },
-            "occlusion": {
-              "mean_ms": 15.296233062499999,
-              "median_ms": 15.266562,
-              "p95_ms": 16.076228,
-              "p99_ms": 16.971249569999994,
-              "min_ms": 14.589295,
-              "max_ms": 17.707464
+            "input_preparation_host_wall_ms": {
+              "mean_ms": 1.0003010125,
+              "median_ms": 0.9915565,
+              "p95_ms": 1.2877326,
+              "p99_ms": 1.705204909999999,
+              "min_ms": 0.802104,
+              "max_ms": 2.855051
             },
-            "pose_motion": {
-              "mean_ms": 15.326897687499999,
-              "median_ms": 15.2211855,
-              "p95_ms": 16.23363395,
-              "p99_ms": 17.18715562999999,
-              "min_ms": 14.553109,
-              "max_ms": 18.496978
-            },
-            "sensor_quality": {
-              "mean_ms": 15.2908451375,
-              "median_ms": 15.299829500000001,
-              "p95_ms": 15.8621836,
-              "p99_ms": 16.856388919999997,
-              "min_ms": 14.624372,
-              "max_ms": 17.249929
-            },
-            "stereo_rig": {
-              "mean_ms": 15.2316015875,
-              "median_ms": 15.219315,
-              "p95_ms": 15.76877305,
-              "p99_ms": 16.40375504,
-              "min_ms": 14.655559,
-              "max_ms": 16.820578
+            "process_cpu_seconds": 9.925979665,
+            "process_cpu_percent": 115.29982320730888,
+            "process_peak_rss_mib": 2162.00390625,
+            "measured_pairs": 560,
+            "warmup_pairs": 56,
+            "first_warmup_pair_ms": 444.974564,
+            "hz": 65.32730834267133,
+            "inverse_p95_hz": 61.89366585886871,
+            "fraction_within_33_33_ms": 1.0,
+            "peak_cuda_allocated_mib": 153.708984375,
+            "peak_cuda_reserved_mib": 360.0,
+            "per_category": {
+              "combined_pose_jaw": {
+                "mean_ms": 15.407553475,
+                "median_ms": 15.3333895,
+                "p95_ms": 16.1499563,
+                "p99_ms": 17.2849417,
+                "min_ms": 14.722474,
+                "max_ms": 17.293924
+              },
+              "ecm_motion": {
+                "mean_ms": 15.243572337500002,
+                "median_ms": 15.2059325,
+                "p95_ms": 15.943122749999999,
+                "p99_ms": 16.992529029999986,
+                "min_ms": 14.594127,
+                "max_ms": 19.010697
+              },
+              "lighting": {
+                "mean_ms": 15.3560354,
+                "median_ms": 15.277006,
+                "p95_ms": 16.28913295,
+                "p99_ms": 16.441550409999998,
+                "min_ms": 14.664747,
+                "max_ms": 16.829457
+              },
+              "occlusion": {
+                "mean_ms": 15.296233062499999,
+                "median_ms": 15.266562,
+                "p95_ms": 16.076228,
+                "p99_ms": 16.971249569999994,
+                "min_ms": 14.589295,
+                "max_ms": 17.707464
+              },
+              "pose_motion": {
+                "mean_ms": 15.326897687499999,
+                "median_ms": 15.2211855,
+                "p95_ms": 16.23363395,
+                "p99_ms": 17.18715562999999,
+                "min_ms": 14.553109,
+                "max_ms": 18.496978
+              },
+              "sensor_quality": {
+                "mean_ms": 15.2908451375,
+                "median_ms": 15.299829500000001,
+                "p95_ms": 15.8621836,
+                "p99_ms": 16.856388919999997,
+                "min_ms": 14.624372,
+                "max_ms": 17.249929
+              },
+              "stereo_rig": {
+                "mean_ms": 15.2316015875,
+                "median_ms": 15.219315,
+                "p95_ms": 15.76877305,
+                "p99_ms": 16.40375504,
+                "min_ms": 14.655559,
+                "max_ms": 16.820578
+              }
             }
           }
-        }
-      },
-      "actual_execution": "optimized_graph",
-      "runtime": {
-        "python": "3.11.18",
-        "torch": "2.9.1+cu128",
-        "cuda": "12.8",
-        "cpu_threads": 4,
-        "cudnn_benchmark": false,
-        "matmul_tf32": false,
-        "cudnn_tf32": true
-      },
-      "gpu": "NVIDIA GeForce RTX 4060 Laptop GPU",
-      "native_library_sha256": "fb0089a61e9fd47a5dcc223e3cdfc5e3d5f860c2cfb5aaebf4c0a34a812322fb",
-      "overlay_library_sha256": "447d72c6ada6c190636dbd698facbf3548d3ab4a666d53d66094a86487755bae"
-    }
-  },
-  "gelu": {
-    "build": {
-      "checkpoint_sha256": "639fc8c7e56263f4ab889aa53cc5132e3610eea4c8b2d8b0db671c41d8a30325",
-      "engine_sha256": "67bc69390df6a3346e729fcd283a66459fae2cf908a750e18d0a57ea83327def",
-      "build_seconds": 109.24682025699985,
-      "builder_optimization_level": 5,
-      "activation_policy": "conv_gelu",
-      "fp16_layers": [
-        "/backbone/stem_0/Conv",
-        "/backbone/stages_0/blocks/blocks.0/conv_dw/Conv",
-        "/backbone/stages_0/blocks/blocks.0/mlp/fc1/Conv",
-        "/backbone/stages_0/blocks/blocks.0/mlp/act/Div",
-        "/backbone/stages_0/blocks/blocks.0/mlp/act/Erf",
-        "/backbone/stages_0/blocks/blocks.0/mlp/act/Add",
-        "/backbone/stages_0/blocks/blocks.0/mlp/act/Mul",
-        "/backbone/stages_0/blocks/blocks.0/mlp/act/Mul_1",
-        "/backbone/stages_0/blocks/blocks.0/mlp/fc2/Conv",
-        "/backbone/stages_0/blocks/blocks.1/conv_dw/Conv",
-        "/backbone/stages_0/blocks/blocks.1/mlp/fc1/Conv",
-        "/backbone/stages_0/blocks/blocks.1/mlp/act/Div",
-        "/backbone/stages_0/blocks/blocks.1/mlp/act/Erf",
-        "/backbone/stages_0/blocks/blocks.1/mlp/act/Add",
-        "/backbone/stages_0/blocks/blocks.1/mlp/act/Mul",
-        "/backbone/stages_0/blocks/blocks.1/mlp/act/Mul_1",
-        "/backbone/stages_0/blocks/blocks.1/mlp/fc2/Conv",
-        "/backbone/stages_1/downsample/downsample.1/Conv",
-        "/backbone/stages_1/blocks/blocks.0/conv_dw/Conv",
-        "/backbone/stages_1/blocks/blocks.0/mlp/fc1/Conv",
-        "/backbone/stages_1/blocks/blocks.0/mlp/act/Div",
-        "/backbone/stages_1/blocks/blocks.0/mlp/act/Erf",
-        "/backbone/stages_1/blocks/blocks.0/mlp/act/Add",
-        "/backbone/stages_1/blocks/blocks.0/mlp/act/Mul",
-        "/backbone/stages_1/blocks/blocks.0/mlp/act/Mul_1",
-        "/backbone/stages_1/blocks/blocks.0/mlp/fc2/Conv",
-        "/backbone/stages_1/blocks/blocks.1/conv_dw/Conv",
-        "/backbone/stages_1/blocks/blocks.1/mlp/fc1/Conv",
-        "/backbone/stages_1/blocks/blocks.1/mlp/act/Div",
-        "/backbone/stages_1/blocks/blocks.1/mlp/act/Erf",
-        "/backbone/stages_1/blocks/blocks.1/mlp/act/Add",
-        "/backbone/stages_1/blocks/blocks.1/mlp/act/Mul",
-        "/backbone/stages_1/blocks/blocks.1/mlp/act/Mul_1",
-        "/backbone/stages_1/blocks/blocks.1/mlp/fc2/Conv",
-        "/backbone/stages_2/downsample/downsample.1/Conv",
-        "/backbone/stages_2/blocks/blocks.0/conv_dw/Conv",
-        "/backbone/stages_2/blocks/blocks.0/mlp/fc1/Conv",
-        "/backbone/stages_2/blocks/blocks.0/mlp/act/Div",
-        "/backbone/stages_2/blocks/blocks.0/mlp/act/Erf",
-        "/backbone/stages_2/blocks/blocks.0/mlp/act/Add",
-        "/backbone/stages_2/blocks/blocks.0/mlp/act/Mul",
-        "/backbone/stages_2/blocks/blocks.0/mlp/act/Mul_1",
-        "/backbone/stages_2/blocks/blocks.0/mlp/fc2/Conv",
-        "/backbone/stages_2/blocks/blocks.1/conv_dw/Conv",
-        "/backbone/stages_2/blocks/blocks.1/mlp/fc1/Conv",
-        "/backbone/stages_2/blocks/blocks.1/mlp/act/Div",
-        "/backbone/stages_2/blocks/blocks.1/mlp/act/Erf",
-        "/backbone/stages_2/blocks/blocks.1/mlp/act/Add",
-        "/backbone/stages_2/blocks/blocks.1/mlp/act/Mul",
-        "/backbone/stages_2/blocks/blocks.1/mlp/act/Mul_1",
-        "/backbone/stages_2/blocks/blocks.1/mlp/fc2/Conv",
-        "/backbone/stages_2/blocks/blocks.2/conv_dw/Conv",
-        "/backbone/stages_2/blocks/blocks.2/mlp/fc1/Conv",
-        "/backbone/stages_2/blocks/blocks.2/mlp/act/Div",
-        "/backbone/stages_2/blocks/blocks.2/mlp/act/Erf",
-        "/backbone/stages_2/blocks/blocks.2/mlp/act/Add",
-        "/backbone/stages_2/blocks/blocks.2/mlp/act/Mul",
-        "/backbone/stages_2/blocks/blocks.2/mlp/act/Mul_1",
-        "/backbone/stages_2/blocks/blocks.2/mlp/fc2/Conv",
-        "/backbone/stages_2/blocks/blocks.3/conv_dw/Conv",
-        "/backbone/stages_2/blocks/blocks.3/mlp/fc1/Conv",
-        "/backbone/stages_2/blocks/blocks.3/mlp/act/Div",
-        "/backbone/stages_2/blocks/blocks.3/mlp/act/Erf",
-        "/backbone/stages_2/blocks/blocks.3/mlp/act/Add",
-        "/backbone/stages_2/blocks/blocks.3/mlp/act/Mul",
-        "/backbone/stages_2/blocks/blocks.3/mlp/act/Mul_1",
-        "/backbone/stages_2/blocks/blocks.3/mlp/fc2/Conv",
-        "/backbone/stages_2/blocks/blocks.4/conv_dw/Conv",
-        "/backbone/stages_2/blocks/blocks.4/mlp/fc1/Conv",
-        "/backbone/stages_2/blocks/blocks.4/mlp/act/Div",
-        "/backbone/stages_2/blocks/blocks.4/mlp/act/Erf",
-        "/backbone/stages_2/blocks/blocks.4/mlp/act/Add",
-        "/backbone/stages_2/blocks/blocks.4/mlp/act/Mul",
-        "/backbone/stages_2/blocks/blocks.4/mlp/act/Mul_1",
-        "/backbone/stages_2/blocks/blocks.4/mlp/fc2/Conv",
-        "/backbone/stages_2/blocks/blocks.5/conv_dw/Conv",
-        "/backbone/stages_2/blocks/blocks.5/mlp/fc1/Conv",
-        "/backbone/stages_2/blocks/blocks.5/mlp/act/Div",
-        "/backbone/stages_2/blocks/blocks.5/mlp/act/Erf",
-        "/backbone/stages_2/blocks/blocks.5/mlp/act/Add",
-        "/backbone/stages_2/blocks/blocks.5/mlp/act/Mul",
-        "/backbone/stages_2/blocks/blocks.5/mlp/act/Mul_1",
-        "/backbone/stages_2/blocks/blocks.5/mlp/fc2/Conv",
-        "/backbone/stages_2/blocks/blocks.6/conv_dw/Conv",
-        "/backbone/stages_2/blocks/blocks.6/mlp/fc1/Conv",
-        "/backbone/stages_2/blocks/blocks.6/mlp/act/Div",
-        "/backbone/stages_2/blocks/blocks.6/mlp/act/Erf",
-        "/backbone/stages_2/blocks/blocks.6/mlp/act/Add",
-        "/backbone/stages_2/blocks/blocks.6/mlp/act/Mul",
-        "/backbone/stages_2/blocks/blocks.6/mlp/act/Mul_1",
-        "/backbone/stages_2/blocks/blocks.6/mlp/fc2/Conv",
-        "/backbone/stages_2/blocks/blocks.7/conv_dw/Conv",
-        "/backbone/stages_2/blocks/blocks.7/mlp/fc1/Conv",
-        "/backbone/stages_2/blocks/blocks.7/mlp/act/Div",
-        "/backbone/stages_2/blocks/blocks.7/mlp/act/Erf",
-        "/backbone/stages_2/blocks/blocks.7/mlp/act/Add",
-        "/backbone/stages_2/blocks/blocks.7/mlp/act/Mul",
-        "/backbone/stages_2/blocks/blocks.7/mlp/act/Mul_1",
-        "/backbone/stages_2/blocks/blocks.7/mlp/fc2/Conv",
-        "/backbone/stages_3/downsample/downsample.1/Conv",
-        "/backbone/stages_3/blocks/blocks.0/conv_dw/Conv",
-        "/backbone/stages_3/blocks/blocks.0/mlp/fc1/Conv",
-        "/backbone/stages_3/blocks/blocks.0/mlp/act/Div",
-        "/backbone/stages_3/blocks/blocks.0/mlp/act/Erf",
-        "/backbone/stages_3/blocks/blocks.0/mlp/act/Add",
-        "/backbone/stages_3/blocks/blocks.0/mlp/act/Mul",
-        "/backbone/stages_3/blocks/blocks.0/mlp/act/Mul_1",
-        "/backbone/stages_3/blocks/blocks.0/mlp/fc2/Conv",
-        "/backbone/stages_3/blocks/blocks.1/conv_dw/Conv",
-        "/backbone/stages_3/blocks/blocks.1/mlp/fc1/Conv",
-        "/backbone/stages_3/blocks/blocks.1/mlp/act/Div",
-        "/backbone/stages_3/blocks/blocks.1/mlp/act/Erf",
-        "/backbone/stages_3/blocks/blocks.1/mlp/act/Add",
-        "/backbone/stages_3/blocks/blocks.1/mlp/act/Mul",
-        "/backbone/stages_3/blocks/blocks.1/mlp/act/Mul_1",
-        "/backbone/stages_3/blocks/blocks.1/mlp/fc2/Conv",
-        "/laterals.3/Conv",
-        "/laterals.2/Conv",
-        "/laterals.1/Conv",
-        "/laterals.0/Conv",
-        "/spatial/spatial.0/Conv",
-        "/mask_head/Conv",
-        "/heatmap_head/Conv"
-      ],
-      "activation_fp16_layers": [
-        "/backbone/stages_0/blocks/blocks.0/mlp/act/Div",
-        "/backbone/stages_0/blocks/blocks.0/mlp/act/Erf",
-        "/backbone/stages_0/blocks/blocks.0/mlp/act/Add",
-        "/backbone/stages_0/blocks/blocks.0/mlp/act/Mul",
-        "/backbone/stages_0/blocks/blocks.0/mlp/act/Mul_1",
-        "/backbone/stages_0/blocks/blocks.1/mlp/act/Div",
-        "/backbone/stages_0/blocks/blocks.1/mlp/act/Erf",
-        "/backbone/stages_0/blocks/blocks.1/mlp/act/Add",
-        "/backbone/stages_0/blocks/blocks.1/mlp/act/Mul",
-        "/backbone/stages_0/blocks/blocks.1/mlp/act/Mul_1",
-        "/backbone/stages_1/blocks/blocks.0/mlp/act/Div",
-        "/backbone/stages_1/blocks/blocks.0/mlp/act/Erf",
-        "/backbone/stages_1/blocks/blocks.0/mlp/act/Add",
-        "/backbone/stages_1/blocks/blocks.0/mlp/act/Mul",
-        "/backbone/stages_1/blocks/blocks.0/mlp/act/Mul_1",
-        "/backbone/stages_1/blocks/blocks.1/mlp/act/Div",
-        "/backbone/stages_1/blocks/blocks.1/mlp/act/Erf",
-        "/backbone/stages_1/blocks/blocks.1/mlp/act/Add",
-        "/backbone/stages_1/blocks/blocks.1/mlp/act/Mul",
-        "/backbone/stages_1/blocks/blocks.1/mlp/act/Mul_1",
-        "/backbone/stages_2/blocks/blocks.0/mlp/act/Div",
-        "/backbone/stages_2/blocks/blocks.0/mlp/act/Erf",
-        "/backbone/stages_2/blocks/blocks.0/mlp/act/Add",
-        "/backbone/stages_2/blocks/blocks.0/mlp/act/Mul",
-        "/backbone/stages_2/blocks/blocks.0/mlp/act/Mul_1",
-        "/backbone/stages_2/blocks/blocks.1/mlp/act/Div",
-        "/backbone/stages_2/blocks/blocks.1/mlp/act/Erf",
-        "/backbone/stages_2/blocks/blocks.1/mlp/act/Add",
-        "/backbone/stages_2/blocks/blocks.1/mlp/act/Mul",
-        "/backbone/stages_2/blocks/blocks.1/mlp/act/Mul_1",
-        "/backbone/stages_2/blocks/blocks.2/mlp/act/Div",
-        "/backbone/stages_2/blocks/blocks.2/mlp/act/Erf",
-        "/backbone/stages_2/blocks/blocks.2/mlp/act/Add",
-        "/backbone/stages_2/blocks/blocks.2/mlp/act/Mul",
-        "/backbone/stages_2/blocks/blocks.2/mlp/act/Mul_1",
-        "/backbone/stages_2/blocks/blocks.3/mlp/act/Div",
-        "/backbone/stages_2/blocks/blocks.3/mlp/act/Erf",
-        "/backbone/stages_2/blocks/blocks.3/mlp/act/Add",
-        "/backbone/stages_2/blocks/blocks.3/mlp/act/Mul",
-        "/backbone/stages_2/blocks/blocks.3/mlp/act/Mul_1",
-        "/backbone/stages_2/blocks/blocks.4/mlp/act/Div",
-        "/backbone/stages_2/blocks/blocks.4/mlp/act/Erf",
-        "/backbone/stages_2/blocks/blocks.4/mlp/act/Add",
-        "/backbone/stages_2/blocks/blocks.4/mlp/act/Mul",
-        "/backbone/stages_2/blocks/blocks.4/mlp/act/Mul_1",
-        "/backbone/stages_2/blocks/blocks.5/mlp/act/Div",
-        "/backbone/stages_2/blocks/blocks.5/mlp/act/Erf",
-        "/backbone/stages_2/blocks/blocks.5/mlp/act/Add",
-        "/backbone/stages_2/blocks/blocks.5/mlp/act/Mul",
-        "/backbone/stages_2/blocks/blocks.5/mlp/act/Mul_1",
-        "/backbone/stages_2/blocks/blocks.6/mlp/act/Div",
-        "/backbone/stages_2/blocks/blocks.6/mlp/act/Erf",
-        "/backbone/stages_2/blocks/blocks.6/mlp/act/Add",
-        "/backbone/stages_2/blocks/blocks.6/mlp/act/Mul",
-        "/backbone/stages_2/blocks/blocks.6/mlp/act/Mul_1",
-        "/backbone/stages_2/blocks/blocks.7/mlp/act/Div",
-        "/backbone/stages_2/blocks/blocks.7/mlp/act/Erf",
-        "/backbone/stages_2/blocks/blocks.7/mlp/act/Add",
-        "/backbone/stages_2/blocks/blocks.7/mlp/act/Mul",
-        "/backbone/stages_2/blocks/blocks.7/mlp/act/Mul_1",
-        "/backbone/stages_3/blocks/blocks.0/mlp/act/Div",
-        "/backbone/stages_3/blocks/blocks.0/mlp/act/Erf",
-        "/backbone/stages_3/blocks/blocks.0/mlp/act/Add",
-        "/backbone/stages_3/blocks/blocks.0/mlp/act/Mul",
-        "/backbone/stages_3/blocks/blocks.0/mlp/act/Mul_1",
-        "/backbone/stages_3/blocks/blocks.1/mlp/act/Div",
-        "/backbone/stages_3/blocks/blocks.1/mlp/act/Erf",
-        "/backbone/stages_3/blocks/blocks.1/mlp/act/Add",
-        "/backbone/stages_3/blocks/blocks.1/mlp/act/Mul",
-        "/backbone/stages_3/blocks/blocks.1/mlp/act/Mul_1"
-      ],
-      "tensorrt": "10.13.3.9",
-      "source_sha256": "80a24e6de6f9a7f204fe539f263630fc28d54e25966fb0c9b7261706ac878717"
-    },
-    "accuracy": {
-      "passed_numerical_tolerances": true,
-      "summary": {
-        "C_mm": {
-          "mean": 0.0022052417602755896,
-          "p95": 0.004220863858393706,
-          "max": 0.005204805827122589
         },
-        "tip_mm": {
-          "mean": 0.002786072197982819,
-          "p95": 0.004980166270278616,
-          "max": 0.007526920757672871
+        "actual_execution": "optimized_graph",
+        "runtime": {
+          "python": "3.11.18",
+          "torch": "2.9.1+cu128",
+          "cuda": "12.8",
+          "cpu_threads": 4,
+          "cudnn_benchmark": false,
+          "matmul_tf32": false,
+          "cudnn_tf32": true
         },
-        "hinge_mm": {
-          "mean": 0.002433891341068794,
-          "p95": 0.004376748839222174,
-          "max": 0.005992690356963519
-        },
-        "rotation_deg": {
-          "mean": 0.005668518539797452,
-          "p95": 0.011841563829921211,
-          "max": 0.017788312668784646
-        },
-        "point_projection_px": {
-          "mean": 0.0167510194506211,
-          "p95": 0.03457531301879032,
-          "max": 0.04763586210685767
-        },
-        "joint_deg": {
-          "pitch": {
-            "mean": 0.0017468207792522403,
-            "p95": 0.004579641507007182,
-            "max": 0.0074585662223398685
-          },
-          "yaw": {
-            "mean": 0.0014406819644656415,
-            "p95": 0.003908575512468815,
-            "max": 0.006539905909448862
-          },
-          "jaw_half": {
-            "mean": 0.0008109581908684049,
-            "p95": 0.0026306899380870163,
-            "max": 0.006095943506807089
-          }
-        },
-        "mask_iou": {
-          "mean": 0.9998590467231614,
-          "p95": 1.0,
-          "max": 1.0
-        }
+        "gpu": "NVIDIA GeForce RTX 4060 Laptop GPU",
+        "native_library_sha256": "fb0089a61e9fd47a5dcc223e3cdfc5e3d5f860c2cfb5aaebf4c0a34a812322fb",
+        "overlay_library_sha256": "447d72c6ada6c190636dbd698facbf3548d3ab4a666d53d66094a86487755bae"
       }
     },
-    "performance": {
-      "results": {
-        "fp32": {
-          "predictor_including_preprocess_transfer_export_ms": {
-            "mean_ms": 12.115947312500001,
-            "median_ms": 12.1300645,
-            "p95_ms": 12.521612949999998,
-            "p99_ms": 12.72612535,
-            "min_ms": 11.576118,
-            "max_ms": 12.979567
+    "gelu": {
+      "build": {
+        "checkpoint_sha256": "639fc8c7e56263f4ab889aa53cc5132e3610eea4c8b2d8b0db671c41d8a30325",
+        "engine_sha256": "67bc69390df6a3346e729fcd283a66459fae2cf908a750e18d0a57ea83327def",
+        "build_seconds": 109.24682025699985,
+        "builder_optimization_level": 5,
+        "activation_policy": "conv_gelu",
+        "fp16_layers": [
+          "/backbone/stem_0/Conv",
+          "/backbone/stages_0/blocks/blocks.0/conv_dw/Conv",
+          "/backbone/stages_0/blocks/blocks.0/mlp/fc1/Conv",
+          "/backbone/stages_0/blocks/blocks.0/mlp/act/Div",
+          "/backbone/stages_0/blocks/blocks.0/mlp/act/Erf",
+          "/backbone/stages_0/blocks/blocks.0/mlp/act/Add",
+          "/backbone/stages_0/blocks/blocks.0/mlp/act/Mul",
+          "/backbone/stages_0/blocks/blocks.0/mlp/act/Mul_1",
+          "/backbone/stages_0/blocks/blocks.0/mlp/fc2/Conv",
+          "/backbone/stages_0/blocks/blocks.1/conv_dw/Conv",
+          "/backbone/stages_0/blocks/blocks.1/mlp/fc1/Conv",
+          "/backbone/stages_0/blocks/blocks.1/mlp/act/Div",
+          "/backbone/stages_0/blocks/blocks.1/mlp/act/Erf",
+          "/backbone/stages_0/blocks/blocks.1/mlp/act/Add",
+          "/backbone/stages_0/blocks/blocks.1/mlp/act/Mul",
+          "/backbone/stages_0/blocks/blocks.1/mlp/act/Mul_1",
+          "/backbone/stages_0/blocks/blocks.1/mlp/fc2/Conv",
+          "/backbone/stages_1/downsample/downsample.1/Conv",
+          "/backbone/stages_1/blocks/blocks.0/conv_dw/Conv",
+          "/backbone/stages_1/blocks/blocks.0/mlp/fc1/Conv",
+          "/backbone/stages_1/blocks/blocks.0/mlp/act/Div",
+          "/backbone/stages_1/blocks/blocks.0/mlp/act/Erf",
+          "/backbone/stages_1/blocks/blocks.0/mlp/act/Add",
+          "/backbone/stages_1/blocks/blocks.0/mlp/act/Mul",
+          "/backbone/stages_1/blocks/blocks.0/mlp/act/Mul_1",
+          "/backbone/stages_1/blocks/blocks.0/mlp/fc2/Conv",
+          "/backbone/stages_1/blocks/blocks.1/conv_dw/Conv",
+          "/backbone/stages_1/blocks/blocks.1/mlp/fc1/Conv",
+          "/backbone/stages_1/blocks/blocks.1/mlp/act/Div",
+          "/backbone/stages_1/blocks/blocks.1/mlp/act/Erf",
+          "/backbone/stages_1/blocks/blocks.1/mlp/act/Add",
+          "/backbone/stages_1/blocks/blocks.1/mlp/act/Mul",
+          "/backbone/stages_1/blocks/blocks.1/mlp/act/Mul_1",
+          "/backbone/stages_1/blocks/blocks.1/mlp/fc2/Conv",
+          "/backbone/stages_2/downsample/downsample.1/Conv",
+          "/backbone/stages_2/blocks/blocks.0/conv_dw/Conv",
+          "/backbone/stages_2/blocks/blocks.0/mlp/fc1/Conv",
+          "/backbone/stages_2/blocks/blocks.0/mlp/act/Div",
+          "/backbone/stages_2/blocks/blocks.0/mlp/act/Erf",
+          "/backbone/stages_2/blocks/blocks.0/mlp/act/Add",
+          "/backbone/stages_2/blocks/blocks.0/mlp/act/Mul",
+          "/backbone/stages_2/blocks/blocks.0/mlp/act/Mul_1",
+          "/backbone/stages_2/blocks/blocks.0/mlp/fc2/Conv",
+          "/backbone/stages_2/blocks/blocks.1/conv_dw/Conv",
+          "/backbone/stages_2/blocks/blocks.1/mlp/fc1/Conv",
+          "/backbone/stages_2/blocks/blocks.1/mlp/act/Div",
+          "/backbone/stages_2/blocks/blocks.1/mlp/act/Erf",
+          "/backbone/stages_2/blocks/blocks.1/mlp/act/Add",
+          "/backbone/stages_2/blocks/blocks.1/mlp/act/Mul",
+          "/backbone/stages_2/blocks/blocks.1/mlp/act/Mul_1",
+          "/backbone/stages_2/blocks/blocks.1/mlp/fc2/Conv",
+          "/backbone/stages_2/blocks/blocks.2/conv_dw/Conv",
+          "/backbone/stages_2/blocks/blocks.2/mlp/fc1/Conv",
+          "/backbone/stages_2/blocks/blocks.2/mlp/act/Div",
+          "/backbone/stages_2/blocks/blocks.2/mlp/act/Erf",
+          "/backbone/stages_2/blocks/blocks.2/mlp/act/Add",
+          "/backbone/stages_2/blocks/blocks.2/mlp/act/Mul",
+          "/backbone/stages_2/blocks/blocks.2/mlp/act/Mul_1",
+          "/backbone/stages_2/blocks/blocks.2/mlp/fc2/Conv",
+          "/backbone/stages_2/blocks/blocks.3/conv_dw/Conv",
+          "/backbone/stages_2/blocks/blocks.3/mlp/fc1/Conv",
+          "/backbone/stages_2/blocks/blocks.3/mlp/act/Div",
+          "/backbone/stages_2/blocks/blocks.3/mlp/act/Erf",
+          "/backbone/stages_2/blocks/blocks.3/mlp/act/Add",
+          "/backbone/stages_2/blocks/blocks.3/mlp/act/Mul",
+          "/backbone/stages_2/blocks/blocks.3/mlp/act/Mul_1",
+          "/backbone/stages_2/blocks/blocks.3/mlp/fc2/Conv",
+          "/backbone/stages_2/blocks/blocks.4/conv_dw/Conv",
+          "/backbone/stages_2/blocks/blocks.4/mlp/fc1/Conv",
+          "/backbone/stages_2/blocks/blocks.4/mlp/act/Div",
+          "/backbone/stages_2/blocks/blocks.4/mlp/act/Erf",
+          "/backbone/stages_2/blocks/blocks.4/mlp/act/Add",
+          "/backbone/stages_2/blocks/blocks.4/mlp/act/Mul",
+          "/backbone/stages_2/blocks/blocks.4/mlp/act/Mul_1",
+          "/backbone/stages_2/blocks/blocks.4/mlp/fc2/Conv",
+          "/backbone/stages_2/blocks/blocks.5/conv_dw/Conv",
+          "/backbone/stages_2/blocks/blocks.5/mlp/fc1/Conv",
+          "/backbone/stages_2/blocks/blocks.5/mlp/act/Div",
+          "/backbone/stages_2/blocks/blocks.5/mlp/act/Erf",
+          "/backbone/stages_2/blocks/blocks.5/mlp/act/Add",
+          "/backbone/stages_2/blocks/blocks.5/mlp/act/Mul",
+          "/backbone/stages_2/blocks/blocks.5/mlp/act/Mul_1",
+          "/backbone/stages_2/blocks/blocks.5/mlp/fc2/Conv",
+          "/backbone/stages_2/blocks/blocks.6/conv_dw/Conv",
+          "/backbone/stages_2/blocks/blocks.6/mlp/fc1/Conv",
+          "/backbone/stages_2/blocks/blocks.6/mlp/act/Div",
+          "/backbone/stages_2/blocks/blocks.6/mlp/act/Erf",
+          "/backbone/stages_2/blocks/blocks.6/mlp/act/Add",
+          "/backbone/stages_2/blocks/blocks.6/mlp/act/Mul",
+          "/backbone/stages_2/blocks/blocks.6/mlp/act/Mul_1",
+          "/backbone/stages_2/blocks/blocks.6/mlp/fc2/Conv",
+          "/backbone/stages_2/blocks/blocks.7/conv_dw/Conv",
+          "/backbone/stages_2/blocks/blocks.7/mlp/fc1/Conv",
+          "/backbone/stages_2/blocks/blocks.7/mlp/act/Div",
+          "/backbone/stages_2/blocks/blocks.7/mlp/act/Erf",
+          "/backbone/stages_2/blocks/blocks.7/mlp/act/Add",
+          "/backbone/stages_2/blocks/blocks.7/mlp/act/Mul",
+          "/backbone/stages_2/blocks/blocks.7/mlp/act/Mul_1",
+          "/backbone/stages_2/blocks/blocks.7/mlp/fc2/Conv",
+          "/backbone/stages_3/downsample/downsample.1/Conv",
+          "/backbone/stages_3/blocks/blocks.0/conv_dw/Conv",
+          "/backbone/stages_3/blocks/blocks.0/mlp/fc1/Conv",
+          "/backbone/stages_3/blocks/blocks.0/mlp/act/Div",
+          "/backbone/stages_3/blocks/blocks.0/mlp/act/Erf",
+          "/backbone/stages_3/blocks/blocks.0/mlp/act/Add",
+          "/backbone/stages_3/blocks/blocks.0/mlp/act/Mul",
+          "/backbone/stages_3/blocks/blocks.0/mlp/act/Mul_1",
+          "/backbone/stages_3/blocks/blocks.0/mlp/fc2/Conv",
+          "/backbone/stages_3/blocks/blocks.1/conv_dw/Conv",
+          "/backbone/stages_3/blocks/blocks.1/mlp/fc1/Conv",
+          "/backbone/stages_3/blocks/blocks.1/mlp/act/Div",
+          "/backbone/stages_3/blocks/blocks.1/mlp/act/Erf",
+          "/backbone/stages_3/blocks/blocks.1/mlp/act/Add",
+          "/backbone/stages_3/blocks/blocks.1/mlp/act/Mul",
+          "/backbone/stages_3/blocks/blocks.1/mlp/act/Mul_1",
+          "/backbone/stages_3/blocks/blocks.1/mlp/fc2/Conv",
+          "/laterals.3/Conv",
+          "/laterals.2/Conv",
+          "/laterals.1/Conv",
+          "/laterals.0/Conv",
+          "/spatial/spatial.0/Conv",
+          "/mask_head/Conv",
+          "/heatmap_head/Conv"
+        ],
+        "activation_fp16_layers": [
+          "/backbone/stages_0/blocks/blocks.0/mlp/act/Div",
+          "/backbone/stages_0/blocks/blocks.0/mlp/act/Erf",
+          "/backbone/stages_0/blocks/blocks.0/mlp/act/Add",
+          "/backbone/stages_0/blocks/blocks.0/mlp/act/Mul",
+          "/backbone/stages_0/blocks/blocks.0/mlp/act/Mul_1",
+          "/backbone/stages_0/blocks/blocks.1/mlp/act/Div",
+          "/backbone/stages_0/blocks/blocks.1/mlp/act/Erf",
+          "/backbone/stages_0/blocks/blocks.1/mlp/act/Add",
+          "/backbone/stages_0/blocks/blocks.1/mlp/act/Mul",
+          "/backbone/stages_0/blocks/blocks.1/mlp/act/Mul_1",
+          "/backbone/stages_1/blocks/blocks.0/mlp/act/Div",
+          "/backbone/stages_1/blocks/blocks.0/mlp/act/Erf",
+          "/backbone/stages_1/blocks/blocks.0/mlp/act/Add",
+          "/backbone/stages_1/blocks/blocks.0/mlp/act/Mul",
+          "/backbone/stages_1/blocks/blocks.0/mlp/act/Mul_1",
+          "/backbone/stages_1/blocks/blocks.1/mlp/act/Div",
+          "/backbone/stages_1/blocks/blocks.1/mlp/act/Erf",
+          "/backbone/stages_1/blocks/blocks.1/mlp/act/Add",
+          "/backbone/stages_1/blocks/blocks.1/mlp/act/Mul",
+          "/backbone/stages_1/blocks/blocks.1/mlp/act/Mul_1",
+          "/backbone/stages_2/blocks/blocks.0/mlp/act/Div",
+          "/backbone/stages_2/blocks/blocks.0/mlp/act/Erf",
+          "/backbone/stages_2/blocks/blocks.0/mlp/act/Add",
+          "/backbone/stages_2/blocks/blocks.0/mlp/act/Mul",
+          "/backbone/stages_2/blocks/blocks.0/mlp/act/Mul_1",
+          "/backbone/stages_2/blocks/blocks.1/mlp/act/Div",
+          "/backbone/stages_2/blocks/blocks.1/mlp/act/Erf",
+          "/backbone/stages_2/blocks/blocks.1/mlp/act/Add",
+          "/backbone/stages_2/blocks/blocks.1/mlp/act/Mul",
+          "/backbone/stages_2/blocks/blocks.1/mlp/act/Mul_1",
+          "/backbone/stages_2/blocks/blocks.2/mlp/act/Div",
+          "/backbone/stages_2/blocks/blocks.2/mlp/act/Erf",
+          "/backbone/stages_2/blocks/blocks.2/mlp/act/Add",
+          "/backbone/stages_2/blocks/blocks.2/mlp/act/Mul",
+          "/backbone/stages_2/blocks/blocks.2/mlp/act/Mul_1",
+          "/backbone/stages_2/blocks/blocks.3/mlp/act/Div",
+          "/backbone/stages_2/blocks/blocks.3/mlp/act/Erf",
+          "/backbone/stages_2/blocks/blocks.3/mlp/act/Add",
+          "/backbone/stages_2/blocks/blocks.3/mlp/act/Mul",
+          "/backbone/stages_2/blocks/blocks.3/mlp/act/Mul_1",
+          "/backbone/stages_2/blocks/blocks.4/mlp/act/Div",
+          "/backbone/stages_2/blocks/blocks.4/mlp/act/Erf",
+          "/backbone/stages_2/blocks/blocks.4/mlp/act/Add",
+          "/backbone/stages_2/blocks/blocks.4/mlp/act/Mul",
+          "/backbone/stages_2/blocks/blocks.4/mlp/act/Mul_1",
+          "/backbone/stages_2/blocks/blocks.5/mlp/act/Div",
+          "/backbone/stages_2/blocks/blocks.5/mlp/act/Erf",
+          "/backbone/stages_2/blocks/blocks.5/mlp/act/Add",
+          "/backbone/stages_2/blocks/blocks.5/mlp/act/Mul",
+          "/backbone/stages_2/blocks/blocks.5/mlp/act/Mul_1",
+          "/backbone/stages_2/blocks/blocks.6/mlp/act/Div",
+          "/backbone/stages_2/blocks/blocks.6/mlp/act/Erf",
+          "/backbone/stages_2/blocks/blocks.6/mlp/act/Add",
+          "/backbone/stages_2/blocks/blocks.6/mlp/act/Mul",
+          "/backbone/stages_2/blocks/blocks.6/mlp/act/Mul_1",
+          "/backbone/stages_2/blocks/blocks.7/mlp/act/Div",
+          "/backbone/stages_2/blocks/blocks.7/mlp/act/Erf",
+          "/backbone/stages_2/blocks/blocks.7/mlp/act/Add",
+          "/backbone/stages_2/blocks/blocks.7/mlp/act/Mul",
+          "/backbone/stages_2/blocks/blocks.7/mlp/act/Mul_1",
+          "/backbone/stages_3/blocks/blocks.0/mlp/act/Div",
+          "/backbone/stages_3/blocks/blocks.0/mlp/act/Erf",
+          "/backbone/stages_3/blocks/blocks.0/mlp/act/Add",
+          "/backbone/stages_3/blocks/blocks.0/mlp/act/Mul",
+          "/backbone/stages_3/blocks/blocks.0/mlp/act/Mul_1",
+          "/backbone/stages_3/blocks/blocks.1/mlp/act/Div",
+          "/backbone/stages_3/blocks/blocks.1/mlp/act/Erf",
+          "/backbone/stages_3/blocks/blocks.1/mlp/act/Add",
+          "/backbone/stages_3/blocks/blocks.1/mlp/act/Mul",
+          "/backbone/stages_3/blocks/blocks.1/mlp/act/Mul_1"
+        ],
+        "tensorrt": "10.13.3.9",
+        "source_sha256": "80a24e6de6f9a7f204fe539f263630fc28d54e25966fb0c9b7261706ac878717"
+      },
+      "accuracy": {
+        "passed_numerical_tolerances": true,
+        "summary": {
+          "C_mm": {
+            "mean": 0.0022052417602755896,
+            "p95": 0.004220863858393706,
+            "max": 0.005204805827122589
           },
-          "cpp_projection_and_draw_ms": {
-            "mean_ms": 3.575628217857143,
-            "median_ms": 3.5179445,
-            "p95_ms": 3.9408437999999997,
-            "p99_ms": 4.718038839999998,
-            "min_ms": 3.017657,
-            "max_ms": 4.848886
+          "tip_mm": {
+            "mean": 0.002786072197982819,
+            "p95": 0.004980166270278616,
+            "max": 0.007526920757672871
           },
-          "end_to_end_ms": {
-            "mean_ms": 15.691575530357145,
-            "median_ms": 15.6666955,
-            "p95_ms": 16.41944535,
-            "p99_ms": 16.899946989999997,
-            "min_ms": 14.809671,
-            "max_ms": 17.408281
+          "hinge_mm": {
+            "mean": 0.002433891341068794,
+            "p95": 0.004376748839222174,
+            "max": 0.005992690356963519
           },
-          "network_cuda_interval_ms": {
-            "mean_ms": 9.079149428435734,
-            "median_ms": 9.108480453491211,
-            "p95_ms": 9.381888389587402,
-            "p99_ms": 9.419223041534424,
-            "min_ms": 8.663040161132812,
-            "max_ms": 9.61023998260498
+          "rotation_deg": {
+            "mean": 0.005668518539797452,
+            "p95": 0.011841563829921211,
+            "max": 0.017788312668784646
           },
-          "input_preparation_host_wall_ms": {
-            "mean_ms": 1.017950269642857,
-            "median_ms": 1.011018,
-            "p95_ms": 1.30124655,
-            "p99_ms": 1.3383888499999999,
-            "min_ms": 0.788189,
-            "max_ms": 1.818277
+          "point_projection_px": {
+            "mean": 0.0167510194506211,
+            "p95": 0.03457531301879032,
+            "max": 0.04763586210685767
           },
-          "process_cpu_seconds": 10.188079304999999,
-          "process_cpu_percent": 115.43074097761762,
-          "process_peak_rss_mib": 2162.28515625,
-          "measured_pairs": 560,
-          "warmup_pairs": 56,
-          "first_warmup_pair_ms": 455.359663,
-          "hz": 63.72846359917051,
-          "inverse_p95_hz": 60.90339708094951,
-          "fraction_within_33_33_ms": 1.0,
-          "peak_cuda_allocated_mib": 153.708984375,
-          "peak_cuda_reserved_mib": 360.0,
-          "per_category": {
-            "combined_pose_jaw": {
-              "mean_ms": 15.745933237500003,
-              "median_ms": 15.708157,
-              "p95_ms": 16.519568449999998,
-              "p99_ms": 16.919117049999997,
-              "min_ms": 15.085344,
-              "max_ms": 17.10327
+          "joint_deg": {
+            "pitch": {
+              "mean": 0.0017468207792522403,
+              "p95": 0.004579641507007182,
+              "max": 0.0074585662223398685
             },
-            "ecm_motion": {
-              "mean_ms": 15.757223437499999,
-              "median_ms": 15.699517499999999,
-              "p95_ms": 16.583285150000002,
-              "p99_ms": 17.066869859999997,
-              "min_ms": 14.909248,
-              "max_ms": 17.408281
+            "yaw": {
+              "mean": 0.0014406819644656415,
+              "p95": 0.003908575512468815,
+              "max": 0.006539905909448862
             },
-            "lighting": {
-              "mean_ms": 15.649330312500002,
-              "median_ms": 15.633491,
-              "p95_ms": 16.3286884,
-              "p99_ms": 16.43031191,
-              "min_ms": 15.054204,
-              "max_ms": 16.475477
-            },
-            "occlusion": {
-              "mean_ms": 15.7470662,
-              "median_ms": 15.74285,
-              "p95_ms": 16.33462345,
-              "p99_ms": 17.01653493,
-              "min_ms": 15.128419,
-              "max_ms": 17.207978
-            },
-            "pose_motion": {
-              "mean_ms": 15.6542445375,
-              "median_ms": 15.640257,
-              "p95_ms": 16.3771908,
-              "p99_ms": 16.571924139999997,
-              "min_ms": 14.809671,
-              "max_ms": 16.835179
-            },
-            "sensor_quality": {
-              "mean_ms": 15.653911387499999,
-              "median_ms": 15.634943499999999,
-              "p95_ms": 16.1252103,
-              "p99_ms": 16.5739214,
-              "min_ms": 14.953482,
-              "max_ms": 16.942804
-            },
-            "stereo_rig": {
-              "mean_ms": 15.633319599999998,
-              "median_ms": 15.6099435,
-              "p95_ms": 16.325487250000002,
-              "p99_ms": 16.47643621,
-              "min_ms": 15.014481,
-              "max_ms": 16.609394
+            "jaw_half": {
+              "mean": 0.0008109581908684049,
+              "p95": 0.0026306899380870163,
+              "max": 0.006095943506807089
             }
+          },
+          "mask_iou": {
+            "mean": 0.9998590467231614,
+            "p95": 1.0,
+            "max": 1.0
           }
         }
       },
-      "actual_execution": "optimized_graph",
-      "runtime": {
-        "python": "3.11.18",
-        "torch": "2.9.1+cu128",
-        "cuda": "12.8",
-        "cpu_threads": 4,
-        "cudnn_benchmark": false,
-        "matmul_tf32": false,
-        "cudnn_tf32": true
-      },
-      "gpu": "NVIDIA GeForce RTX 4060 Laptop GPU",
-      "native_library_sha256": "fb0089a61e9fd47a5dcc223e3cdfc5e3d5f860c2cfb5aaebf4c0a34a812322fb",
-      "overlay_library_sha256": "447d72c6ada6c190636dbd698facbf3548d3ab4a666d53d66094a86487755bae"
+      "performance": {
+        "results": {
+          "fp32": {
+            "predictor_including_preprocess_transfer_export_ms": {
+              "mean_ms": 12.115947312500001,
+              "median_ms": 12.1300645,
+              "p95_ms": 12.521612949999998,
+              "p99_ms": 12.72612535,
+              "min_ms": 11.576118,
+              "max_ms": 12.979567
+            },
+            "cpp_projection_and_draw_ms": {
+              "mean_ms": 3.575628217857143,
+              "median_ms": 3.5179445,
+              "p95_ms": 3.9408437999999997,
+              "p99_ms": 4.718038839999998,
+              "min_ms": 3.017657,
+              "max_ms": 4.848886
+            },
+            "end_to_end_ms": {
+              "mean_ms": 15.691575530357145,
+              "median_ms": 15.6666955,
+              "p95_ms": 16.41944535,
+              "p99_ms": 16.899946989999997,
+              "min_ms": 14.809671,
+              "max_ms": 17.408281
+            },
+            "network_cuda_interval_ms": {
+              "mean_ms": 9.079149428435734,
+              "median_ms": 9.108480453491211,
+              "p95_ms": 9.381888389587402,
+              "p99_ms": 9.419223041534424,
+              "min_ms": 8.663040161132812,
+              "max_ms": 9.61023998260498
+            },
+            "input_preparation_host_wall_ms": {
+              "mean_ms": 1.017950269642857,
+              "median_ms": 1.011018,
+              "p95_ms": 1.30124655,
+              "p99_ms": 1.3383888499999999,
+              "min_ms": 0.788189,
+              "max_ms": 1.818277
+            },
+            "process_cpu_seconds": 10.188079304999999,
+            "process_cpu_percent": 115.43074097761762,
+            "process_peak_rss_mib": 2162.28515625,
+            "measured_pairs": 560,
+            "warmup_pairs": 56,
+            "first_warmup_pair_ms": 455.359663,
+            "hz": 63.72846359917051,
+            "inverse_p95_hz": 60.90339708094951,
+            "fraction_within_33_33_ms": 1.0,
+            "peak_cuda_allocated_mib": 153.708984375,
+            "peak_cuda_reserved_mib": 360.0,
+            "per_category": {
+              "combined_pose_jaw": {
+                "mean_ms": 15.745933237500003,
+                "median_ms": 15.708157,
+                "p95_ms": 16.519568449999998,
+                "p99_ms": 16.919117049999997,
+                "min_ms": 15.085344,
+                "max_ms": 17.10327
+              },
+              "ecm_motion": {
+                "mean_ms": 15.757223437499999,
+                "median_ms": 15.699517499999999,
+                "p95_ms": 16.583285150000002,
+                "p99_ms": 17.066869859999997,
+                "min_ms": 14.909248,
+                "max_ms": 17.408281
+              },
+              "lighting": {
+                "mean_ms": 15.649330312500002,
+                "median_ms": 15.633491,
+                "p95_ms": 16.3286884,
+                "p99_ms": 16.43031191,
+                "min_ms": 15.054204,
+                "max_ms": 16.475477
+              },
+              "occlusion": {
+                "mean_ms": 15.7470662,
+                "median_ms": 15.74285,
+                "p95_ms": 16.33462345,
+                "p99_ms": 17.01653493,
+                "min_ms": 15.128419,
+                "max_ms": 17.207978
+              },
+              "pose_motion": {
+                "mean_ms": 15.6542445375,
+                "median_ms": 15.640257,
+                "p95_ms": 16.3771908,
+                "p99_ms": 16.571924139999997,
+                "min_ms": 14.809671,
+                "max_ms": 16.835179
+              },
+              "sensor_quality": {
+                "mean_ms": 15.653911387499999,
+                "median_ms": 15.634943499999999,
+                "p95_ms": 16.1252103,
+                "p99_ms": 16.5739214,
+                "min_ms": 14.953482,
+                "max_ms": 16.942804
+              },
+              "stereo_rig": {
+                "mean_ms": 15.633319599999998,
+                "median_ms": 15.6099435,
+                "p95_ms": 16.325487250000002,
+                "p99_ms": 16.47643621,
+                "min_ms": 15.014481,
+                "max_ms": 16.609394
+              }
+            }
+          }
+        },
+        "actual_execution": "optimized_graph",
+        "runtime": {
+          "python": "3.11.18",
+          "torch": "2.9.1+cu128",
+          "cuda": "12.8",
+          "cpu_threads": 4,
+          "cudnn_benchmark": false,
+          "matmul_tf32": false,
+          "cudnn_tf32": true
+        },
+        "gpu": "NVIDIA GeForce RTX 4060 Laptop GPU",
+        "native_library_sha256": "fb0089a61e9fd47a5dcc223e3cdfc5e3d5f860c2cfb5aaebf4c0a34a812322fb",
+        "overlay_library_sha256": "447d72c6ada6c190636dbd698facbf3548d3ab4a666d53d66094a86487755bae"
+      }
     }
   }
 }

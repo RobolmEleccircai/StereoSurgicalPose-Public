@@ -1,817 +1,821 @@
 {
-  "performance": {
-    "completed": true,
-    "gpu": "NVIDIA GeForce RTX 4060 Laptop GPU",
-    "gpu_before": "name, driver_version, memory.total [MiB], memory.used [MiB], utilization.gpu [%], power.draw [W], temperature.gpu, clocks.current.sm [MHz], clocks.current.memory [MHz]\nNVIDIA GeForce RTX 4060 Laptop GPU, 580.95.05, 8188 MiB, 128 MiB, 0 %, 1.39 W, 44, 210 MHz, 405 MHz",
-    "gpu_after": "name, driver_version, memory.total [MiB], memory.used [MiB], utilization.gpu [%], power.draw [W], temperature.gpu, clocks.current.sm [MHz], clocks.current.memory [MHz]\nNVIDIA GeForce RTX 4060 Laptop GPU, 580.95.05, 8188 MiB, 791 MiB, 75 %, 54.61 W, 60, 2295 MHz, 8001 MHz",
-    "inference_backend": "libtorch",
-    "execution_mode": "optimized_graph",
-    "actual_execution": "optimized_graph",
-    "graph_error": null,
-    "preprocessing": "gpu",
-    "display_mode": "vectors",
-    "overlay_library": "reference/pose_display/native/build/optimized/libsurgical_overlay.so",
-    "overlay_library_sha256": "447d72c6ada6c190636dbd698facbf3548d3ab4a666d53d66094a86487755bae",
-    "visual_engine": {
-      "schema": "stereo_visual_trt_v1",
-      "checkpoint_sha256": "639fc8c7e56263f4ab889aa53cc5132e3610eea4c8b2d8b0db671c41d8a30325",
-      "engine_sha256": "7b74e39eca0e693f87878cead96e2d15c843c2e0cbf9460347dabd6a96ad1c83",
-      "onnx_sha256": "bfa3b0c5d686a1fecc1fb0aa5dfd58e17202aa2cc847aca0ba870454a6052bb5",
-      "precision": "fp16",
-      "build_seconds": 31.677622777999204,
-      "engine_bytes": 34153076,
-      "tensorrt": "10.13.3.9",
-      "torch": "2.9.1+cu128",
-      "onnx": "1.19.1",
+  "publication_scope": "Historical execution benchmark and implementation numerical equivalence only; not an independent pose-accuracy result. No checkpoint or image dataset is included.",
+  "source_report_sha256": "b65541329374c374abab6bae9bb6fde3cb32d737ce953907533f1c9bce99b972",
+  "report": {
+    "performance": {
+      "completed": true,
       "gpu": "NVIDIA GeForce RTX 4060 Laptop GPU",
-      "input_shape": [
-        2,
-        3,
+      "gpu_before": "name, driver_version, memory.total [MiB], memory.used [MiB], utilization.gpu [%], power.draw [W], temperature.gpu, clocks.current.sm [MHz], clocks.current.memory [MHz]\nNVIDIA GeForce RTX 4060 Laptop GPU, 580.95.05, 8188 MiB, 128 MiB, 0 %, 1.39 W, 44, 210 MHz, 405 MHz",
+      "gpu_after": "name, driver_version, memory.total [MiB], memory.used [MiB], utilization.gpu [%], power.draw [W], temperature.gpu, clocks.current.sm [MHz], clocks.current.memory [MHz]\nNVIDIA GeForce RTX 4060 Laptop GPU, 580.95.05, 8188 MiB, 791 MiB, 75 %, 54.61 W, 60, 2295 MHz, 8001 MHz",
+      "inference_backend": "libtorch",
+      "execution_mode": "optimized_graph",
+      "actual_execution": "optimized_graph",
+      "graph_error": null,
+      "preprocessing": "gpu",
+      "display_mode": "vectors",
+      "overlay_library": "reference/pose_display/native/build/optimized/libsurgical_overlay.so",
+      "overlay_library_sha256": "447d72c6ada6c190636dbd698facbf3548d3ab4a666d53d66094a86487755bae",
+      "visual_engine": {
+        "schema": "stereo_visual_trt_v1",
+        "checkpoint_sha256": "639fc8c7e56263f4ab889aa53cc5132e3610eea4c8b2d8b0db671c41d8a30325",
+        "engine_sha256": "7b74e39eca0e693f87878cead96e2d15c843c2e0cbf9460347dabd6a96ad1c83",
+        "onnx_sha256": "bfa3b0c5d686a1fecc1fb0aa5dfd58e17202aa2cc847aca0ba870454a6052bb5",
+        "precision": "fp16",
+        "build_seconds": 31.677622777999204,
+        "engine_bytes": 34153076,
+        "tensorrt": "10.13.3.9",
+        "torch": "2.9.1+cu128",
+        "onnx": "1.19.1",
+        "gpu": "NVIDIA GeForce RTX 4060 Laptop GPU",
+        "input_shape": [
+          2,
+          3,
+          360,
+          640
+        ],
+        "outputs": {
+          "spatial": [
+            2,
+            128,
+            90,
+            160
+          ],
+          "mask": [
+            2,
+            1,
+            90,
+            160
+          ],
+          "heat": [
+            2,
+            5,
+            90,
+            160
+          ]
+        },
+        "boundary_dtype": "float32",
+        "tf32": false,
+        "fp16_layers": [
+          "/backbone/stem_0/Conv",
+          "/backbone/stages_0/blocks/blocks.0/conv_dw/Conv",
+          "/backbone/stages_0/blocks/blocks.0/mlp/fc1/Conv",
+          "/backbone/stages_0/blocks/blocks.0/mlp/fc2/Conv",
+          "/backbone/stages_0/blocks/blocks.1/conv_dw/Conv",
+          "/backbone/stages_0/blocks/blocks.1/mlp/fc1/Conv",
+          "/backbone/stages_0/blocks/blocks.1/mlp/fc2/Conv",
+          "/backbone/stages_1/downsample/downsample.1/Conv",
+          "/backbone/stages_1/blocks/blocks.0/conv_dw/Conv",
+          "/backbone/stages_1/blocks/blocks.0/mlp/fc1/Conv",
+          "/backbone/stages_1/blocks/blocks.0/mlp/fc2/Conv",
+          "/backbone/stages_1/blocks/blocks.1/conv_dw/Conv",
+          "/backbone/stages_1/blocks/blocks.1/mlp/fc1/Conv",
+          "/backbone/stages_1/blocks/blocks.1/mlp/fc2/Conv",
+          "/backbone/stages_2/downsample/downsample.1/Conv",
+          "/backbone/stages_2/blocks/blocks.0/conv_dw/Conv",
+          "/backbone/stages_2/blocks/blocks.0/mlp/fc1/Conv",
+          "/backbone/stages_2/blocks/blocks.0/mlp/fc2/Conv",
+          "/backbone/stages_2/blocks/blocks.1/conv_dw/Conv",
+          "/backbone/stages_2/blocks/blocks.1/mlp/fc1/Conv",
+          "/backbone/stages_2/blocks/blocks.1/mlp/fc2/Conv",
+          "/backbone/stages_2/blocks/blocks.2/conv_dw/Conv",
+          "/backbone/stages_2/blocks/blocks.2/mlp/fc1/Conv",
+          "/backbone/stages_2/blocks/blocks.2/mlp/fc2/Conv",
+          "/backbone/stages_2/blocks/blocks.3/conv_dw/Conv",
+          "/backbone/stages_2/blocks/blocks.3/mlp/fc1/Conv",
+          "/backbone/stages_2/blocks/blocks.3/mlp/fc2/Conv",
+          "/backbone/stages_2/blocks/blocks.4/conv_dw/Conv",
+          "/backbone/stages_2/blocks/blocks.4/mlp/fc1/Conv",
+          "/backbone/stages_2/blocks/blocks.4/mlp/fc2/Conv",
+          "/backbone/stages_2/blocks/blocks.5/conv_dw/Conv",
+          "/backbone/stages_2/blocks/blocks.5/mlp/fc1/Conv",
+          "/backbone/stages_2/blocks/blocks.5/mlp/fc2/Conv",
+          "/backbone/stages_2/blocks/blocks.6/conv_dw/Conv",
+          "/backbone/stages_2/blocks/blocks.6/mlp/fc1/Conv",
+          "/backbone/stages_2/blocks/blocks.6/mlp/fc2/Conv",
+          "/backbone/stages_2/blocks/blocks.7/conv_dw/Conv",
+          "/backbone/stages_2/blocks/blocks.7/mlp/fc1/Conv",
+          "/backbone/stages_2/blocks/blocks.7/mlp/fc2/Conv",
+          "/backbone/stages_3/downsample/downsample.1/Conv",
+          "/backbone/stages_3/blocks/blocks.0/conv_dw/Conv",
+          "/backbone/stages_3/blocks/blocks.0/mlp/fc1/Conv",
+          "/backbone/stages_3/blocks/blocks.0/mlp/fc2/Conv",
+          "/backbone/stages_3/blocks/blocks.1/conv_dw/Conv",
+          "/backbone/stages_3/blocks/blocks.1/mlp/fc1/Conv",
+          "/backbone/stages_3/blocks/blocks.1/mlp/fc2/Conv",
+          "/laterals.3/Conv",
+          "/laterals.2/Conv",
+          "/laterals.1/Conv",
+          "/laterals.0/Conv",
+          "/spatial/spatial.0/Conv",
+          "/mask_head/Conv",
+          "/heatmap_head/Conv"
+        ],
+        "source_sha256": "14490c8e3369d39b888b7b9b69bf50bead6a69f99b024ecee250d368d6329f28",
+        "workspace_limit_bytes": 1073741824
+      },
+      "checkpoint_sha256": "639fc8c7e56263f4ab889aa53cc5132e3610eea4c8b2d8b0db671c41d8a30325",
+      "raw_resolution_per_eye": [
+        1280,
+        720
+      ],
+      "network_resolution_hw": [
         360,
         640
       ],
-      "outputs": {
-        "spatial": [
-          2,
-          128,
-          90,
-          160
-        ],
-        "mask": [
-          2,
-          1,
-          90,
-          160
-        ],
-        "heat": [
-          2,
-          5,
-          90,
-          160
-        ]
-      },
-      "boundary_dtype": "float32",
-      "tf32": false,
-      "fp16_layers": [
-        "/backbone/stem_0/Conv",
-        "/backbone/stages_0/blocks/blocks.0/conv_dw/Conv",
-        "/backbone/stages_0/blocks/blocks.0/mlp/fc1/Conv",
-        "/backbone/stages_0/blocks/blocks.0/mlp/fc2/Conv",
-        "/backbone/stages_0/blocks/blocks.1/conv_dw/Conv",
-        "/backbone/stages_0/blocks/blocks.1/mlp/fc1/Conv",
-        "/backbone/stages_0/blocks/blocks.1/mlp/fc2/Conv",
-        "/backbone/stages_1/downsample/downsample.1/Conv",
-        "/backbone/stages_1/blocks/blocks.0/conv_dw/Conv",
-        "/backbone/stages_1/blocks/blocks.0/mlp/fc1/Conv",
-        "/backbone/stages_1/blocks/blocks.0/mlp/fc2/Conv",
-        "/backbone/stages_1/blocks/blocks.1/conv_dw/Conv",
-        "/backbone/stages_1/blocks/blocks.1/mlp/fc1/Conv",
-        "/backbone/stages_1/blocks/blocks.1/mlp/fc2/Conv",
-        "/backbone/stages_2/downsample/downsample.1/Conv",
-        "/backbone/stages_2/blocks/blocks.0/conv_dw/Conv",
-        "/backbone/stages_2/blocks/blocks.0/mlp/fc1/Conv",
-        "/backbone/stages_2/blocks/blocks.0/mlp/fc2/Conv",
-        "/backbone/stages_2/blocks/blocks.1/conv_dw/Conv",
-        "/backbone/stages_2/blocks/blocks.1/mlp/fc1/Conv",
-        "/backbone/stages_2/blocks/blocks.1/mlp/fc2/Conv",
-        "/backbone/stages_2/blocks/blocks.2/conv_dw/Conv",
-        "/backbone/stages_2/blocks/blocks.2/mlp/fc1/Conv",
-        "/backbone/stages_2/blocks/blocks.2/mlp/fc2/Conv",
-        "/backbone/stages_2/blocks/blocks.3/conv_dw/Conv",
-        "/backbone/stages_2/blocks/blocks.3/mlp/fc1/Conv",
-        "/backbone/stages_2/blocks/blocks.3/mlp/fc2/Conv",
-        "/backbone/stages_2/blocks/blocks.4/conv_dw/Conv",
-        "/backbone/stages_2/blocks/blocks.4/mlp/fc1/Conv",
-        "/backbone/stages_2/blocks/blocks.4/mlp/fc2/Conv",
-        "/backbone/stages_2/blocks/blocks.5/conv_dw/Conv",
-        "/backbone/stages_2/blocks/blocks.5/mlp/fc1/Conv",
-        "/backbone/stages_2/blocks/blocks.5/mlp/fc2/Conv",
-        "/backbone/stages_2/blocks/blocks.6/conv_dw/Conv",
-        "/backbone/stages_2/blocks/blocks.6/mlp/fc1/Conv",
-        "/backbone/stages_2/blocks/blocks.6/mlp/fc2/Conv",
-        "/backbone/stages_2/blocks/blocks.7/conv_dw/Conv",
-        "/backbone/stages_2/blocks/blocks.7/mlp/fc1/Conv",
-        "/backbone/stages_2/blocks/blocks.7/mlp/fc2/Conv",
-        "/backbone/stages_3/downsample/downsample.1/Conv",
-        "/backbone/stages_3/blocks/blocks.0/conv_dw/Conv",
-        "/backbone/stages_3/blocks/blocks.0/mlp/fc1/Conv",
-        "/backbone/stages_3/blocks/blocks.0/mlp/fc2/Conv",
-        "/backbone/stages_3/blocks/blocks.1/conv_dw/Conv",
-        "/backbone/stages_3/blocks/blocks.1/mlp/fc1/Conv",
-        "/backbone/stages_3/blocks/blocks.1/mlp/fc2/Conv",
-        "/laterals.3/Conv",
-        "/laterals.2/Conv",
-        "/laterals.1/Conv",
-        "/laterals.0/Conv",
-        "/spatial/spatial.0/Conv",
-        "/mask_head/Conv",
-        "/heatmap_head/Conv"
-      ],
-      "source_sha256": "14490c8e3369d39b888b7b9b69bf50bead6a69f99b024ecee250d368d6329f28",
-      "workspace_limit_bytes": 1073741824
-    },
-    "checkpoint_sha256": "639fc8c7e56263f4ab889aa53cc5132e3610eea4c8b2d8b0db671c41d8a30325",
-    "raw_resolution_per_eye": [
-      1280,
-      720
-    ],
-    "network_resolution_hw": [
-      360,
-      640
-    ],
-    "batch_size": 1,
-    "time_steps_per_call": 1,
-    "causal_states": "body/wrist/jaw, retained within each eight-frame sequence",
-    "input_pairs": 56,
-    "sequences": 7,
-    "results": {
-      "fp32": {
-        "predictor_including_preprocess_transfer_export_ms": {
-          "mean_ms": 14.556826008928573,
-          "median_ms": 14.542289,
-          "p95_ms": 14.98042045,
-          "p99_ms": 15.13097661,
-          "min_ms": 14.028281,
-          "max_ms": 15.902937
-        },
-        "cpp_projection_and_draw_ms": {
-          "mean_ms": 3.899318160714286,
-          "median_ms": 3.824269,
-          "p95_ms": 4.289754849999998,
-          "p99_ms": 5.1991131399999935,
-          "min_ms": 3.458693,
-          "max_ms": 7.06616
-        },
-        "end_to_end_ms": {
-          "mean_ms": 18.456144169642858,
-          "median_ms": 18.3737545,
-          "p95_ms": 19.2373635,
-          "p99_ms": 20.184916429999998,
-          "min_ms": 17.643005,
-          "max_ms": 21.911935
-        },
-        "network_cuda_interval_ms": {
-          "mean_ms": 11.526566743850708,
-          "median_ms": 11.530752182006836,
-          "p95_ms": 11.755724668502808,
-          "p99_ms": 11.843634881973266,
-          "min_ms": 11.155455589294434,
-          "max_ms": 11.908096313476562
-        },
-        "input_preparation_host_wall_ms": {
-          "mean_ms": 1.0018566767857144,
-          "median_ms": 0.992299,
-          "p95_ms": 1.29467065,
-          "p99_ms": 1.3412707699999997,
-          "min_ms": 0.751162,
-          "max_ms": 2.275526
-        },
-        "process_cpu_seconds": 11.897955682,
-        "process_cpu_percent": 114.71726030113165,
-        "process_peak_rss_mib": 2367.05078125,
-        "measured_pairs": 560,
-        "warmup_pairs": 56,
-        "first_warmup_pair_ms": 530.230257,
-        "hz": 54.18249829478607,
-        "inverse_p95_hz": 51.98217520815677,
-        "fraction_within_33_33_ms": 1.0,
-        "peak_cuda_allocated_mib": 153.708984375,
-        "peak_cuda_reserved_mib": 360.0,
-        "per_category": {
-          "combined_pose_jaw": {
-            "mean_ms": 18.46315795,
-            "median_ms": 18.364134999999997,
-            "p95_ms": 19.2556879,
-            "p99_ms": 19.769644999999993,
+      "batch_size": 1,
+      "time_steps_per_call": 1,
+      "causal_states": "body/wrist/jaw, retained within each eight-frame sequence",
+      "input_pairs": 56,
+      "sequences": 7,
+      "results": {
+        "fp32": {
+          "predictor_including_preprocess_transfer_export_ms": {
+            "mean_ms": 14.556826008928573,
+            "median_ms": 14.542289,
+            "p95_ms": 14.98042045,
+            "p99_ms": 15.13097661,
+            "min_ms": 14.028281,
+            "max_ms": 15.902937
+          },
+          "cpp_projection_and_draw_ms": {
+            "mean_ms": 3.899318160714286,
+            "median_ms": 3.824269,
+            "p95_ms": 4.289754849999998,
+            "p99_ms": 5.1991131399999935,
+            "min_ms": 3.458693,
+            "max_ms": 7.06616
+          },
+          "end_to_end_ms": {
+            "mean_ms": 18.456144169642858,
+            "median_ms": 18.3737545,
+            "p95_ms": 19.2373635,
+            "p99_ms": 20.184916429999998,
             "min_ms": 17.643005,
-            "max_ms": 20.190004
-          },
-          "ecm_motion": {
-            "mean_ms": 18.387372,
-            "median_ms": 18.329781,
-            "p95_ms": 19.0421879,
-            "p99_ms": 19.42896441,
-            "min_ms": 17.749148,
-            "max_ms": 19.552932
-          },
-          "lighting": {
-            "mean_ms": 18.4922733,
-            "median_ms": 18.394473499999997,
-            "p95_ms": 19.2067486,
-            "p99_ms": 20.55683386999999,
-            "min_ms": 17.911607,
-            "max_ms": 21.730653
-          },
-          "occlusion": {
-            "mean_ms": 18.4840189875,
-            "median_ms": 18.413220000000003,
-            "p95_ms": 19.211969699999997,
-            "p99_ms": 19.96695980999999,
-            "min_ms": 17.755504,
-            "max_ms": 20.981921
-          },
-          "pose_motion": {
-            "mean_ms": 18.374684725,
-            "median_ms": 18.340467500000003,
-            "p95_ms": 19.1829274,
-            "p99_ms": 19.60131212,
-            "min_ms": 17.793609,
-            "max_ms": 19.718368
-          },
-          "sensor_quality": {
-            "mean_ms": 18.475012025,
-            "median_ms": 18.363086,
-            "p95_ms": 19.3441732,
-            "p99_ms": 20.71145415999999,
-            "min_ms": 17.816973,
             "max_ms": 21.911935
           },
-          "stereo_rig": {
-            "mean_ms": 18.5164902,
-            "median_ms": 18.4411835,
-            "p95_ms": 19.1956904,
-            "p99_ms": 19.520477630000002,
-            "min_ms": 17.818814,
-            "max_ms": 19.523245
+          "network_cuda_interval_ms": {
+            "mean_ms": 11.526566743850708,
+            "median_ms": 11.530752182006836,
+            "p95_ms": 11.755724668502808,
+            "p99_ms": 11.843634881973266,
+            "min_ms": 11.155455589294434,
+            "max_ms": 11.908096313476562
+          },
+          "input_preparation_host_wall_ms": {
+            "mean_ms": 1.0018566767857144,
+            "median_ms": 0.992299,
+            "p95_ms": 1.29467065,
+            "p99_ms": 1.3412707699999997,
+            "min_ms": 0.751162,
+            "max_ms": 2.275526
+          },
+          "process_cpu_seconds": 11.897955682,
+          "process_cpu_percent": 114.71726030113165,
+          "process_peak_rss_mib": 2367.05078125,
+          "measured_pairs": 560,
+          "warmup_pairs": 56,
+          "first_warmup_pair_ms": 530.230257,
+          "hz": 54.18249829478607,
+          "inverse_p95_hz": 51.98217520815677,
+          "fraction_within_33_33_ms": 1.0,
+          "peak_cuda_allocated_mib": 153.708984375,
+          "peak_cuda_reserved_mib": 360.0,
+          "per_category": {
+            "combined_pose_jaw": {
+              "mean_ms": 18.46315795,
+              "median_ms": 18.364134999999997,
+              "p95_ms": 19.2556879,
+              "p99_ms": 19.769644999999993,
+              "min_ms": 17.643005,
+              "max_ms": 20.190004
+            },
+            "ecm_motion": {
+              "mean_ms": 18.387372,
+              "median_ms": 18.329781,
+              "p95_ms": 19.0421879,
+              "p99_ms": 19.42896441,
+              "min_ms": 17.749148,
+              "max_ms": 19.552932
+            },
+            "lighting": {
+              "mean_ms": 18.4922733,
+              "median_ms": 18.394473499999997,
+              "p95_ms": 19.2067486,
+              "p99_ms": 20.55683386999999,
+              "min_ms": 17.911607,
+              "max_ms": 21.730653
+            },
+            "occlusion": {
+              "mean_ms": 18.4840189875,
+              "median_ms": 18.413220000000003,
+              "p95_ms": 19.211969699999997,
+              "p99_ms": 19.96695980999999,
+              "min_ms": 17.755504,
+              "max_ms": 20.981921
+            },
+            "pose_motion": {
+              "mean_ms": 18.374684725,
+              "median_ms": 18.340467500000003,
+              "p95_ms": 19.1829274,
+              "p99_ms": 19.60131212,
+              "min_ms": 17.793609,
+              "max_ms": 19.718368
+            },
+            "sensor_quality": {
+              "mean_ms": 18.475012025,
+              "median_ms": 18.363086,
+              "p95_ms": 19.3441732,
+              "p99_ms": 20.71145415999999,
+              "min_ms": 17.816973,
+              "max_ms": 21.911935
+            },
+            "stereo_rig": {
+              "mean_ms": 18.5164902,
+              "median_ms": 18.4411835,
+              "p95_ms": 19.1956904,
+              "p99_ms": 19.520477630000002,
+              "min_ms": 17.818814,
+              "max_ms": 19.523245
+            }
           }
         }
-      }
+      },
+      "mixed_precision_drift": {},
+      "timing_scope": "RAM RGB -> resize/normalize -> all H2D transfers -> real model -> 17 values D2H -> C++ FK/distortion projection/Chinese arrows and XYZ panels -> completed RGB canvas. No disk/image decoding, capture latency, video encoding, imshow or refresh.",
+      "cuda_timing_note": "Network CUDA interval excludes preprocessing and CPU drawing; end-to-end wall time is the primary result. GPU input_preparation_host_wall_ms is submission time, not completed GPU time, and cannot be added to the model interval to obtain latency. Records and metrics are written after timing.",
+      "runtime": {
+        "python": "3.11.18",
+        "torch": "2.9.1+cu128",
+        "cuda": "12.8",
+        "cpu_threads": 4,
+        "cudnn_benchmark": false,
+        "matmul_tf32": false,
+        "cudnn_tf32": true
+      },
+      "source_sha256": {
+        "stereo_pose/predict.py": "2d0e72e50c331580e0e9ea5b9056a20a113ea686a5704702fdf66ee0f972307d",
+        "stereo_pose/model.py": "c31443b7b447dcfe7eee4543bfcbc0e27cb2d44fdbef7c644a42d7b273ae8d1a",
+        "reference/pose_display/native/overlay.cpp": "36e9d6e3584c12482b15e18e88b2fe5527b4214cad708ad28e84cb23ef4b703a",
+        "tools/benchmark_realtime.py": "e26e4cf144012ae7ac5c5bf46971254762bf96fac50f53a48228fd3e4808eda1",
+        "native/libtorch/model.cpp": "47b676e426d9661d87d545e70cebe543ab87c1bbd0018e5dcfff169265c1f2d2",
+        "native/libtorch/model.h": "ceb76dff5e4750c5be401552fa0ba35cf34e471111affda31a9575b5fef81806",
+        "native/libtorch/bindings.cpp": "63ebf03f6f1f3b7a932fbe746936ded29c5f884b000519b6e2eaf194606f0965",
+        "native/libtorch/preprocess.cpp": "1743f875db47e6cf9d5449ec008387ca218755b931c8fcdf3210a5813195acb5",
+        "native/libtorch/preprocess.h": "e29580fc2223c2455140a1805f338db663a5c7b5d3efd90ba2c6376edac13934",
+        "stereo_pose/libtorch_predict.py": "c301f9e4e39a0af8492e3a72cecf0c572b07b33e97e6530c2c1b54caf08a00dd"
+      },
+      "native_library_sha256": "fb0089a61e9fd47a5dcc223e3cdfc5e3d5f860c2cfb5aaebf4c0a34a812322fb",
+      "preprocess_library_sha256": "c66f5ee11ef16cc3bcbd5f181b904c6acff5856abfa8330b80c91402e636bb0d"
     },
-    "mixed_precision_drift": {},
-    "timing_scope": "RAM RGB -> resize/normalize -> all H2D transfers -> real model -> 17 values D2H -> C++ FK/distortion projection/Chinese arrows and XYZ panels -> completed RGB canvas. No disk/image decoding, capture latency, video encoding, imshow or refresh.",
-    "cuda_timing_note": "Network CUDA interval excludes preprocessing and CPU drawing; end-to-end wall time is the primary result. GPU input_preparation_host_wall_ms is submission time, not completed GPU time, and cannot be added to the model interval to obtain latency. Records and metrics are written after timing.",
-    "runtime": {
-      "python": "3.11.18",
-      "torch": "2.9.1+cu128",
-      "cuda": "12.8",
-      "cpu_threads": 4,
-      "cudnn_benchmark": false,
-      "matmul_tf32": false,
-      "cudnn_tf32": true
-    },
-    "source_sha256": {
-      "stereo_pose/predict.py": "2d0e72e50c331580e0e9ea5b9056a20a113ea686a5704702fdf66ee0f972307d",
-      "stereo_pose/model.py": "c31443b7b447dcfe7eee4543bfcbc0e27cb2d44fdbef7c644a42d7b273ae8d1a",
-      "reference/pose_display/native/overlay.cpp": "36e9d6e3584c12482b15e18e88b2fe5527b4214cad708ad28e84cb23ef4b703a",
-      "tools/benchmark_realtime.py": "e26e4cf144012ae7ac5c5bf46971254762bf96fac50f53a48228fd3e4808eda1",
-      "native/libtorch/model.cpp": "47b676e426d9661d87d545e70cebe543ab87c1bbd0018e5dcfff169265c1f2d2",
-      "native/libtorch/model.h": "ceb76dff5e4750c5be401552fa0ba35cf34e471111affda31a9575b5fef81806",
-      "native/libtorch/bindings.cpp": "63ebf03f6f1f3b7a932fbe746936ded29c5f884b000519b6e2eaf194606f0965",
-      "native/libtorch/preprocess.cpp": "1743f875db47e6cf9d5449ec008387ca218755b931c8fcdf3210a5813195acb5",
-      "native/libtorch/preprocess.h": "e29580fc2223c2455140a1805f338db663a5c7b5d3efd90ba2c6376edac13934",
-      "stereo_pose/libtorch_predict.py": "c301f9e4e39a0af8492e3a72cecf0c572b07b33e97e6530c2c1b54caf08a00dd"
-    },
-    "native_library_sha256": "fb0089a61e9fd47a5dcc223e3cdfc5e3d5f860c2cfb5aaebf4c0a34a812322fb",
-    "preprocess_library_sha256": "c66f5ee11ef16cc3bcbd5f181b904c6acff5856abfa8330b80c91402e636bb0d"
-  },
-  "pixels": {
-    "passed": true,
-    "cases": [
-      {
-        "category": "pose_motion",
-        "frame": "eval_v2_seq_002/000017",
-        "background": "real",
-        "max_channel_difference": 0,
-        "changed_channels": 0
-      },
-      {
-        "category": "pose_motion",
-        "frame": "eval_v2_seq_002/000017",
-        "background": "noise",
-        "max_channel_difference": 0,
-        "changed_channels": 0
-      },
-      {
-        "category": "pose_motion",
-        "frame": "eval_v2_seq_002/000017",
-        "background": "black",
-        "max_channel_difference": 0,
-        "changed_channels": 0
-      },
-      {
-        "category": "pose_motion",
-        "frame": "eval_v2_seq_002/000017",
-        "background": "white",
-        "max_channel_difference": 0,
-        "changed_channels": 0
-      },
-      {
-        "category": "pose_motion",
-        "frame": "eval_v2_seq_002/000018",
-        "background": "real",
-        "max_channel_difference": 0,
-        "changed_channels": 0
-      },
-      {
-        "category": "pose_motion",
-        "frame": "eval_v2_seq_002/000019",
-        "background": "real",
-        "max_channel_difference": 0,
-        "changed_channels": 0
-      },
-      {
-        "category": "pose_motion",
-        "frame": "eval_v2_seq_002/000020",
-        "background": "real",
-        "max_channel_difference": 0,
-        "changed_channels": 0
-      },
-      {
-        "category": "pose_motion",
-        "frame": "eval_v2_seq_002/000021",
-        "background": "real",
-        "max_channel_difference": 0,
-        "changed_channels": 0
-      },
-      {
-        "category": "pose_motion",
-        "frame": "eval_v2_seq_002/000022",
-        "background": "real",
-        "max_channel_difference": 0,
-        "changed_channels": 0
-      },
-      {
-        "category": "pose_motion",
-        "frame": "eval_v2_seq_002/000023",
-        "background": "real",
-        "max_channel_difference": 0,
-        "changed_channels": 0
-      },
-      {
-        "category": "pose_motion",
-        "frame": "eval_v2_seq_002/000024",
-        "background": "real",
-        "max_channel_difference": 0,
-        "changed_channels": 0
-      },
-      {
-        "category": "lighting",
-        "frame": "eval_v2_seq_005/000017",
-        "background": "real",
-        "max_channel_difference": 0,
-        "changed_channels": 0
-      },
-      {
-        "category": "lighting",
-        "frame": "eval_v2_seq_005/000017",
-        "background": "noise",
-        "max_channel_difference": 0,
-        "changed_channels": 0
-      },
-      {
-        "category": "lighting",
-        "frame": "eval_v2_seq_005/000017",
-        "background": "black",
-        "max_channel_difference": 0,
-        "changed_channels": 0
-      },
-      {
-        "category": "lighting",
-        "frame": "eval_v2_seq_005/000017",
-        "background": "white",
-        "max_channel_difference": 0,
-        "changed_channels": 0
-      },
-      {
-        "category": "lighting",
-        "frame": "eval_v2_seq_005/000018",
-        "background": "real",
-        "max_channel_difference": 0,
-        "changed_channels": 0
-      },
-      {
-        "category": "lighting",
-        "frame": "eval_v2_seq_005/000019",
-        "background": "real",
-        "max_channel_difference": 0,
-        "changed_channels": 0
-      },
-      {
-        "category": "lighting",
-        "frame": "eval_v2_seq_005/000020",
-        "background": "real",
-        "max_channel_difference": 0,
-        "changed_channels": 0
-      },
-      {
-        "category": "lighting",
-        "frame": "eval_v2_seq_005/000021",
-        "background": "real",
-        "max_channel_difference": 0,
-        "changed_channels": 0
-      },
-      {
-        "category": "lighting",
-        "frame": "eval_v2_seq_005/000022",
-        "background": "real",
-        "max_channel_difference": 0,
-        "changed_channels": 0
-      },
-      {
-        "category": "lighting",
-        "frame": "eval_v2_seq_005/000023",
-        "background": "real",
-        "max_channel_difference": 0,
-        "changed_channels": 0
-      },
-      {
-        "category": "lighting",
-        "frame": "eval_v2_seq_005/000024",
-        "background": "real",
-        "max_channel_difference": 0,
-        "changed_channels": 0
-      },
-      {
-        "category": "sensor_quality",
-        "frame": "eval_v2_seq_008/000017",
-        "background": "real",
-        "max_channel_difference": 0,
-        "changed_channels": 0
-      },
-      {
-        "category": "sensor_quality",
-        "frame": "eval_v2_seq_008/000017",
-        "background": "noise",
-        "max_channel_difference": 0,
-        "changed_channels": 0
-      },
-      {
-        "category": "sensor_quality",
-        "frame": "eval_v2_seq_008/000017",
-        "background": "black",
-        "max_channel_difference": 0,
-        "changed_channels": 0
-      },
-      {
-        "category": "sensor_quality",
-        "frame": "eval_v2_seq_008/000017",
-        "background": "white",
-        "max_channel_difference": 0,
-        "changed_channels": 0
-      },
-      {
-        "category": "sensor_quality",
-        "frame": "eval_v2_seq_008/000018",
-        "background": "real",
-        "max_channel_difference": 0,
-        "changed_channels": 0
-      },
-      {
-        "category": "sensor_quality",
-        "frame": "eval_v2_seq_008/000019",
-        "background": "real",
-        "max_channel_difference": 0,
-        "changed_channels": 0
-      },
-      {
-        "category": "sensor_quality",
-        "frame": "eval_v2_seq_008/000020",
-        "background": "real",
-        "max_channel_difference": 0,
-        "changed_channels": 0
-      },
-      {
-        "category": "sensor_quality",
-        "frame": "eval_v2_seq_008/000021",
-        "background": "real",
-        "max_channel_difference": 0,
-        "changed_channels": 0
-      },
-      {
-        "category": "sensor_quality",
-        "frame": "eval_v2_seq_008/000022",
-        "background": "real",
-        "max_channel_difference": 0,
-        "changed_channels": 0
-      },
-      {
-        "category": "sensor_quality",
-        "frame": "eval_v2_seq_008/000023",
-        "background": "real",
-        "max_channel_difference": 0,
-        "changed_channels": 0
-      },
-      {
-        "category": "sensor_quality",
-        "frame": "eval_v2_seq_008/000024",
-        "background": "real",
-        "max_channel_difference": 0,
-        "changed_channels": 0
-      },
-      {
-        "category": "occlusion",
-        "frame": "eval_v2_seq_011/000090",
-        "background": "real",
-        "max_channel_difference": 0,
-        "changed_channels": 0
-      },
-      {
-        "category": "occlusion",
-        "frame": "eval_v2_seq_011/000090",
-        "background": "noise",
-        "max_channel_difference": 0,
-        "changed_channels": 0
-      },
-      {
-        "category": "occlusion",
-        "frame": "eval_v2_seq_011/000090",
-        "background": "black",
-        "max_channel_difference": 0,
-        "changed_channels": 0
-      },
-      {
-        "category": "occlusion",
-        "frame": "eval_v2_seq_011/000090",
-        "background": "white",
-        "max_channel_difference": 0,
-        "changed_channels": 0
-      },
-      {
-        "category": "occlusion",
-        "frame": "eval_v2_seq_011/000091",
-        "background": "real",
-        "max_channel_difference": 0,
-        "changed_channels": 0
-      },
-      {
-        "category": "occlusion",
-        "frame": "eval_v2_seq_011/000092",
-        "background": "real",
-        "max_channel_difference": 0,
-        "changed_channels": 0
-      },
-      {
-        "category": "occlusion",
-        "frame": "eval_v2_seq_011/000093",
-        "background": "real",
-        "max_channel_difference": 0,
-        "changed_channels": 0
-      },
-      {
-        "category": "occlusion",
-        "frame": "eval_v2_seq_011/000094",
-        "background": "real",
-        "max_channel_difference": 0,
-        "changed_channels": 0
-      },
-      {
-        "category": "occlusion",
-        "frame": "eval_v2_seq_011/000095",
-        "background": "real",
-        "max_channel_difference": 0,
-        "changed_channels": 0
-      },
-      {
-        "category": "occlusion",
-        "frame": "eval_v2_seq_011/000096",
-        "background": "real",
-        "max_channel_difference": 0,
-        "changed_channels": 0
-      },
-      {
-        "category": "occlusion",
-        "frame": "eval_v2_seq_011/000097",
-        "background": "real",
-        "max_channel_difference": 0,
-        "changed_channels": 0
-      },
-      {
-        "category": "ecm_motion",
-        "frame": "eval_v2_seq_014/000018",
-        "background": "real",
-        "max_channel_difference": 0,
-        "changed_channels": 0
-      },
-      {
-        "category": "ecm_motion",
-        "frame": "eval_v2_seq_014/000018",
-        "background": "noise",
-        "max_channel_difference": 0,
-        "changed_channels": 0
-      },
-      {
-        "category": "ecm_motion",
-        "frame": "eval_v2_seq_014/000018",
-        "background": "black",
-        "max_channel_difference": 0,
-        "changed_channels": 0
-      },
-      {
-        "category": "ecm_motion",
-        "frame": "eval_v2_seq_014/000018",
-        "background": "white",
-        "max_channel_difference": 0,
-        "changed_channels": 0
-      },
-      {
-        "category": "ecm_motion",
-        "frame": "eval_v2_seq_014/000019",
-        "background": "real",
-        "max_channel_difference": 0,
-        "changed_channels": 0
-      },
-      {
-        "category": "ecm_motion",
-        "frame": "eval_v2_seq_014/000020",
-        "background": "real",
-        "max_channel_difference": 0,
-        "changed_channels": 0
-      },
-      {
-        "category": "ecm_motion",
-        "frame": "eval_v2_seq_014/000021",
-        "background": "real",
-        "max_channel_difference": 0,
-        "changed_channels": 0
-      },
-      {
-        "category": "ecm_motion",
-        "frame": "eval_v2_seq_014/000022",
-        "background": "real",
-        "max_channel_difference": 0,
-        "changed_channels": 0
-      },
-      {
-        "category": "ecm_motion",
-        "frame": "eval_v2_seq_014/000023",
-        "background": "real",
-        "max_channel_difference": 0,
-        "changed_channels": 0
-      },
-      {
-        "category": "ecm_motion",
-        "frame": "eval_v2_seq_014/000024",
-        "background": "real",
-        "max_channel_difference": 0,
-        "changed_channels": 0
-      },
-      {
-        "category": "ecm_motion",
-        "frame": "eval_v2_seq_014/000025",
-        "background": "real",
-        "max_channel_difference": 0,
-        "changed_channels": 0
-      },
-      {
-        "category": "stereo_rig",
-        "frame": "eval_v2_seq_017/000017",
-        "background": "real",
-        "max_channel_difference": 0,
-        "changed_channels": 0
-      },
-      {
-        "category": "stereo_rig",
-        "frame": "eval_v2_seq_017/000017",
-        "background": "noise",
-        "max_channel_difference": 0,
-        "changed_channels": 0
-      },
-      {
-        "category": "stereo_rig",
-        "frame": "eval_v2_seq_017/000017",
-        "background": "black",
-        "max_channel_difference": 0,
-        "changed_channels": 0
-      },
-      {
-        "category": "stereo_rig",
-        "frame": "eval_v2_seq_017/000017",
-        "background": "white",
-        "max_channel_difference": 0,
-        "changed_channels": 0
-      },
-      {
-        "category": "stereo_rig",
-        "frame": "eval_v2_seq_017/000018",
-        "background": "real",
-        "max_channel_difference": 0,
-        "changed_channels": 0
-      },
-      {
-        "category": "stereo_rig",
-        "frame": "eval_v2_seq_017/000019",
-        "background": "real",
-        "max_channel_difference": 0,
-        "changed_channels": 0
-      },
-      {
-        "category": "stereo_rig",
-        "frame": "eval_v2_seq_017/000020",
-        "background": "real",
-        "max_channel_difference": 0,
-        "changed_channels": 0
-      },
-      {
-        "category": "stereo_rig",
-        "frame": "eval_v2_seq_017/000021",
-        "background": "real",
-        "max_channel_difference": 0,
-        "changed_channels": 0
-      },
-      {
-        "category": "stereo_rig",
-        "frame": "eval_v2_seq_017/000022",
-        "background": "real",
-        "max_channel_difference": 0,
-        "changed_channels": 0
-      },
-      {
-        "category": "stereo_rig",
-        "frame": "eval_v2_seq_017/000023",
-        "background": "real",
-        "max_channel_difference": 0,
-        "changed_channels": 0
-      },
-      {
-        "category": "stereo_rig",
-        "frame": "eval_v2_seq_017/000024",
-        "background": "real",
-        "max_channel_difference": 0,
-        "changed_channels": 0
-      },
-      {
-        "category": "combined_pose_jaw",
-        "frame": "eval_v2_seq_020/000030",
-        "background": "real",
-        "max_channel_difference": 0,
-        "changed_channels": 0
-      },
-      {
-        "category": "combined_pose_jaw",
-        "frame": "eval_v2_seq_020/000030",
-        "background": "noise",
-        "max_channel_difference": 0,
-        "changed_channels": 0
-      },
-      {
-        "category": "combined_pose_jaw",
-        "frame": "eval_v2_seq_020/000030",
-        "background": "black",
-        "max_channel_difference": 0,
-        "changed_channels": 0
-      },
-      {
-        "category": "combined_pose_jaw",
-        "frame": "eval_v2_seq_020/000030",
-        "background": "white",
-        "max_channel_difference": 0,
-        "changed_channels": 0
-      },
-      {
-        "category": "combined_pose_jaw",
-        "frame": "eval_v2_seq_020/000031",
-        "background": "real",
-        "max_channel_difference": 0,
-        "changed_channels": 0
-      },
-      {
-        "category": "combined_pose_jaw",
-        "frame": "eval_v2_seq_020/000032",
-        "background": "real",
-        "max_channel_difference": 0,
-        "changed_channels": 0
-      },
-      {
-        "category": "combined_pose_jaw",
-        "frame": "eval_v2_seq_020/000033",
-        "background": "real",
-        "max_channel_difference": 0,
-        "changed_channels": 0
-      },
-      {
-        "category": "combined_pose_jaw",
-        "frame": "eval_v2_seq_020/000034",
-        "background": "real",
-        "max_channel_difference": 0,
-        "changed_channels": 0
-      },
-      {
-        "category": "combined_pose_jaw",
-        "frame": "eval_v2_seq_020/000035",
-        "background": "real",
-        "max_channel_difference": 0,
-        "changed_channels": 0
-      },
-      {
-        "category": "combined_pose_jaw",
-        "frame": "eval_v2_seq_020/000036",
-        "background": "real",
-        "max_channel_difference": 0,
-        "changed_channels": 0
-      },
-      {
-        "category": "combined_pose_jaw",
-        "frame": "eval_v2_seq_020/000037",
-        "background": "real",
-        "max_channel_difference": 0,
-        "changed_channels": 0
-      }
-    ],
-    "max_channel_difference": 0,
-    "geometry_identical": true,
-    "library_sha256": [
-      "fba5f79a8b38f349269556be97e6bed7e0e6c779e9fa889534d03ac6e5dbfdb3",
-      "447d72c6ada6c190636dbd698facbf3548d3ab4a666d53d66094a86487755bae"
-    ]
+    "pixels": {
+      "passed": true,
+      "cases": [
+        {
+          "category": "pose_motion",
+          "frame": "eval_v2_seq_002/000017",
+          "background": "real",
+          "max_channel_difference": 0,
+          "changed_channels": 0
+        },
+        {
+          "category": "pose_motion",
+          "frame": "eval_v2_seq_002/000017",
+          "background": "noise",
+          "max_channel_difference": 0,
+          "changed_channels": 0
+        },
+        {
+          "category": "pose_motion",
+          "frame": "eval_v2_seq_002/000017",
+          "background": "black",
+          "max_channel_difference": 0,
+          "changed_channels": 0
+        },
+        {
+          "category": "pose_motion",
+          "frame": "eval_v2_seq_002/000017",
+          "background": "white",
+          "max_channel_difference": 0,
+          "changed_channels": 0
+        },
+        {
+          "category": "pose_motion",
+          "frame": "eval_v2_seq_002/000018",
+          "background": "real",
+          "max_channel_difference": 0,
+          "changed_channels": 0
+        },
+        {
+          "category": "pose_motion",
+          "frame": "eval_v2_seq_002/000019",
+          "background": "real",
+          "max_channel_difference": 0,
+          "changed_channels": 0
+        },
+        {
+          "category": "pose_motion",
+          "frame": "eval_v2_seq_002/000020",
+          "background": "real",
+          "max_channel_difference": 0,
+          "changed_channels": 0
+        },
+        {
+          "category": "pose_motion",
+          "frame": "eval_v2_seq_002/000021",
+          "background": "real",
+          "max_channel_difference": 0,
+          "changed_channels": 0
+        },
+        {
+          "category": "pose_motion",
+          "frame": "eval_v2_seq_002/000022",
+          "background": "real",
+          "max_channel_difference": 0,
+          "changed_channels": 0
+        },
+        {
+          "category": "pose_motion",
+          "frame": "eval_v2_seq_002/000023",
+          "background": "real",
+          "max_channel_difference": 0,
+          "changed_channels": 0
+        },
+        {
+          "category": "pose_motion",
+          "frame": "eval_v2_seq_002/000024",
+          "background": "real",
+          "max_channel_difference": 0,
+          "changed_channels": 0
+        },
+        {
+          "category": "lighting",
+          "frame": "eval_v2_seq_005/000017",
+          "background": "real",
+          "max_channel_difference": 0,
+          "changed_channels": 0
+        },
+        {
+          "category": "lighting",
+          "frame": "eval_v2_seq_005/000017",
+          "background": "noise",
+          "max_channel_difference": 0,
+          "changed_channels": 0
+        },
+        {
+          "category": "lighting",
+          "frame": "eval_v2_seq_005/000017",
+          "background": "black",
+          "max_channel_difference": 0,
+          "changed_channels": 0
+        },
+        {
+          "category": "lighting",
+          "frame": "eval_v2_seq_005/000017",
+          "background": "white",
+          "max_channel_difference": 0,
+          "changed_channels": 0
+        },
+        {
+          "category": "lighting",
+          "frame": "eval_v2_seq_005/000018",
+          "background": "real",
+          "max_channel_difference": 0,
+          "changed_channels": 0
+        },
+        {
+          "category": "lighting",
+          "frame": "eval_v2_seq_005/000019",
+          "background": "real",
+          "max_channel_difference": 0,
+          "changed_channels": 0
+        },
+        {
+          "category": "lighting",
+          "frame": "eval_v2_seq_005/000020",
+          "background": "real",
+          "max_channel_difference": 0,
+          "changed_channels": 0
+        },
+        {
+          "category": "lighting",
+          "frame": "eval_v2_seq_005/000021",
+          "background": "real",
+          "max_channel_difference": 0,
+          "changed_channels": 0
+        },
+        {
+          "category": "lighting",
+          "frame": "eval_v2_seq_005/000022",
+          "background": "real",
+          "max_channel_difference": 0,
+          "changed_channels": 0
+        },
+        {
+          "category": "lighting",
+          "frame": "eval_v2_seq_005/000023",
+          "background": "real",
+          "max_channel_difference": 0,
+          "changed_channels": 0
+        },
+        {
+          "category": "lighting",
+          "frame": "eval_v2_seq_005/000024",
+          "background": "real",
+          "max_channel_difference": 0,
+          "changed_channels": 0
+        },
+        {
+          "category": "sensor_quality",
+          "frame": "eval_v2_seq_008/000017",
+          "background": "real",
+          "max_channel_difference": 0,
+          "changed_channels": 0
+        },
+        {
+          "category": "sensor_quality",
+          "frame": "eval_v2_seq_008/000017",
+          "background": "noise",
+          "max_channel_difference": 0,
+          "changed_channels": 0
+        },
+        {
+          "category": "sensor_quality",
+          "frame": "eval_v2_seq_008/000017",
+          "background": "black",
+          "max_channel_difference": 0,
+          "changed_channels": 0
+        },
+        {
+          "category": "sensor_quality",
+          "frame": "eval_v2_seq_008/000017",
+          "background": "white",
+          "max_channel_difference": 0,
+          "changed_channels": 0
+        },
+        {
+          "category": "sensor_quality",
+          "frame": "eval_v2_seq_008/000018",
+          "background": "real",
+          "max_channel_difference": 0,
+          "changed_channels": 0
+        },
+        {
+          "category": "sensor_quality",
+          "frame": "eval_v2_seq_008/000019",
+          "background": "real",
+          "max_channel_difference": 0,
+          "changed_channels": 0
+        },
+        {
+          "category": "sensor_quality",
+          "frame": "eval_v2_seq_008/000020",
+          "background": "real",
+          "max_channel_difference": 0,
+          "changed_channels": 0
+        },
+        {
+          "category": "sensor_quality",
+          "frame": "eval_v2_seq_008/000021",
+          "background": "real",
+          "max_channel_difference": 0,
+          "changed_channels": 0
+        },
+        {
+          "category": "sensor_quality",
+          "frame": "eval_v2_seq_008/000022",
+          "background": "real",
+          "max_channel_difference": 0,
+          "changed_channels": 0
+        },
+        {
+          "category": "sensor_quality",
+          "frame": "eval_v2_seq_008/000023",
+          "background": "real",
+          "max_channel_difference": 0,
+          "changed_channels": 0
+        },
+        {
+          "category": "sensor_quality",
+          "frame": "eval_v2_seq_008/000024",
+          "background": "real",
+          "max_channel_difference": 0,
+          "changed_channels": 0
+        },
+        {
+          "category": "occlusion",
+          "frame": "eval_v2_seq_011/000090",
+          "background": "real",
+          "max_channel_difference": 0,
+          "changed_channels": 0
+        },
+        {
+          "category": "occlusion",
+          "frame": "eval_v2_seq_011/000090",
+          "background": "noise",
+          "max_channel_difference": 0,
+          "changed_channels": 0
+        },
+        {
+          "category": "occlusion",
+          "frame": "eval_v2_seq_011/000090",
+          "background": "black",
+          "max_channel_difference": 0,
+          "changed_channels": 0
+        },
+        {
+          "category": "occlusion",
+          "frame": "eval_v2_seq_011/000090",
+          "background": "white",
+          "max_channel_difference": 0,
+          "changed_channels": 0
+        },
+        {
+          "category": "occlusion",
+          "frame": "eval_v2_seq_011/000091",
+          "background": "real",
+          "max_channel_difference": 0,
+          "changed_channels": 0
+        },
+        {
+          "category": "occlusion",
+          "frame": "eval_v2_seq_011/000092",
+          "background": "real",
+          "max_channel_difference": 0,
+          "changed_channels": 0
+        },
+        {
+          "category": "occlusion",
+          "frame": "eval_v2_seq_011/000093",
+          "background": "real",
+          "max_channel_difference": 0,
+          "changed_channels": 0
+        },
+        {
+          "category": "occlusion",
+          "frame": "eval_v2_seq_011/000094",
+          "background": "real",
+          "max_channel_difference": 0,
+          "changed_channels": 0
+        },
+        {
+          "category": "occlusion",
+          "frame": "eval_v2_seq_011/000095",
+          "background": "real",
+          "max_channel_difference": 0,
+          "changed_channels": 0
+        },
+        {
+          "category": "occlusion",
+          "frame": "eval_v2_seq_011/000096",
+          "background": "real",
+          "max_channel_difference": 0,
+          "changed_channels": 0
+        },
+        {
+          "category": "occlusion",
+          "frame": "eval_v2_seq_011/000097",
+          "background": "real",
+          "max_channel_difference": 0,
+          "changed_channels": 0
+        },
+        {
+          "category": "ecm_motion",
+          "frame": "eval_v2_seq_014/000018",
+          "background": "real",
+          "max_channel_difference": 0,
+          "changed_channels": 0
+        },
+        {
+          "category": "ecm_motion",
+          "frame": "eval_v2_seq_014/000018",
+          "background": "noise",
+          "max_channel_difference": 0,
+          "changed_channels": 0
+        },
+        {
+          "category": "ecm_motion",
+          "frame": "eval_v2_seq_014/000018",
+          "background": "black",
+          "max_channel_difference": 0,
+          "changed_channels": 0
+        },
+        {
+          "category": "ecm_motion",
+          "frame": "eval_v2_seq_014/000018",
+          "background": "white",
+          "max_channel_difference": 0,
+          "changed_channels": 0
+        },
+        {
+          "category": "ecm_motion",
+          "frame": "eval_v2_seq_014/000019",
+          "background": "real",
+          "max_channel_difference": 0,
+          "changed_channels": 0
+        },
+        {
+          "category": "ecm_motion",
+          "frame": "eval_v2_seq_014/000020",
+          "background": "real",
+          "max_channel_difference": 0,
+          "changed_channels": 0
+        },
+        {
+          "category": "ecm_motion",
+          "frame": "eval_v2_seq_014/000021",
+          "background": "real",
+          "max_channel_difference": 0,
+          "changed_channels": 0
+        },
+        {
+          "category": "ecm_motion",
+          "frame": "eval_v2_seq_014/000022",
+          "background": "real",
+          "max_channel_difference": 0,
+          "changed_channels": 0
+        },
+        {
+          "category": "ecm_motion",
+          "frame": "eval_v2_seq_014/000023",
+          "background": "real",
+          "max_channel_difference": 0,
+          "changed_channels": 0
+        },
+        {
+          "category": "ecm_motion",
+          "frame": "eval_v2_seq_014/000024",
+          "background": "real",
+          "max_channel_difference": 0,
+          "changed_channels": 0
+        },
+        {
+          "category": "ecm_motion",
+          "frame": "eval_v2_seq_014/000025",
+          "background": "real",
+          "max_channel_difference": 0,
+          "changed_channels": 0
+        },
+        {
+          "category": "stereo_rig",
+          "frame": "eval_v2_seq_017/000017",
+          "background": "real",
+          "max_channel_difference": 0,
+          "changed_channels": 0
+        },
+        {
+          "category": "stereo_rig",
+          "frame": "eval_v2_seq_017/000017",
+          "background": "noise",
+          "max_channel_difference": 0,
+          "changed_channels": 0
+        },
+        {
+          "category": "stereo_rig",
+          "frame": "eval_v2_seq_017/000017",
+          "background": "black",
+          "max_channel_difference": 0,
+          "changed_channels": 0
+        },
+        {
+          "category": "stereo_rig",
+          "frame": "eval_v2_seq_017/000017",
+          "background": "white",
+          "max_channel_difference": 0,
+          "changed_channels": 0
+        },
+        {
+          "category": "stereo_rig",
+          "frame": "eval_v2_seq_017/000018",
+          "background": "real",
+          "max_channel_difference": 0,
+          "changed_channels": 0
+        },
+        {
+          "category": "stereo_rig",
+          "frame": "eval_v2_seq_017/000019",
+          "background": "real",
+          "max_channel_difference": 0,
+          "changed_channels": 0
+        },
+        {
+          "category": "stereo_rig",
+          "frame": "eval_v2_seq_017/000020",
+          "background": "real",
+          "max_channel_difference": 0,
+          "changed_channels": 0
+        },
+        {
+          "category": "stereo_rig",
+          "frame": "eval_v2_seq_017/000021",
+          "background": "real",
+          "max_channel_difference": 0,
+          "changed_channels": 0
+        },
+        {
+          "category": "stereo_rig",
+          "frame": "eval_v2_seq_017/000022",
+          "background": "real",
+          "max_channel_difference": 0,
+          "changed_channels": 0
+        },
+        {
+          "category": "stereo_rig",
+          "frame": "eval_v2_seq_017/000023",
+          "background": "real",
+          "max_channel_difference": 0,
+          "changed_channels": 0
+        },
+        {
+          "category": "stereo_rig",
+          "frame": "eval_v2_seq_017/000024",
+          "background": "real",
+          "max_channel_difference": 0,
+          "changed_channels": 0
+        },
+        {
+          "category": "combined_pose_jaw",
+          "frame": "eval_v2_seq_020/000030",
+          "background": "real",
+          "max_channel_difference": 0,
+          "changed_channels": 0
+        },
+        {
+          "category": "combined_pose_jaw",
+          "frame": "eval_v2_seq_020/000030",
+          "background": "noise",
+          "max_channel_difference": 0,
+          "changed_channels": 0
+        },
+        {
+          "category": "combined_pose_jaw",
+          "frame": "eval_v2_seq_020/000030",
+          "background": "black",
+          "max_channel_difference": 0,
+          "changed_channels": 0
+        },
+        {
+          "category": "combined_pose_jaw",
+          "frame": "eval_v2_seq_020/000030",
+          "background": "white",
+          "max_channel_difference": 0,
+          "changed_channels": 0
+        },
+        {
+          "category": "combined_pose_jaw",
+          "frame": "eval_v2_seq_020/000031",
+          "background": "real",
+          "max_channel_difference": 0,
+          "changed_channels": 0
+        },
+        {
+          "category": "combined_pose_jaw",
+          "frame": "eval_v2_seq_020/000032",
+          "background": "real",
+          "max_channel_difference": 0,
+          "changed_channels": 0
+        },
+        {
+          "category": "combined_pose_jaw",
+          "frame": "eval_v2_seq_020/000033",
+          "background": "real",
+          "max_channel_difference": 0,
+          "changed_channels": 0
+        },
+        {
+          "category": "combined_pose_jaw",
+          "frame": "eval_v2_seq_020/000034",
+          "background": "real",
+          "max_channel_difference": 0,
+          "changed_channels": 0
+        },
+        {
+          "category": "combined_pose_jaw",
+          "frame": "eval_v2_seq_020/000035",
+          "background": "real",
+          "max_channel_difference": 0,
+          "changed_channels": 0
+        },
+        {
+          "category": "combined_pose_jaw",
+          "frame": "eval_v2_seq_020/000036",
+          "background": "real",
+          "max_channel_difference": 0,
+          "changed_channels": 0
+        },
+        {
+          "category": "combined_pose_jaw",
+          "frame": "eval_v2_seq_020/000037",
+          "background": "real",
+          "max_channel_difference": 0,
+          "changed_channels": 0
+        }
+      ],
+      "max_channel_difference": 0,
+      "geometry_identical": true,
+      "library_sha256": [
+        "fba5f79a8b38f349269556be97e6bed7e0e6c779e9fa889534d03ac6e5dbfdb3",
+        "447d72c6ada6c190636dbd698facbf3548d3ab4a666d53d66094a86487755bae"
+      ]
+    }
   }
 }
