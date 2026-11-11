@@ -10,6 +10,7 @@
 - [LibTorch直接推理、GPU预处理及资源审计](docs/LIBTORCH_INFERENCE.md)：4060工作区三向量显示模式实测均值31.96Hz，含数值、箭头、面板及投影；提供分模块耗时、资源统计及对应代码版本范围。
 - [TensorRT视觉前端与原版对照](docs/TENSORRT_VISUAL.md)：4060完整双目流程约37.76Hz，记录56对样本的实现转换差异。
 - [逐步推理优化与最终验收](docs/RUNTIME_OPTIMIZATION.md)：C点CUDA计算、缓存、CUDA Graph、并行绘图及引擎构建；三轮完整双目均值15.23ms／65.68Hz，记录数值一致性检查。
+- [CUDA算子融合过程与验收](docs/CUDA_FUSION.md)：同权重、同引擎、同绘图，三轮完整双目15.28→12.98ms／77.04Hz；预处理和局部裁剪融合通过，关键点归约无稳定加速而默认关闭。
 - [验证方法及统计口径](docs/VALIDATION_PROTOCOL.md)。
 - [论文与实现来源](docs/SOURCES.md)。
 - [历史结构源码和复现实验](experiments/README.md)。
