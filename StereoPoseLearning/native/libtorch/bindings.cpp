@@ -4,6 +4,9 @@
 #include "position_cuda.h"
 #endif
 #include "profile_ranges.h"
+#ifdef STEREO_FUSIONS
+#include "fusion_cuda.h"
+#endif
 #include <torch/csrc/utils/pybind.h>
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
@@ -24,6 +27,11 @@ PYBIND11_MODULE(STEREO_MODULE_NAME,m) {
           pybind11::gil_scoped_acquire gil; callback(name);
       };
   });
+#endif
+#ifdef STEREO_FUSIONS
+  m.def("crop_reference",&stereo_crop_reference);
+  m.def("crop_cuda",&stereo_crop_cuda);
+  m.def("mask_cuda",&stereo_mask_cuda);
 #endif
   m.def("position_reference",&stereo_position_reference);
 #ifdef STEREO_OPTIMIZED

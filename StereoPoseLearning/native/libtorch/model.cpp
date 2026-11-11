@@ -1,3 +1,6 @@
+#ifdef STEREO_FUSIONS
+#include "fusion_cuda.h"
+#endif
 #include "model.h"
 #include "profile_ranges.h"
 #include <ATen/TensorIndexing.h>
@@ -304,6 +307,12 @@ std::tuple<T,T,TensorMap> StereoNet::forward(const T& images,const T& K,const T&
     auto grids=at::meshgrid({axis,axis},"ij");return at::stack({grids[1],grids[0]},-1);});
   auto pixel_grid=centre.unsqueeze(2).unsqueeze(2)+extent.unsqueeze(2).unsqueeze(2)*offsets;
   auto grid=(pixel_grid+.5)*constant("crop_scale",[&]{return fresh(pixel_grid,{2.f/640,2.f/360});})-1;
+  T crop;
+#ifdef STEREO_FUSIONS
+  if(cfg("fusion_hires_crop",0))crop=stereo_crop_cuda(hires,mask,grid.reshape({2,2*size,size,2}),cfg("part_mask_cutoff",.2),static_cast<int>(cfg("part_mask_dilation_px",1)));
+  else
+#endif
+  {
   auto mean=constant("mean",[&]{return fresh(grid,{.485f,.456f,.406f});}).view({1,3,1,1}),sd=constant("std",[&]{return fresh(grid,{.229f,.224f,.225f});}).view({1,3,1,1});
   auto probability=resize(mask.sigmoid(),720,1280); double cutoff=cfg("part_mask_cutoff",.2);
   probability=((probability-cutoff)/(1-cutoff)).clamp(0,1);
@@ -311,7 +320,8 @@ std::tuple<T,T,TensorMap> StereoNet::forward(const T& images,const T& K,const T&
   if(dilation) probability=at::max_pool2d(probability,{2*dilation+1,2*dilation+1},{1,1},{dilation,dilation},{1,1},false);
   auto image=(hires.reshape({2,3,720,1280}).to(at::kFloat)/255-mean)/sd;
   auto masked=at::cat({image*probability,probability},1);
-  auto crop=at::grid_sampler(masked,grid.reshape({2,2*size,size,2}),0,0,false);
+  crop=at::grid_sampler(masked,grid.reshape({2,2*size,size,2}),0,0,false);
+  }
   crop=crop.reshape({2,4,2,size,size}).permute({0,2,1,3,4});
   auto observed=crop.select(2,3).mean({-2,-1});
   auto divisor=constant("size",[&]{return fresh(centre,{640,360});});
@@ -343,3 +353,15 @@ std::tuple<T,T,TensorMap> StereoNet::forward(const T& images,const T& K,const T&
   }
   return {values,next,detail};
 }
+
+#ifdef STEREO_FUSIONS
+at::Tensor stereo_crop_reference(const at::Tensor& hires,const at::Tensor& mask,const at::Tensor& grid,double cutoff,int dilation) {
+  auto mean=at::tensor({.485f,.456f,.406f},at::kFloat).to(hires.device()).view({1,3,1,1});
+  auto sd=at::tensor({.229f,.224f,.225f},at::kFloat).to(hires.device()).view({1,3,1,1});
+  auto probability=at::upsample_bilinear2d(mask.sigmoid(),{720,1280},false,std::nullopt,std::nullopt);
+  probability=((probability-cutoff)/(1-cutoff)).clamp(0,1);
+  if(dilation)probability=at::max_pool2d(probability,{2*dilation+1,2*dilation+1},{1,1},{dilation,dilation},{1,1},false);
+  auto image=(hires.reshape({2,3,720,1280}).to(at::kFloat)/255-mean)/sd;
+  return at::grid_sampler(at::cat({image*probability,probability},1),grid,0,0,false);
+}
+#endif
