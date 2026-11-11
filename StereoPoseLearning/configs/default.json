@@ -93,7 +93,7 @@
     "decouple_geometry": true
   },
   "expected_pairs": {
-    "train": 1820,
+    "train": 1400,
     "validation": 350,
     "test": 350
   },
@@ -126,5 +126,5 @@
       1.0
     ]
   },
-  "notes": "Public training template. Verify immutable source assignments before training; no historical checkpoint or accuracy result is supplied."
+  "notes": "Public fresh-training template for the 21 independent-trajectory generation plan. Counts are design targets, not a statement about supplied data. prepare_run validates immutable source assignments and writes observed counts. No learned checkpoint is supplied."
 }

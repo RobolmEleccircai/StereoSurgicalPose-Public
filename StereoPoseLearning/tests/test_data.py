@@ -47,7 +47,11 @@ def save_label(root, frame, *, seq="seq_000", split="train", group="trajectory_a
         images.mkdir(parents=True, exist_ok=True)
         masks.mkdir(parents=True, exist_ok=True)
         image_path, mask_path = images / f"{job}.png", masks / f"{job}.png"
-        Image.new("RGB", (64, 32), (100 + frame % 50, 120, 140)).save(image_path)
+        # Independent synthetic trajectories need distinct image content too;
+        # otherwise flat-color fixtures look like copied cross-split frames.
+        color_id = hashlib.sha256(group.encode()).digest()
+        Image.new("RGB", (64, 32), (100 + frame % 50, 16 + color_id[0] % 224,
+                                    16 + color_id[1] % 224)).save(image_path)
         Image.new("L", (64, 32), 255).save(mask_path)
         origins = {"shaft": [offset, 0, 100], "jaw1": [offset - 1, 0, 110],
                    "jaw2": [offset + 1, 0, 110]}

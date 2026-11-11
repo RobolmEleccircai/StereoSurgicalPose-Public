@@ -19,6 +19,7 @@ from .losses import PoseLoss, rotation_error_degrees
 from .model import StereoPoseNet, joint_bounds_from_model
 from .loading import make_loader, device_batches, category_weighted_loss
 from .augmentation import augment_batch
+from .split_policy import verify_disjoint_splits, verify_source_assignments
 from .training_policy import (validate_training_policy, training_epochs, should_early_stop,
     learning_rate_factor, restore_loss_bests, update_loss_bests, atomic_checkpoint_link,
     update_epoch_archive)
@@ -116,6 +117,7 @@ def verify_manifest(manifest, instrument):
         raise ValueError("Manifest changed after indexing; rebuild a fresh snapshot")
     if manifest["source_scene_sha256"] != instrument["source_scene_sha256"]:
         raise ValueError("The instrument geometry and dataset came from different USD assets")
+    verify_disjoint_splits(manifest)
 
 
 def amp_context(device, enabled):
@@ -138,7 +140,7 @@ def require_complete(manifest, config):
     expected = config["expected_pairs"]
     sealed = manifest.get('training_supplement', {}).get('snapshot_sealed', False)
     if not manifest["hashes_verified"] or not (manifest["complete"] or sealed) or manifest["trajectory_split_counts"] != expected:
-        raise ValueError(f"Full training requires the completed 2100-pair manifest {expected}; observed {manifest['trajectory_split_counts']}. Use smoke to check partial data.")
+        raise ValueError(f"Full training requires a verified manifest with configured counts {expected}; observed {manifest['trajectory_split_counts']}. Use smoke to check partial data.")
     if manifest["isolated_diagnostic_pairs"]:
         raise ValueError("Full training manifest must contain production sequences, not isolated diagnostic captures.")
 
@@ -274,6 +276,7 @@ def evaluate(model, kinematics, manifest, split, config, device, limit=None):
 
 def train(config, instrument, manifest, output, device, resume=None, smoke=False, trial=False, loader_upgrade=False, extend_training=False, append_train_manifest=None):
     verify_manifest(manifest, instrument)
+    split_audit = verify_source_assignments(manifest)
     settings = config["training"]
     torch.set_num_threads(settings.get('cpu_threads',4))
     if device.type=='cuda':
@@ -297,6 +300,7 @@ def train(config, instrument, manifest, output, device, resume=None, smoke=False
     if output.exists() and any(output.iterdir()) and not resume:
         raise FileExistsError(f"Choose a fresh run directory: {output}")
     output.mkdir(parents=True, exist_ok=True)
+    write_json(output / "split_audit.json", split_audit)
     signature = identity(config, instrument, manifest)
     dataset = StereoDataset(manifest, "train", window=config["window"], image_size=tuple(config["image_size"]), include_hires=config.get("model", {}).get("foreground_parts", False))
     if config['training'].get('shared_frame_cache',False):dataset.preload_shared()

@@ -8,6 +8,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 from reproduction import empty_destination, path_maps, relocated_manifest, verify_files, write_json
 from stereo_pose.runtime import verify_manifest
+from stereo_pose.split_policy import verify_source_assignments
 
 
 def main():
@@ -21,6 +22,7 @@ def main():
     manifest = relocated_manifest(source, path_maps(args.path_map))
     instrument = json.loads((ROOT / 'assets/instrument_model.json').read_text())
     verify_manifest(manifest, instrument)
+    split_audit = verify_source_assignments(manifest)
     count = verify_files(manifest)
     config = json.loads(args.config.read_text())
     config['expected_pairs'] = manifest['trajectory_split_counts']
@@ -29,6 +31,7 @@ def main():
     output = empty_destination(args.output)
     write_json(output / 'manifest.json', manifest)
     write_json(output / 'config.json', config)
+    write_json(output / 'split_audit.json', split_audit)
     write_json(output / 'preparation.json', {
         'source_manifest_sha256': source['manifest_sha256'],
         'manifest_sha256': manifest['manifest_sha256'], 'verified_files': count,

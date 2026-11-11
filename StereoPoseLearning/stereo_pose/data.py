@@ -211,6 +211,11 @@ def build_manifest(run_roots: Iterable[str | Path], output: str | Path,
                 "tip_region_visibility": {eye: [bool(v.get("region_visible", False)) for v in label["eyes"][eye].get("jaw_tip_region_visibility", [])] for eye in EYES},
             }
             identity = (temporal_group, source_index)
+            # Preserve capture lineage; derived renders belong to the same split.
+            for provenance_key in ("original_split", "source_split", "source_trajectory_group_id",
+                                   "parent_trajectory_group_id", "original_trajectory_group_id"):
+                if provenance_key in label:
+                    record[provenance_key] = label[provenance_key]
             if identity in seen:
                 old = seen[identity]
                 signatures = ("label_sha256", "image_sha256", "mask_sha256", "split", "timestamp_ns")
