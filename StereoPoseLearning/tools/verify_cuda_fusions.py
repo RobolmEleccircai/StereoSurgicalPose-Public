@@ -34,11 +34,22 @@ def crop_cases(native):
 
 def main():
     p=argparse.ArgumentParser(description=__doc__);p.add_argument('--output',type=Path,required=True)
-    a=p.parse_args();root=Path(__file__).resolve().parents[1]
+    args=p.parse_args();root=Path(__file__).resolve().parents[1]
     sys.path.insert(0,str(root/'native/libtorch/build/fused'))
     import stereo_libtorch_fused as native
     records=crop_cases(native)
-    result={'passed':True,'crop_cases':records,'scope':'operator numerical agreement, not pose accuracy'}
-    a.output.parent.mkdir(parents=True,exist_ok=True);a.output.write_text(json.dumps(result,indent=2)+'\n')
+    landmark=[]
+    for name,x in [('random',torch.randn(2,5,90,160,device='cuda')*8),('zero',torch.zeros(2,5,90,160,device='cuda')),
+                   ('negative',torch.full((2,5,90,160),-100.,device='cuda')),('positive',torch.full((2,5,90,160),100.,device='cuda'))]:
+        for variant in ('plain','spike','edge'):
+            h=x.clone()
+            if variant=='spike':h[:,:,40,80]=100
+            if variant=='edge':h[:,:,-1,-1]=100
+            a,c=native.landmark_reference(h,4);b,d=native.landmark_cuda(h,4)
+            torch.testing.assert_close(a,b,atol=2e-6,rtol=2e-6)
+            torch.testing.assert_close(c,d,atol=2e-7,rtol=2e-7)
+            landmark.append({'input':name,'variant':variant,'xy_max_abs':float((a-b).abs().max()),'confidence_max_abs':float((c-d).abs().max())})
+    result={'passed':True,'crop_cases':records,'landmark_cases':landmark,'scope':'operator numerical agreement, not pose accuracy'}
+    args.output.parent.mkdir(parents=True,exist_ok=True);args.output.write_text(json.dumps(result,indent=2)+'\n')
     print(json.dumps({'passed':True,'cases':len(records),'crop_max_abs':max(r['crop_max_abs'] for r in records)}))
 if __name__=='__main__':main()

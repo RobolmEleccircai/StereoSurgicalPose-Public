@@ -151,13 +151,20 @@ T StereoNet::attention(const T& qin,const T& kvin,const std::string& p) const {
 std::tuple<T,T,T> StereoNet::guided(const T& spatial,const T& mask_logits,const T& heat) const {
   const std::string p="guided_regions";
   int64_t h=spatial.size(2),ww=spatial.size(3),patch=static_cast<int64_t>(cfg("roi_patch_size",8));
-  auto probs=heat.to(at::kFloat).sigmoid();
-  auto options=probs.options().dtype(at::kLong);
+  auto options=heat.options().dtype(at::kLong);
   auto grid=constant("guided_grid",[&]{return at::stack(at::meshgrid({(at::arange(h,options)+.5)*2/h-1,(at::arange(ww,options)+.5)*2/ww-1},"ij"));});
-  auto yy=grid[0],xx=grid[1],weights=probs.pow(cfg("landmark_power",4))+1e-12;
-  weights=weights/weights.sum({-2,-1},true).clamp_min(1e-12);
-  auto xy=at::stack({(weights*xx).sum({-2,-1}),(weights*yy).sum({-2,-1})},-1);
-  auto confidence=probs.amax({-2,-1});
+  auto yy=grid[0],xx=grid[1];T xy,confidence;
+#ifdef STEREO_FUSIONS
+  if(cfg("fusion_landmark_reduce",0))std::tie(xy,confidence)=stereo_landmark_cuda(heat,cfg("landmark_power",4));
+  else
+#endif
+  {
+    auto probs=heat.to(at::kFloat).sigmoid();
+    auto weights=probs.pow(cfg("landmark_power",4))+1e-12;
+    weights=weights/weights.sum({-2,-1},true).clamp_min(1e-12);
+    xy=at::stack({(weights*xx).sum({-2,-1}),(weights*yy).sum({-2,-1})},-1);
+    confidence=probs.amax({-2,-1});
+  }
   auto radius=constant("guided_radius",[&]{return fresh(xy,{static_cast<float>(2*cfg("roi_radius_px",24)/640),static_cast<float>(2*cfg("roi_radius_px",24)/360)});});
   auto offsets=constant("guided_offsets",[&]{auto t=(at::arange(patch,options)+.5)*2/patch-1;
     auto gg=at::meshgrid({t,t},"ij");return at::stack({gg[1],gg[0]},-1)*radius;});
@@ -363,5 +370,15 @@ at::Tensor stereo_crop_reference(const at::Tensor& hires,const at::Tensor& mask,
   if(dilation)probability=at::max_pool2d(probability,{2*dilation+1,2*dilation+1},{1,1},{dilation,dilation},{1,1},false);
   auto image=(hires.reshape({2,3,720,1280}).to(at::kFloat)/255-mean)/sd;
   return at::grid_sampler(at::cat({image*probability,probability},1),grid,0,0,false);
+}
+#endif
+
+#ifdef STEREO_FUSIONS
+std::tuple<at::Tensor,at::Tensor> stereo_landmark_reference(const at::Tensor& heat,double power) {
+  auto probs=heat.to(at::kFloat).sigmoid();auto options=probs.options().dtype(at::kLong);
+  auto grid=at::meshgrid({(at::arange(heat.size(2),options)+.5)*2/heat.size(2)-1,
+      (at::arange(heat.size(3),options)+.5)*2/heat.size(3)-1},"ij");
+  auto weights=probs.pow(power)+1e-12;weights=weights/weights.sum({-2,-1},true).clamp_min(1e-12);
+  return {at::stack({(weights*grid[1]).sum({-2,-1}),(weights*grid[0]).sum({-2,-1})},-1),probs.amax({-2,-1})};
 }
 #endif

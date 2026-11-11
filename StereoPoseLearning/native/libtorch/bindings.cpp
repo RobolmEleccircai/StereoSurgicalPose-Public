@@ -32,6 +32,8 @@ PYBIND11_MODULE(STEREO_MODULE_NAME,m) {
   m.def("crop_reference",&stereo_crop_reference);
   m.def("crop_cuda",&stereo_crop_cuda);
   m.def("mask_cuda",&stereo_mask_cuda);
+  m.def("landmark_cuda",&stereo_landmark_cuda);
+  m.def("landmark_reference",&stereo_landmark_reference);
 #endif
   m.def("position_reference",&stereo_position_reference);
 #ifdef STEREO_OPTIMIZED

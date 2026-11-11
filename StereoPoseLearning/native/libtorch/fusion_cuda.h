@@ -8,3 +8,5 @@ at::Tensor stereo_crop_cuda(const at::Tensor& hires,const at::Tensor& mask,
     const at::Tensor& grid,double cutoff,int dilation);
 at::Tensor stereo_crop_reference(const at::Tensor& hires,const at::Tensor& mask,
     const at::Tensor& grid,double cutoff,int dilation);
+std::tuple<at::Tensor,at::Tensor> stereo_landmark_cuda(const at::Tensor& heat,double power);
+std::tuple<at::Tensor,at::Tensor> stereo_landmark_reference(const at::Tensor& heat,double power);
