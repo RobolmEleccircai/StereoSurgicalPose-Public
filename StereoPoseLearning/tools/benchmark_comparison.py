@@ -12,20 +12,26 @@ def main():
     p.add_argument('--baseline-config',type=Path,required=True)
     p.add_argument('--candidate-config',type=Path,required=True)
     p.add_argument('--candidate-overlay',type=Path,required=True)
+    p.add_argument('--baseline-overlay',type=Path)
+    p.add_argument('--timing-detail',choices=('minimal','stages'),default='stages')
     p.add_argument('--output',type=Path,required=True)
     p.add_argument('--repeats',type=int,default=3)
     p.add_argument('--rounds',type=int,default=10)
+    p.add_argument('--min-improvement',type=float,default=.1)
     a=p.parse_args()
     if a.repeats<3 or a.rounds<10:raise ValueError('Final comparison requires at least three repeats of 560 measured pairs')
     a.output.mkdir(parents=True,exist_ok=False)
     reports={'baseline':[],'candidate':[]};frames={'baseline':[],'candidate':[]}
     tool=Path(__file__).with_name('benchmark_realtime.py')
     for repeat in range(a.repeats):
-        for mode,config in [('baseline',a.baseline_config),('candidate',a.candidate_config)]:
+        order=[('baseline',a.baseline_config),('candidate',a.candidate_config)]
+        if repeat%2:order.reverse()
+        for mode,config in order:
             output=a.output/f'{mode}_{repeat+1}'
             command=[sys.executable,str(tool),'--inputs',str(a.inputs),'--inference-backend','libtorch',
-                     '--modes','fp32','--predictor-config',str(config),'--rounds',str(a.rounds),'--output',str(output)]
-            if mode=='candidate':command+=['--overlay-library',str(a.candidate_overlay)]
+                     '--modes','fp32','--timing-detail',a.timing_detail,'--predictor-config',str(config),'--rounds',str(a.rounds),'--output',str(output)]
+            overlay=a.candidate_overlay if mode=='candidate' else a.baseline_overlay
+            if overlay:command+=['--overlay-library',str(overlay)]
             with (a.output/f'{mode}_{repeat+1}.log').open('w') as log:
                 subprocess.run(command,stdout=log,stderr=subprocess.STDOUT,check=True)
             report=json.loads((output/'report.json').read_text())
@@ -36,24 +42,27 @@ def main():
     def stats(values):
         x=np.asarray(values);return {'mean_ms':float(x.mean()),'p50_ms':float(np.percentile(x,50)),
             'p95_ms':float(np.percentile(x,95)),'p99_ms':float(np.percentile(x,99)),
-            'max_ms':float(x.max()),'hz':float(1000/x.mean()),'over_33_33_ms_fraction':float((x>1000/30).mean())}
+            'max_ms':float(x.max()),'hz':float(1000/x.mean()),'over_16_67_ms_fraction':float((x>1000/60).mean()),'over_33_33_ms_fraction':float((x>1000/30).mean())}
     summary={}
     for mode in reports:
         summary[mode]={'measured_pairs':len(frames[mode]),
           'timings':{field:stats([r[field] for r in frames[mode]]) for field in
-             ('end_to_end_ms','predictor_including_preprocess_transfer_export_ms','cpp_projection_and_draw_ms','network_cuda_interval_ms')},
+             ('end_to_end_ms','predictor_including_preprocess_transfer_export_ms','cpp_projection_and_draw_ms','network_cuda_interval_ms') if field in frames[mode][0]},
           'runs':[{'mean_ms':r['results']['fp32']['end_to_end_ms']['mean_ms'],
                    'p95_ms':r['results']['fp32']['end_to_end_ms']['p95_ms'],
                    'cpu_percent':r['results']['fp32']['process_cpu_percent'],
                    'peak_rss_mib':r['results']['fp32']['process_peak_rss_mib'],
                    'peak_torch_cuda_allocated_mib':r['results']['fp32']['peak_cuda_allocated_mib'],
                    'actual_execution':r['actual_execution'],'graph_error':r['graph_error']} for r in reports[mode]]}
+    if a.baseline_overlay:
+        hashes={r['overlay_library_sha256'] for side in reports.values() for r in side}
+        if len(hashes)!=1:raise ValueError('Fusion comparison must use the same overlay library')
     improvement=1-summary['candidate']['timings']['end_to_end_ms']['mean_ms']/summary['baseline']['timings']['end_to_end_ms']['mean_ms']
     repeatable=max(r['mean_ms'] for r in summary['candidate']['runs'])<min(r['mean_ms'] for r in summary['baseline']['runs'])
     p95_pass=max(r['p95_ms'] for r in summary['candidate']['runs'])<=min(r['p95_ms'] for r in summary['baseline']['runs'])
     graph_pass=all(r['actual_execution']=='optimized_graph' and r['graph_error'] is None for r in summary['candidate']['runs'])
     result={'completed':True,'summary':summary,'latency_reduction':improvement,'repeatable_improvement':repeatable,
-            'p95_pass':p95_pass,'graph_pass':graph_pass,'speed_goal_passed':improvement>=.1 and repeatable and p95_pass and graph_pass,
+            'p95_pass':p95_pass,'graph_pass':graph_pass,'minimum_improvement_target':a.min_improvement,'speed_goal_passed':improvement>=a.min_improvement and repeatable and p95_pass and graph_pass,
             'scope':reports['candidate'][0]['timing_scope'],'telemetry_scope':'GPU telemetry includes warmup and measurement; CPU percentage is measured-loop process CPU time / wall time.'}
     (a.output/'summary.json').write_text(json.dumps(result,indent=2)+'\n')
     print(json.dumps(result,indent=2))

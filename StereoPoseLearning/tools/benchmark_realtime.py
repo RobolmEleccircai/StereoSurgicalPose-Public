@@ -60,6 +60,7 @@ def main():
     parser.add_argument('--visual-engine',type=Path,help='Optional TensorRT visual frontend; downstream remains LibTorch')
     parser.add_argument('--overlay-library',type=Path,help='Optional separately built native renderer')
     parser.add_argument('--predictor-config',type=Path,help='Native runtime configuration; overrides checkpoint/engine/execution selection')
+    parser.add_argument('--timing-detail',choices=('minimal','stages'),default='stages')
     args = parser.parse_args()
     if args.visual_engine is not None and args.inference_backend!='libtorch':
         parser.error('--visual-engine requires --inference-backend libtorch')
@@ -132,14 +133,14 @@ def main():
     canvas = np.empty(next(iter(overlays.values())).canvas_shape, dtype=np.uint8)
     events = [torch.cuda.Event(enable_timing=True), torch.cuda.Event(enable_timing=True)]
     hooks = [predictor.model.register_forward_pre_hook(lambda *_: events[0].record()),
-             predictor.model.register_forward_hook(lambda *_: events[1].record())]
+             predictor.model.register_forward_hook(lambda *_: events[1].record())] if args.timing_detail=='stages' else []
     stage = {}
     original_preprocess = predictor._prepare_inputs
     def measured_preprocess(*a, **kw):
         start = time.perf_counter_ns(); result = original_preprocess(*a, **kw)
         stage['input_preparation_host_wall_ms'] = (time.perf_counter_ns()-start)/1e6
         return result
-    predictor._prepare_inputs = measured_preprocess
+    if args.timing_detail=='stages':predictor._prepare_inputs = measured_preprocess
     telemetry_file = (args.output/'gpu_telemetry.csv').open('w')
     telemetry = subprocess.Popen(['nvidia-smi',
         '--query-gpu=timestamp,memory.used,utilization.gpu,power.draw,temperature.gpu,clocks.sm',
@@ -175,7 +176,7 @@ def main():
                         end = time.perf_counter_ns()
                         # Returning a CPU numpy prediction synchronizes the GPU
                         # result; this is real completion, not launch timing.
-                        events[1].synchronize()
+                        if args.timing_detail=='stages':events[1].synchronize()
                         assert metadata['valid'] and metadata['backend'] == 'cpp'
                         assert predictor.reset_count == reset_count, 'Unexpected mid-sequence state reset'
                         record = {'mode': mode, 'repeat': repeat, 'sequence_id': sid,
@@ -183,7 +184,7 @@ def main():
                             'predictor_including_preprocess_transfer_export_ms': (after_prediction-start)/1e6,
                             'cpp_projection_and_draw_ms': (end-after_prediction)/1e6,
                             'end_to_end_ms': (end-start)/1e6,
-                            'network_cuda_interval_ms': events[0].elapsed_time(events[1]), **stage}
+                            **({'network_cuda_interval_ms':events[0].elapsed_time(events[1]),**stage} if args.timing_detail=='stages' else {})}
                         measured.append(record); details.append(record)
                         if repeat == 0:
                             predictions[(mode, sid, row['frame_index'])] = prediction.values17.copy()
@@ -193,7 +194,7 @@ def main():
                     'pairs_so_far': len(measured), 'mean_total_ms': np.mean([r['end_to_end_ms'] for r in measured])}), flush=True)
             fields = ('predictor_including_preprocess_transfer_export_ms', 'cpp_projection_and_draw_ms',
                       'end_to_end_ms', 'network_cuda_interval_ms', 'input_preparation_host_wall_ms')
-            summary = {field: statistics([r[field] for r in measured]) for field in fields}
+            summary = {field: statistics([r[field] for r in measured]) for field in fields if field in measured[0]}
             total_times = [r['end_to_end_ms'] for r in measured]
             cpu_seconds=time.process_time()-measured_cpu
             process_wall=time.perf_counter()-measured_wall
@@ -202,6 +203,7 @@ def main():
                 measured_pairs=len(measured), warmup_pairs=len(bundle['samples']),
                 first_warmup_pair_ms=cold_ms, hz=1000/np.mean(total_times),
                 inverse_p95_hz=1000/np.percentile(total_times,95),
+                fraction_within_16_67_ms=float(np.mean(np.asarray(total_times)<=1000/60)),
                 fraction_within_33_33_ms=float(np.mean(np.asarray(total_times)<=1000/30)),
                 peak_cuda_allocated_mib=torch.cuda.max_memory_allocated()/1024**2,
                 peak_cuda_reserved_mib=torch.cuda.max_memory_reserved()/1024**2,
@@ -226,7 +228,8 @@ def main():
                      'joint_deg_mean_pitch_yaw_half': np.mean(joints,0).tolist(),
                      'joint_deg_max_pitch_yaw_half': np.max(joints,0).tolist()}
         result = {'completed': True, 'completed_utc':datetime.now(timezone.utc).isoformat(), 'gpu': name, 'gpu_before': gpu_before, 'gpu_after': gpu_snapshot(),
-            'inference_backend': args.inference_backend,
+            'inference_backend': args.inference_backend,'timing_detail':args.timing_detail,
+            'cuda_fusions':list(getattr(predictor,'cuda_fusions',())),
             'execution_mode':getattr(predictor,'execution_mode','reference'),
             'actual_execution':getattr(predictor.model,'actual_execution','reference'),
             'graph_error':getattr(predictor.model,'graph_error',None),
@@ -252,7 +255,7 @@ def main():
             import importlib
             module=importlib.import_module(predictor.model.native_module)
             result['native_library_sha256']=digest(module.__file__)
-            result['preprocess_library_sha256']=digest(importlib.import_module('stereo_libtorch').__file__)
+            result['preprocess_library_sha256']=digest(importlib.import_module(getattr(predictor,'preprocess_module','stereo_libtorch')).__file__)
             result['source_sha256'].update({str(p.relative_to(args.project)): digest(p) for p in
                 [args.project/'native/libtorch/model.cpp', args.project/'native/libtorch/model.h',
                  args.project/'native/libtorch/bindings.cpp', args.project/'native/libtorch/preprocess.cpp',

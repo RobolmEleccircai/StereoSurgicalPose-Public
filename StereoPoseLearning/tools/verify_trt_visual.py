@@ -28,6 +28,7 @@ def main():
     p.add_argument('--candidate-config',type=Path)
     p.add_argument('--output',type=Path,required=True)
     p.add_argument('--truth',type=Path,help='Optional hash-matched label values, used only after inference')
+    p.add_argument('--overlay-library',type=Path)
     a=p.parse_args()
     if a.output.exists():raise FileExistsError(a.output)
     a.output.mkdir(parents=True)
@@ -69,7 +70,8 @@ def main():
             pred0=original(frame,row['calibration']);pred1=accelerated(frame,row['calibration'])
             inputs=original._preprocess(frame,row['calibration']);hires=original._hires
             v0,h0,d0=original.model.engine.forward(*inputs,h0,hires,True)
-            v1,h1,d1=accelerated.model.engine.forward(*inputs,h1,hires,True)
+            candidate_inputs=accelerated._preprocess(frame,row['calibration'])
+            v1,h1,d1=accelerated.model.engine.forward(*candidate_inputs,h1,accelerated._hires,True)
             for name in ('spatial','mask_logits','heatmap_logits','landmark_uv','hidden'):
                 t0,t1=(h0,h1) if name=='hidden' else (d0[name],d1[name])
                 diff=(t1-t0).float()
@@ -86,14 +88,20 @@ def main():
             record={'sequence_id':row['sequence_id'],'category':row['category'],'frame_index':row['frame_index'],
                 'joint_deg':np.rad2deg(np.abs(x[14:]-y[14:])).tolist(),
                 'original_values17':x.tolist(),'tensorrt_values17':y.tolist(),
-                'C_mm':[],'tip_mm':[],'hinge_mm':[],'rotation_deg':[],'point_projection_px':[]}
+                'C_mm':[],'tip_mm':[],'hinge_mm':[],'midpoint_mm':[],'axis_deg':[],
+                'rotation_deg':[],'jaw_rotation_deg':[],'point_projection_px':[],
+                'hidden_max_abs':float((original.hidden-accelerated.hidden).abs().max()),
+                'hidden_per_state_max_abs':(original.hidden-accelerated.hidden).abs().amax(dim=(1,2)).cpu().tolist()}
             for eye in ('left','right'):
+                record['midpoint_mm'].append(float(np.linalg.norm(xx[eye]['T']-yy[eye]['T'])))
+                record['axis_deg'].append(float(np.rad2deg(np.arctan2(np.linalg.norm(np.cross(xx[eye]['d'],yy[eye]['d'])),np.dot(xx[eye]['d'],yy[eye]['d'])))))
+                record['jaw_rotation_deg'].extend(float(np.rad2deg(Rotation.from_matrix(xx[eye][k].T@yy[eye][k]).magnitude())) for k in ('R_jaw1','R_jaw2'))
                 record['C_mm'].append(float(np.linalg.norm(xx[eye]['C']-yy[eye]['C'])))
                 record['tip_mm'].extend(float(np.linalg.norm(xx[eye][k]-yy[eye][k])) for k in ('J1','J2'))
                 record['hinge_mm'].extend(float(np.linalg.norm(xx[eye][k]-yy[eye][k])) for k in ('H1','H2'))
                 record['rotation_deg'].append(float(np.rad2deg(Rotation.from_matrix(xx[eye]['R_shaft'].T@yy[eye]['R_shaft']).magnitude())))
                 # Independent distorted projection of all five physical/reference points.
-                for key in ('C','H1','H2','J1','J2'):
+                for key in ('C','H1','H2','J1','J2','T'):
                     camera=row['calibration'][eye]
                     u0=project_points(xx[eye][key][None],camera['K'],camera['D'])[0]
                     u1=project_points(yy[eye][key][None],camera['K'],camera['D'])[0]
@@ -103,14 +111,29 @@ def main():
             record['mask_iou']=float((m0&m1).sum()/((m0|m1).sum().clamp_min(1)))
             if truth:
                 record['task_error']={}
+                tv=[]
+                for eye in ('left','right'):
+                    tv.extend(truth['eyes'][eye]['C'])
+                    tv.extend(Rotation.from_matrix(np.asarray(truth['eyes'][eye]['shaft_transform'])[:3,:3]).as_quat())
+                tv.extend(truth['joints']);td=decode(tv,original.instrument_model)
                 for name,value,decoded in (('original',x,xx),('tensorrt',y,yy)):
                     record['task_error'][name]={
                         'C_mm':[float(np.linalg.norm(decoded[e]['C']-truth['eyes'][e]['C'])) for e in ('left','right')],
                         'tip_mm':[float(np.linalg.norm(decoded[e][k]-truth['eyes'][e][k])) for e in ('left','right') for k in ('J1','J2')],
-                        'joint_deg':np.rad2deg(np.abs(value[14:]-truth['joints'])).tolist()}
+                        'joint_deg':np.rad2deg(np.abs(value[14:]-truth['joints'])).tolist(),
+                        'hinge_mm':[float(np.linalg.norm(decoded[e][k]-td[e][k])) for e in ('left','right') for k in ('H1','H2')],
+                        'midpoint_mm':[float(np.linalg.norm(decoded[e]['T']-(np.asarray(truth['eyes'][e]['J1'])+truth['eyes'][e]['J2'])/2)) for e in ('left','right')],
+                        'rotation_deg':[float(np.rad2deg(Rotation.from_matrix(td[e]['R_shaft'].T@decoded[e]['R_shaft']).magnitude())) for e in ('left','right')],
+                        'jaw_rotation_deg':[float(np.rad2deg(Rotation.from_matrix(td[e][k].T@decoded[e][k]).magnitude())) for e in ('left','right') for k in ('R_jaw1','R_jaw2')],
+                        'axis_deg':[float(np.rad2deg(np.arctan2(np.linalg.norm(np.cross(td[e]['d'],decoded[e]['d'])),np.dot(td[e]['d'],decoded[e]['d'])))) for e in ('left','right')]}
+                    record['task_error'][name]['projection_px']=[float(np.linalg.norm(
+                        project_points(decoded[e][k][None],row['calibration'][e]['K'],row['calibration'][e]['D'])[0]-
+                        project_points((np.asarray(truth['eyes'][e][k]) if k in ('C','J1','J2') else td[e][k])[None],row['calibration'][e]['K'],row['calibration'][e]['D'])[0]))
+                        for e in ('left','right') for k in ('C','H1','H2','J1','J2','T')]
+
             rows.append(record)
             key=json.dumps(row['calibration'],sort_keys=True)
-            if key not in overlays:overlays[key]=CppStereoOverlay(original.instrument_model,row['calibration'],display_mode='vectors')
+            if key not in overlays:overlays[key]=CppStereoOverlay(original.instrument_model,row['calibration'],display_mode='vectors',library=a.overlay_library)
             if row['category'] not in previews:
                 im0,_=overlays[key].render(frame,PosePrediction(frame.frame_id,frame.timestamp_ns,x))
                 im1,_=overlays[key].render(frame,PosePrediction(frame.frame_id,frame.timestamp_ns,y))
@@ -120,14 +143,14 @@ def main():
             previous=row['sequence_id']
     for overlay in overlays.values():overlay.close()
     summary={name:stats([v for r in rows for v in r[name]]) for name in
-             ('C_mm','tip_mm','hinge_mm','rotation_deg','point_projection_px')}
+             ('C_mm','tip_mm','hinge_mm','midpoint_mm','axis_deg','rotation_deg','jaw_rotation_deg','point_projection_px')}
     joint=np.asarray([r['joint_deg'] for r in rows])
     summary['joint_deg']={n:stats(joint[:,i]) for i,n in enumerate(('pitch','yaw','jaw_half'))}
     summary['mask_iou']=stats([r['mask_iou'] for r in rows])
     # Engineering conversion tolerances, not scientific model accuracy targets.
     limits={'position_max_mm':.1,'rotation_max_deg':.1,'joint_max_deg':.1,'projection_max_px':.25}
-    passed=(max(summary[k]['max'] for k in ('C_mm','tip_mm','hinge_mm'))<=limits['position_max_mm'] and
-            summary['rotation_deg']['max']<=limits['rotation_max_deg'] and
+    passed=(max(summary[k]['max'] for k in ('C_mm','tip_mm','hinge_mm','midpoint_mm'))<=limits['position_max_mm'] and
+            max(summary[k]['max'] for k in ('rotation_deg','jaw_rotation_deg','axis_deg'))<=limits['rotation_max_deg'] and
             joint.max()<=limits['joint_max_deg'] and summary['point_projection_px']['max']<=limits['projection_max_px'])
     for r in layers.values():
         r['rms_mean']=float(np.mean(r.pop('rms')))
@@ -143,11 +166,18 @@ def main():
         'preview_layout':'top: original; bottom: TensorRT; each row left/right stereo',
         'previews':previews,'per_category':{c:{k:stats([v for r in rows if r['category']==c for v in r[k]]) for k in
            ('C_mm','tip_mm','joint_deg','point_projection_px')} for c in previews}}
+    all_metrics=('C_mm','tip_mm','hinge_mm','midpoint_mm','axis_deg','rotation_deg','jaw_rotation_deg','point_projection_px')
+    for category in previews:
+        selected=[r for r in rows if r['category']==category]
+        result['per_category'][category]={k:stats([v for r in selected for v in r[k]]) for k in all_metrics}
+        result['per_category'][category]['joint_deg']={n:stats([r['joint_deg'][i] for r in selected]) for i,n in enumerate(('pitch','yaw','jaw_half'))}
+    result['values17_difference']={scope:[stats(np.abs(np.asarray([r['original_values17'] for r in rows if scope=='all' or r['category']==scope])-np.asarray([r['tensorrt_values17'] for r in rows if scope=='all' or r['category']==scope]))[:,i]) for i in range(17)] for scope in ['all']+list(previews)}
+    result['hidden_difference']={scope:{n:stats([r['hidden_per_state_max_abs'][i] for r in rows if scope=='all' or r['category']==scope]) for i,n in enumerate(('body','wrist','jaw'))} for scope in ['all']+list(previews)}
     if truths:
         result['accuracy_vs_ground_truth']={}
         for name in ('original','tensorrt'):
             result['accuracy_vs_ground_truth'][name]={
-                k:stats([v for r in rows for v in r['task_error'][name][k]]) for k in ('C_mm','tip_mm')}
+                k:stats([v for r in rows for v in r['task_error'][name][k]]) for k in ('C_mm','tip_mm','hinge_mm','midpoint_mm','rotation_deg','jaw_rotation_deg','axis_deg','projection_px')}
             result['accuracy_vs_ground_truth'][name]['joint_deg']={
                 n:stats([r['task_error'][name]['joint_deg'][i] for r in rows])
                 for i,n in enumerate(('pitch','yaw','jaw_half'))}
@@ -157,9 +187,9 @@ def main():
         for category in ['all']+sorted({r['category'] for r in rows}):
             selected=[r for r in rows if category=='all' or r['category']==category]
             comparison={}
-            for metric in ('C_mm','tip_mm','pitch_deg','yaw_deg','jaw_half_deg'):
+            for metric in ('C_mm','tip_mm','hinge_mm','midpoint_mm','rotation_deg','jaw_rotation_deg','axis_deg','pitch_deg','yaw_deg','jaw_half_deg'):
                 def errors(name):
-                    if metric.endswith('_mm'):return [v for r in selected for v in r['task_error'][name][metric]]
+                    if metric not in ('pitch_deg','yaw_deg','jaw_half_deg'):return [v for r in selected for v in r['task_error'][name][metric]]
                     index=('pitch_deg','yaw_deg','jaw_half_deg').index(metric)
                     return [r['task_error'][name]['joint_deg'][index] for r in selected]
                 base=stats(errors('original'));cand=stats(errors('tensorrt'))
@@ -169,6 +199,9 @@ def main():
         result['truth_accuracy_comparison']=comparisons
         result['passed_truth_accuracy']=all(m['passed'] for c in comparisons.values() for m in c.values())
         passed=passed and result['passed_truth_accuracy']
+    result['values17_max_abs_per_field']=np.abs(np.asarray([r['original_values17'] for r in rows])-np.asarray([r['tensorrt_values17'] for r in rows])).max(0).tolist()
+    result['hidden_max_abs']=max(r['hidden_max_abs'] for r in rows)
+    result['derived_truth_note']='Hinges and jaw rotations use label shaft poses/joints and the fixed CAD kinematics; C/J1/J2 use saved labels. Not image-estimated ground truth.'
     (a.output/'report.json').write_text(json.dumps(result,indent=2)+'\n')
     (a.output/'frames.jsonl').write_text(''.join(json.dumps(r)+'\n' for r in rows))
     print(json.dumps(result,indent=2),flush=True)

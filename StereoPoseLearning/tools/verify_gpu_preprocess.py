@@ -14,6 +14,8 @@ def main():
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--inputs',type=Path,required=True)
     parser.add_argument('--output',type=Path,required=True)
+    parser.add_argument('--baseline-config',type=Path)
+    parser.add_argument('--candidate-config',type=Path)
     args=parser.parse_args()
     project=Path(__file__).resolve().parents[1]
     sys.path.insert(0,str(project));sys.path.insert(0,str(project/'reference'))
@@ -21,8 +23,12 @@ def main():
     from pose_display import StereoFrame,CppStereoOverlay
     from pose_display.decoding import decode
     torch.set_num_threads(4);torch.set_num_interop_threads(1)
-    cpu=LibTorchPredictor(args.inputs/'best_val.pt',preprocessing='cpu')
-    gpu=LibTorchPredictor(args.inputs/'best_val.pt',preprocessing='gpu')
+    from stereo_pose.libtorch_predict import build_predictor
+    def configured(path, fallback):
+        if not path:return fallback()
+        c=json.loads(path.read_text());c['_config_dir']=str(path.resolve().parent);return build_predictor(c)
+    cpu=configured(args.baseline_config,lambda:LibTorchPredictor(args.inputs/'best_val.pt',preprocessing='cpu'))
+    gpu=configured(args.candidate_config,lambda:LibTorchPredictor(args.inputs/'best_val.pt',preprocessing='gpu'))
     bundle=json.loads((args.inputs/'samples.json').read_text())
     differences={'resized_uint8':0,'normalized_fp32':0,'K':0,'D':0,'hires':0,
                  'values17':0,'hidden':0,'derived_point_mm':0,'joint_deg':0,'overlay_rgb':0}
@@ -94,7 +100,9 @@ def main():
         'maximum_differences':differences,'calibration_change_and_stream_reset_checked':True,
         'noncontiguous_inputs_and_error_recovery_checked':True,
         'checkpoint_sha256':hashlib.sha256((args.inputs/'best_val.pt').read_bytes()).hexdigest(),
-        'meaning':'Implementation equivalence to CPU preprocessing, not accuracy against ground truth.'}
+        'baseline_config':str(args.baseline_config) if args.baseline_config else 'CPU Pillow/NumPy',
+        'candidate_config':str(args.candidate_config) if args.candidate_config else 'original CUDA ATen',
+        'meaning':'Implementation equivalence to the selected baseline plus Pillow pixel checks, not accuracy against ground truth.'}
     args.output.parent.mkdir(parents=True,exist_ok=True)
     args.output.write_text(json.dumps(result,indent=2)+'\n')
     print(json.dumps(result,indent=2),flush=True)

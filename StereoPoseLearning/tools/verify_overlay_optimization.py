@@ -13,19 +13,22 @@ def main():
     p.add_argument('--inputs',type=Path,required=True)
     p.add_argument('--predictions',type=Path,required=True)
     p.add_argument('--output',type=Path,required=True)
+    p.add_argument('--baseline-library',type=Path)
+    p.add_argument('--candidate-library',type=Path)
+    p.add_argument('--require-exact',action='store_true')
     a=p.parse_args();root=Path(__file__).resolve().parents[1];sys.path.insert(0,str(root/'reference'))
     from pose_display import CppStereoOverlay,PosePrediction,StereoFrame
     model=torch.load(a.inputs/'best_val.pt',map_location='cpu',weights_only=True)['instrument_model']
     rows=json.loads((a.inputs/'samples.json').read_text())['samples']
     preds={(r['sequence_id'],r['frame_index']):r['tensorrt_values17'] for r in map(json.loads,a.predictions.read_text().splitlines())}
-    libs=[root/'reference/pose_display/native/build/libsurgical_overlay.so',root/'reference/pose_display/native/build/optimized/libsurgical_overlay.so']
+    libs=[a.baseline_library or root/'reference/pose_display/native/build/libsurgical_overlay.so',a.candidate_library or root/'reference/pose_display/native/build/optimized/libsurgical_overlay.so']
     overlays={};cases=[];previews={};rng=np.random.default_rng(101)
     a.output.mkdir(parents=True,exist_ok=False)
     try:
         for row in rows:
             key=json.dumps(row['calibration'],sort_keys=True)
             if key not in overlays:
-                overlays[key]=[CppStereoOverlay(model,row['calibration'],library=path,geometry_log=True) for path in libs]
+                overlays[key]=[CppStereoOverlay(model,row['calibration'],library=path,geometry_log=True,display_mode='vectors') for path in libs]
             pair=overlays[key]
             real=[np.asarray(Image.open(a.inputs/row['images'][eye]).convert('RGB')) for eye in ('left','right')]
             # Noise catches alpha/antialias rounding; solids catch cached-border errors.
@@ -46,7 +49,7 @@ def main():
                     filename=row['category']+'.jpg'
                     Image.fromarray(np.concatenate(images_out,axis=0)).save(a.output/filename,quality=95)
                     previews[row['category']]=filename
-        passed=max(x['max_channel_difference'] for x in cases)<=1
+        passed=max(x['max_channel_difference'] for x in cases)<=(0 if a.require_exact else 1)
         report={'passed':passed,'cases':cases,'previews':previews,
                 'max_channel_difference':max(x['max_channel_difference'] for x in cases),
                 'geometry_identical':True,'library_sha256':[hashlib.sha256(p.read_bytes()).hexdigest() for p in libs]}

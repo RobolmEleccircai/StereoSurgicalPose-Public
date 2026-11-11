@@ -45,7 +45,10 @@ def main():
     p.add_argument('--mode',choices=('measure','stages','operators'),required=True)
     p.add_argument('--rounds',type=int,default=10)
     p.add_argument('--display-mode',choices=('vectors','full'),default='vectors')
+    p.add_argument('--predictor-config',type=Path)
+    p.add_argument('--overlay-library',type=Path)
     a=p.parse_args();a.inputs=a.inputs.resolve()
+    if a.predictor_config and a.mode!='operators':raise ValueError('Configured runtime profiling uses operators mode; run benchmark_realtime --timing-detail stages for timing')
     if a.output.exists() and any(a.output.iterdir()):raise ValueError('Use a new output directory')
     a.output.mkdir(parents=True,exist_ok=True)
     project=Path(__file__).resolve().parents[1]
@@ -53,25 +56,32 @@ def main():
     native=project/'native/libtorch/build'
     if a.mode!='measure':native=native/'profile'
     sys.path.insert(0,str(native))
-    import stereo_libtorch  # choose the library before the adapter imports it
+    if not a.predictor_config:
+        import stereo_libtorch  # legacy diagnostic build
     from stereo_pose.libtorch_predict import LibTorchPredictor
     from pose_display import StereoFrame,CppStereoOverlay
     assert '4060' in torch.cuda.get_device_name(0)
     torch.set_num_threads(4);torch.set_num_interop_threads(1)
-    predictor=LibTorchPredictor(a.inputs/'best_val.pt',preprocessing='gpu')
+    if a.predictor_config:
+        import importlib
+        from stereo_pose.libtorch_predict import build_predictor
+        c=json.loads(a.predictor_config.read_text());c['_config_dir']=str(a.predictor_config.resolve().parent)
+        predictor=build_predictor(c);stereo_libtorch=importlib.import_module(predictor.model.native_module)
+    else:predictor=LibTorchPredictor(a.inputs/'best_val.pt',preprocessing='gpu')
     bundle=json.loads((a.inputs/'samples.json').read_text())
     if digest(a.inputs/'best_val.pt')!=bundle['checkpoint_sha256']:raise ValueError('Checkpoint hash mismatch')
     loaded_model_status=process_status()
     rows=[];overlays={}
-    overlay_library=project/'reference/pose_display/native/build/profile/libsurgical_overlay.so'
+    overlay_library=a.overlay_library or project/'reference/pose_display/native/build/profile/libsurgical_overlay.so'
     for r in bundle['samples']:
         images=[np.asarray(Image.open(a.inputs/r['images'][e]).convert('RGB')) for e in ('left','right')]
         frame=StereoFrame(f"{r['sequence_id']}/{r['frame_index']:06d}",r['timestamp_ns'],*images)
         key=json.dumps(r['calibration'],sort_keys=True)
         if key not in overlays:
             renderer=CppStereoOverlay(predictor.instrument_model,r['calibration'],library=overlay_library,display_mode=a.display_mode)
-            renderer._lib.sd_profile_last.argtypes=[ct.c_void_p,ct.c_void_p]
-            renderer._lib.sd_profile_last.restype=ct.c_int
+            if a.mode!='operators':
+                renderer._lib.sd_profile_last.argtypes=[ct.c_void_p,ct.c_void_p]
+                renderer._lib.sd_profile_last.restype=ct.c_int
             overlays[key]=renderer
         rows.append((r,frame,overlays[key]))
     canvas=np.empty(next(iter(overlays.values())).canvas_shape,np.uint8)
@@ -80,14 +90,17 @@ def main():
     for r,f,o in rows:
         prediction=predictor(f,r['calibration']);o.render(f,prediction,out=canvas)
     # Verify that the diagnostic renderer has not changed the canvas.
-    original_overlay=CppStereoOverlay(predictor.instrument_model,r['calibration'],display_mode=a.display_mode)
+    original_overlay=CppStereoOverlay(predictor.instrument_model,r['calibration'],display_mode=a.display_mode,library=overlay_library if a.predictor_config else None)
     expected,_=original_overlay.render(f,prediction)
     np.testing.assert_array_equal(expected,canvas);original_overlay.close()
     torch.cuda.synchronize()
     initial_status=process_status()
     common={'mode':a.mode,'display_mode':a.display_mode,'gpu':torch.cuda.get_device_name(0),'checkpoint_epoch':predictor.epoch+1,
         'checkpoint_sha256':bundle['checkpoint_sha256'],'pairs_available':len(rows),
-        'batch_size':1,'precision':'FP32 plus original FP64 C unprojection',
+        'batch_size':1,'precision':'Unchanged configured engine + FP32 downstream + FP64 C unprojection',
+        'cuda_fusions':list(getattr(predictor,'cuda_fusions',())),
+        'actual_execution':getattr(predictor.model,'actual_execution','reference'),
+        'visual_engine':getattr(predictor,'visual_engine',None),
         'library_sha256':digest(stereo_libtorch.__file__),'overlay_library_sha256':digest(overlay_library),
         'diagnostic_overlay_pixels_equal':True,'runtime':{'torch':torch.__version__,'cuda':torch.version.cuda,
         'logical_cpus':os.cpu_count(),'allowed_cpus':len(os.sched_getaffinity(0)),'torch_cpu_threads':torch.get_num_threads()},
@@ -180,12 +193,22 @@ def main():
             if counts[row[0]['sequence_id']]<2:selected.append(row)
             counts[row[0]['sequence_id']]+=1
         from torch.profiler import profile,ProfilerActivity,record_function
+        preprocessing_events=[]
+        original_prepare=predictor._prepare_inputs
+        def traced_prepare(*args,**kwargs):
+            begin=torch.cuda.Event(enable_timing=True);end=torch.cuda.Event(enable_timing=True)
+            begin.record();value=original_prepare(*args,**kwargs);end.record()
+            preprocessing_events.append((begin,end));return value
+        predictor._prepare_inputs=traced_prepare
         with profile(activities=[ProfilerActivity.CPU,ProfilerActivity.CUDA],record_shapes=True,
                      with_flops=True,profile_memory=True) as prof:
             predictor.reset()
             for r,f,o in selected:
                 with record_function('pipeline::predict'):prediction=predictor(f,r['calibration'])
                 with record_function('pipeline::draw'):o.render(f,prediction,out=canvas)
+        predictor._prepare_inputs=original_prepare
+        torch.cuda.synchronize()
+        common['profiled_preprocess_cuda_ms']=summary([a.elapsed_time(b) for a,b in preprocessing_events])
         number=len(selected)
         stages=[]
         for e in prof.key_averages():
@@ -225,6 +248,8 @@ def main():
             supported_ops_gflops_by_operator={k:v/number/1e9 for k,v in flops_by_op.items()},
             kernels_per_pair=len(kernels)/number,kernel_active_ms_per_pair=sum(e['dur'] for e in kernels)/number/1000,
             memcpy_active_ms_per_pair=sum(e['dur'] for e in copies)/number/1000,
+            kernel_names={k:{'calls_per_pair':sum(1 for e in kernels if e['name']==k)/number,
+                'gpu_ms_per_pair':sum(e['dur'] for e in kernels if e['name']==k)/number/1000} for k in sorted({e['name'] for e in kernels})},
             cuda_runtime={k:{'calls_per_pair':v['count']/number,'cpu_ms_per_pair':v['us']/number/1000} for k,v in grouped.items()},
             transfers={k:{'calls_per_pair':v['count']/number,'gpu_ms_per_pair':v['us']/number/1000,'bytes_per_pair':v['bytes']/number} for k,v in transfer_groups.items()},
             notes=['Intrusive operator profiling is separate from real latency measurement.',
