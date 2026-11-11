@@ -1,9 +1,0 @@
-{
-  "passed": true,
-  "scope": "same 63 frozen states; numerical geometry and labels only",
-  "old_runtime": "5.1.0-rc.19+release.26219.9c81211b.gl",
-  "new_runtime": "6.0.0-rc.59+release.41464.5f2772bc.gl",
-  "numeric_values_checked": 27421,
-  "maximum_absolute_error": 0.0,
-  "does_not_assert_identical_rendered_pixels": true
-}

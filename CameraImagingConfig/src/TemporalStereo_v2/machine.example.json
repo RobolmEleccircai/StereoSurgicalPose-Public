@@ -1,8 +1,8 @@
 {
   "role": "laptop",
-  "isaac_root": "~/isaacsim-5.1.0",
-  "asset_root": "~/PoseProject/CameraImagingConfig",
-  "output_root": "~/PoseProject/CameraImagingConfig/TemporalStereo_v2/runs",
+  "isaac_root": "/opt/isaacsim-5.1.0",
+  "asset_root": "../../../../assets",
+  "output_root": "../../../../outputs",
   "deps_root": ".deps",
   "expected_isaac_version": "5.1.0",
   "preview_font": null

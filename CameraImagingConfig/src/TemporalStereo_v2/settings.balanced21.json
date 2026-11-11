@@ -52,9 +52,9 @@
     "frame_fraction_threshold": 0.01
   },
   "validation_budget_scope": "temporal_v2_validation",
-  "source_scene": "ShaftTipStereo_2026-11-07/render/native/scene/sample_0000.usda",
-  "calibration": "calibration/profiles/drends_exvivo_1080.json",
-  "appearance": "CameraRefinement_2026-11-06/InitialImaging_v1/initial_parameters.json",
+  "source_scene": "scene.usdc",
+  "calibration": "calibration.json",
+  "appearance": "appearance.json",
   "occlusion_search": {
     "provenance": "Scene-specific collision-free search seeds; sampling design, not manufacturer calibration",
     "joint_names": [

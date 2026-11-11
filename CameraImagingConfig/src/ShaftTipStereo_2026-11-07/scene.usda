@@ -1,7 +1,0 @@
-#usda 1.0
-(
-    subLayers = [
-        @/home/leorobot/PoseProject/CameraImagingConfig/ShaftTipStereo_2026-11-07/scene_0000.usda@
-    ]
-)
-
