@@ -107,3 +107,4 @@ T_camera_child = T_camera_parent × T_parent_child(q)
 | landmark_consistency | 0 | 关闭早期预测热图一致性项 |
 
 `decouple_geometry=true`：关节专用几何监督使用真值杆体位姿作为锚；杆体专用监督使用真值关节角作为锚，减少两类预测互相补偿。真值只进入 loss，不进入推理模型。详见 `losses.py` 与 `test_part_losses.py`。
+

@@ -1,0 +1,32 @@
+{
+  "scope": "Public source packaging checks; no rendering, model training or new GPU benchmark.",
+  "data_inventory": {
+    "pairs": 2520,
+    "trajectories": 23,
+    "raw_rgb_images": 5040,
+    "original_trajectory_assignment": {
+      "train": 1820,
+      "validation": 350,
+      "test": 350
+    }
+  },
+  "split_policy_tests": {
+    "passed": 7
+  },
+  "training_policy_contract_tests": {
+    "passed": 10,
+    "skipped": 1,
+    "reason": "PyTorch is not installed in the local packaging interpreter"
+  },
+  "full_pytorch_suite_run": false,
+  "original_project_unchanged": true,
+  "prediction_math_and_network_unchanged": true,
+  "performance_reports_preserved": 16,
+  "all_published_performance_numeric_values_unchanged": true,
+  "public_history_target_commits": 68,
+  "new_training_results_included": false,
+  "trained_checkpoint_included": false,
+  "full_history_review": "All 68 reachable public commits reviewed; run-specific diagnostic source, document schedules and figure footer records removed.",
+  "history_commit_dates_and_messages_preserved": true,
+  "detailed_figure_revision": "Overview footer only; second PDF page unchanged; no model or performance changes."
+}
